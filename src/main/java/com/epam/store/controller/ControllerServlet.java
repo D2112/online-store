@@ -1,9 +1,8 @@
 package com.epam.store.controller;
 
-import com.epam.store.controller.action.Action;
-import com.epam.store.controller.action.ActionFactory;
-import com.epam.store.controller.action.ActionResult;
-import com.epam.store.controller.action.Context;
+import com.epam.store.action.Action;
+import com.epam.store.action.ActionFactory;
+import com.epam.store.action.ActionResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,5 +1,6 @@
-package com.epam.store;
+package com.epam.store.dao;
 
+import com.epam.store.NameFormatter;
 import com.epam.store.metadata.DBMetadataManager;
 import com.epam.store.metadata.DatabaseColumn;
 import com.epam.store.metadata.DatabaseTable;
@@ -9,18 +10,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-public class SqlQueryManager {
-    private static final String QUERY_FILE_NAME = "query.sql";
+public class SqlQueryGenerator {
+    private static final String QUERY_FILE_NAME = "query.properties";
     private static final String FIND_BY_PARAMETERS_QUERY_NAME = "FIND_BY_PARAMETERS";
     private Map<String, String> queryTemplateByName;
     private DBMetadataManager dbMetadataManager;
     private NameFormatter nameFormatter;
 
-    public SqlQueryManager(DBMetadataManager dbMetadataManager) {
+    public SqlQueryGenerator(DBMetadataManager dbMetadataManager) {
         this.dbMetadataManager = dbMetadataManager;
         nameFormatter = NameFormatter.getInstance();
         Properties queriesProperties = new Properties();
-        InputStream inputStream = SqlQueryManager.class.getClassLoader().getResourceAsStream(QUERY_FILE_NAME);
+        InputStream inputStream = SqlQueryGenerator.class.getClassLoader().getResourceAsStream(QUERY_FILE_NAME);
         try {
             queriesProperties.load(inputStream);
         } catch (IOException e) {

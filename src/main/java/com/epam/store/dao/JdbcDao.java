@@ -1,7 +1,5 @@
 package com.epam.store.dao;
 
-import com.epam.store.SqlQueryManager;
-import com.epam.store.SqlQueryType;
 import com.epam.store.dbpool.SqlPooledConnection;
 import com.epam.store.metadata.DatabaseColumn;
 import com.epam.store.metadata.DatabaseTable;
@@ -20,15 +18,15 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     private final Class<T> clazz;
     private DaoSession daoSession;
     private SqlPooledConnection connection;
-    private SqlQueryManager sqlQueryManager;
+    private SqlQueryGenerator sqlQueryGenerator;
     private EntityMetadata<T> entityMetadata;
     private DatabaseTable table;
 
-    public JdbcDao(DaoSession daoSession, Class<T> clazz, SqlQueryManager sqlQueryManager, DatabaseTable table) {
+    public JdbcDao(DaoSession daoSession, Class<T> clazz, SqlQueryGenerator sqlQueryGenerator, DatabaseTable table) {
         this.daoSession = daoSession;
         this.connection = daoSession.getConnection();
         this.table = table;
-        this.sqlQueryManager = sqlQueryManager;
+        this.sqlQueryGenerator = sqlQueryGenerator;
         this.clazz = clazz;
         this.entityMetadata = new EntityMetadata<>(clazz);
     }
@@ -36,7 +34,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     @Override
     public T insert(T object) {
         T insertedObject;
-        String insertQuery = sqlQueryManager.getQueryForClass(SqlQueryType.INSERT, clazz);
+        String insertQuery = sqlQueryGenerator.getQueryForClass(SqlQueryType.INSERT, clazz);
         try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
             prepareStatementForInsert(statement, object);
             int inserted = statement.executeUpdate();
@@ -45,7 +43,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
         } catch (SQLException exc) {
             throw new DaoException(exc);
         }
-        String readLastQuery = sqlQueryManager.getQueryForClass(SqlQueryType.READ_LAST, clazz);
+        String readLastQuery = sqlQueryGenerator.getQueryForClass(SqlQueryType.READ_LAST, clazz);
         try (PreparedStatement statement = connection.prepareStatement(readLastQuery);
              ResultSet rs = statement.executeQuery()) {
             if (!rs.next()) throw new DaoException("Last inserted ID was not found");
@@ -60,7 +58,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     @Override
     public T find(long id) {
         List<T> list;
-        String readQuery = sqlQueryManager.getQueryForClass(SqlQueryType.FIND_BY_ID, clazz);
+        String readQuery = sqlQueryGenerator.getQueryForClass(SqlQueryType.FIND_BY_ID, clazz);
         try (PreparedStatement statement = connection.prepareStatement(readQuery)) {
             statement.setLong(1, id);
             ResultSet rs = statement.executeQuery();
@@ -80,7 +78,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
 
     @Override
     public boolean update(T object) {
-        String updateQuery = sqlQueryManager.getQueryForClass(SqlQueryType.UPDATE_BY_ID, clazz);
+        String updateQuery = sqlQueryGenerator.getQueryForClass(SqlQueryType.UPDATE_BY_ID, clazz);
         try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
             prepareStatementForUpdate(statement, object);
             int updated = statement.executeUpdate();
@@ -96,7 +94,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
 
     @Override
     public boolean delete(long id) {
-        String deleteQuery = sqlQueryManager.getQueryForClass(SqlQueryType.DELETE_BY_ID, clazz);
+        String deleteQuery = sqlQueryGenerator.getQueryForClass(SqlQueryType.DELETE_BY_ID, clazz);
         try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
             statement.setLong(1, id);
             T entityToDelete = find(id);
@@ -117,7 +115,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     @Override
     public List<T> findAll() {
         List<T> list;
-        String readAllQuery = sqlQueryManager.getQueryForClass(SqlQueryType.READ_ALL, clazz);
+        String readAllQuery = sqlQueryGenerator.getQueryForClass(SqlQueryType.READ_ALL, clazz);
         try (PreparedStatement statement = connection.prepareStatement(readAllQuery);
              ResultSet rs = statement.executeQuery()) {
 
@@ -131,7 +129,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     @Override
     public List<T> findByParameters(Map<String, Object> parameters) {
         List<T> list;
-        String searchQuery = sqlQueryManager.getFindByParametersQuery(clazz, parameters.keySet());
+        String searchQuery = sqlQueryGenerator.getFindByParametersQuery(clazz, parameters.keySet());
         try (PreparedStatement statement = connection.prepareStatement(searchQuery)) {
             int index = 1;
             for (Object obj : parameters.values()) {
@@ -224,6 +222,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
         return dao.find(dependencyEntityID);
     }
 
+    @SuppressWarnings("unchecked")
     private BaseEntity insertDependency(String fieldName, Object entityToInsert) {
         Class<T> type = entityMetadata.getFieldType(fieldName);
         Dao dao = daoSession.getDao(type);

@@ -3,6 +3,7 @@ package com.epam.store;
 import com.epam.store.dao.DaoFactory;
 import com.epam.store.dao.DaoSession;
 import com.epam.store.dao.JdbcDaoFactory;
+import com.epam.store.dao.SqlQueryGenerator;
 import com.epam.store.dbpool.ConnectionPool;
 import com.epam.store.dbpool.SqlConnectionPool;
 import com.epam.store.dbpool.SqlPooledConnection;
@@ -28,9 +29,9 @@ public class Test {
         ConnectionPool connectionPool = new SqlConnectionPool();
         SqlPooledConnection connection = connectionPool.getConnection();
         DBMetadataManager dbMetadataManager = new DBMetadataManager(connection.getMetaData());
-        SqlQueryManager sqlQueryManager = new SqlQueryManager(dbMetadataManager);
+        SqlQueryGenerator sqlQueryGenerator = new SqlQueryGenerator(dbMetadataManager);
 
-        DaoFactory daoFactory = new JdbcDaoFactory(connectionPool, sqlQueryManager);
+        DaoFactory daoFactory = new JdbcDaoFactory(connectionPool, sqlQueryGenerator);
         DaoSession daoSession = daoFactory.getDaoSession();
 
         Product bread = new Product();
@@ -45,7 +46,7 @@ public class Test {
 
         bread.setAttributes(attributeList);
 
-        ProductService productService = new ProductService(daoFactory, sqlQueryManager);
+        ProductService productService = new ProductService(daoFactory, sqlQueryGenerator);
         productService.addProduct(bread);
 
         List<Product> food = productService.getProductsForCategory("food");

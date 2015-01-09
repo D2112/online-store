@@ -1,7 +1,7 @@
 package com.epam.store.service;
 
-import com.epam.store.SqlQueryManager;
-import com.epam.store.SqlQueryType;
+import com.epam.store.dao.SqlQueryGenerator;
+import com.epam.store.dao.SqlQueryType;
 import com.epam.store.dao.Dao;
 import com.epam.store.dao.DaoFactory;
 import com.epam.store.dao.DaoSession;
@@ -20,11 +20,11 @@ import java.util.List;
 
 class AttributeService {
     private DaoFactory daoFactory;
-    private SqlQueryManager sqlQueryManager;
+    private SqlQueryGenerator sqlQueryGenerator;
     private List<Class> attributeClasses;
 
-    public AttributeService(DaoFactory daoFactory, SqlQueryManager sqlQueryManager) {
-        this.sqlQueryManager = sqlQueryManager;
+    public AttributeService(DaoFactory daoFactory, SqlQueryGenerator sqlQueryGenerator) {
+        this.sqlQueryGenerator = sqlQueryGenerator;
         this.daoFactory = daoFactory;
 
         attributeClasses = new ArrayList<>();
@@ -42,7 +42,7 @@ class AttributeService {
             for (Attribute attribute : attributeList) {
                 EntityMetadata attributeMetadata = new EntityMetadata(attribute.getClass());
                 Attribute inserted = attributeDao.insert(attribute);
-                String insertAttributeQuery = sqlQueryManager.getQueryForClass(SqlQueryType.INSERT, attribute.getClass());
+                String insertAttributeQuery = sqlQueryGenerator.getQueryForClass(SqlQueryType.INSERT, attribute.getClass());
                 long attributeID = inserted.getId();
                 try (PreparedStatement statement = connection.prepareStatement(insertAttributeQuery)) {
                     statement.setLong(1, attributeID);
@@ -62,7 +62,7 @@ class AttributeService {
         List<Attribute> attributeList = new ArrayList<>();
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             for (Class attributeClass : attributeClasses) {
-                String sqlQuery = sqlQueryManager.getFindByParameterQuery(attributeClass, "PRODUCT_ID");
+                String sqlQuery = sqlQueryGenerator.getFindByParameterQuery(attributeClass, "PRODUCT_ID");
                 List attributesOfConcreteClass = getAttributesOfConcreteClass(productID, sqlQuery, attributeClass, daoSession.getConnection());
                 attributeList.addAll(attributesOfConcreteClass);
             }
@@ -95,7 +95,7 @@ class AttributeService {
     }
 
     private String readAttributeName(long attributeID, SqlPooledConnection connection) {
-        String sqlQuery = sqlQueryManager.getQueryForClass(SqlQueryType.FIND_BY_ID, Attribute.class);
+        String sqlQuery = sqlQueryGenerator.getQueryForClass(SqlQueryType.FIND_BY_ID, Attribute.class);
         String attributeName = null;
         try (PreparedStatement statement = connection.prepareStatement(sqlQuery)) {
             statement.setLong(1, attributeID);

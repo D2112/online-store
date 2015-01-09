@@ -1,4 +1,4 @@
-package com.epam.store.controller.action;
+package com.epam.store.action;
 
 public class ActionResult {
     private String page;

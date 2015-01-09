@@ -1,4 +1,4 @@
-package com.epam.store;
+package com.epam.store.dao;
 
 public enum SqlQueryType {
     INSERT,

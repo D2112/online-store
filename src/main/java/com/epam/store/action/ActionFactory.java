@@ -1,4 +1,6 @@
-package com.epam.store.controller.action;
+package com.epam.store.action;
+
+import com.epam.store.controller.Context;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +20,7 @@ public class ActionFactory {
         actions.put("GET/signup", new ShowPageAction("signup"));
         actions.put("GET/registration", new ShowPageAction("registration"));
         actions.put("POST/registration", new RegistrationAction());
+        actions.put("POST/signup", new LoginAction());
     }
 
     public Action getAction(Context context) {

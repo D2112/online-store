@@ -1,25 +1,20 @@
 package com.epam.store.dao;
 
-import com.epam.store.SqlQueryManager;
 import com.epam.store.dbpool.ConnectionPool;
 import com.epam.store.dbpool.SqlPooledConnection;
 import com.epam.store.metadata.DBMetadataManager;
 import com.epam.store.model.BaseEntity;
 
-import java.sql.SQLException;
-
 public class JdbcDaoFactory implements DaoFactory {
     private ConnectionPool connectionPool;
     private DBMetadataManager dbMetadataManager;
-    private SqlQueryManager sqlQueryManager;
+    private SqlQueryGenerator sqlQueryGenerator;
 
-    public JdbcDaoFactory(ConnectionPool connectionPool, SqlQueryManager sqlQueryManager) {
+    public JdbcDaoFactory(ConnectionPool connectionPool, SqlQueryGenerator sqlQueryGenerator) {
         this.connectionPool = connectionPool;
-        this.sqlQueryManager = sqlQueryManager;
+        this.sqlQueryGenerator = sqlQueryGenerator;
         try (SqlPooledConnection connection = connectionPool.getConnection()) {
             dbMetadataManager = new DBMetadataManager(connection.getMetaData());
-        } catch (SQLException e) {
-            throw new DaoException(e);
         }
     }
 
@@ -38,7 +33,7 @@ public class JdbcDaoFactory implements DaoFactory {
         @SuppressWarnings("unchecked")
         public <T extends BaseEntity> Dao<T> getDao(Class<T> clazz) {
             return new JdbcDao<>
-                    (this, clazz, sqlQueryManager, dbMetadataManager.getTableForClass(clazz));
+                    (this, clazz, sqlQueryGenerator, dbMetadataManager.getTableForClass(clazz));
         }
 
         @Override

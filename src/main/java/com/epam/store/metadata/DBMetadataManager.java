@@ -17,7 +17,7 @@ public class DBMetadataManager {
     private Map<Class, DatabaseTable> tables;
     private NameFormatter nameFormatter;
 
-    public DBMetadataManager(DatabaseMetaData databaseMetaData) throws SQLException {
+    public DBMetadataManager(DatabaseMetaData databaseMetaData) {
         nameFormatter = NameFormatter.getInstance();
         tables = new HashMap<>();
         columnNamesByTableName = getColumnsByTableNameMap(databaseMetaData);
@@ -48,19 +48,23 @@ public class DBMetadataManager {
         return columnsList;
     }
 
-    private Map<String, List<String>> getColumnsByTableNameMap(DatabaseMetaData databaseMetaData) throws SQLException {
+    private Map<String, List<String>> getColumnsByTableNameMap(DatabaseMetaData databaseMetaData) {
         Map<String, List<String>> columnsByTableName = new HashMap<>();
-        ResultSet tables = databaseMetaData.getTables(null, "PUBLIC", null, null);
-        while (tables.next()) {
-            String tableName = tables.getString(3);
-            ResultSet columnsResultSet = databaseMetaData.getColumns(null, null, tableName, null);
-            List<String> columnsList = new ArrayList<>();
-            while (columnsResultSet.next()) {
-                String columnName = columnsResultSet.getString("COLUMN_NAME");
-                if (isColumnUnnecessary(tableName, columnName)) continue;
-                columnsList.add(columnName);
+        try {
+            ResultSet tables = databaseMetaData.getTables(null, "PUBLIC", null, null);
+            while (tables.next()) {
+                String tableName = tables.getString(3);
+                ResultSet columnsResultSet = databaseMetaData.getColumns(null, null, tableName, null);
+                List<String> columnsList = new ArrayList<>();
+                while (columnsResultSet.next()) {
+                    String columnName = columnsResultSet.getString("COLUMN_NAME");
+                    if (isColumnUnnecessary(tableName, columnName)) continue;
+                    columnsList.add(columnName);
+                }
+                columnsByTableName.put(tableName, columnsList);
             }
-            columnsByTableName.put(tableName, columnsList);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return columnsByTableName;
     }
