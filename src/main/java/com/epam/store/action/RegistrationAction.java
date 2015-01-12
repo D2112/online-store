@@ -2,6 +2,7 @@ package com.epam.store.action;
 
 import com.epam.store.controller.Scope;
 import com.epam.store.controller.Context;
+import com.epam.store.service.InputValidator;
 import com.epam.store.service.RegistrationService;
 
 public class RegistrationAction implements Action {
@@ -13,14 +14,25 @@ public class RegistrationAction implements Action {
         String email = context.getParameter("email");
         String password = context.getParameter("password");
         RegistrationService registrationService = context.getService(RegistrationService.class);
-        //if registration is successful
-        if (registrationService.register(name, email, password)) {
-            context.setAttribute("registerResult", email + " successfully registered", Scope.SESSION);
-        } else {
-            context.setAttribute("name", name, Scope.SESSION);
-            context.setAttribute("email", email, Scope.SESSION);
-            context.setAttribute("registerResult", "Error: " + email + " is already registered", Scope.SESSION);
-        }
+        String resultMessage = register(name, email, password, registrationService);
+        context.setAttribute("name", name, Scope.FLASH);
+        context.setAttribute("email", email, Scope.FLASH);
+        context.setAttribute("registerResult", resultMessage, Scope.FLASH);
         return registrationResult;
     }
+
+    private String register(String name, String email, String password, RegistrationService registrationService) {
+        InputValidator inputValidator = new InputValidator();
+        if (!inputValidator.isEmailValid(email)) {
+            return "Error: incorrect email";
+        }
+        if(!inputValidator.isNameValid(name)) {
+            return "Error: incorrect name";
+        }
+        if (!registrationService.register(name, email, password)) {
+            return "Error: " + email + " is already registered";
+        }
+        return (email + " successfully registered");
+    }
 }
+

@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ tag description="Writes the HTML code for inserting a filter menu."%>
 
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css"/>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/static/css/style.css"/>
 
 <div class="left_content">
     <div class="title_box">Filter Menu</div>

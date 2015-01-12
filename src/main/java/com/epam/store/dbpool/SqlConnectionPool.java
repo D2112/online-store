@@ -12,11 +12,11 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class SqlConnectionPool extends ConnectionPool {
+public class SqlConnectionPool implements ConnectionPool {
     private static final Logger log = LoggerFactory.getLogger(SqlConnectionPool.class);
     private Queue<PooledConnection> availableConnections;
-    private ConnectionPoolConfig config;
     private int usedConnectionsAmount;
+    private ConnectionPoolConfig config;
     private Lock lock;
     private Condition hasAvailableConnection;
 
@@ -58,6 +58,20 @@ public class SqlConnectionPool extends ConnectionPool {
         } finally {
             lock.unlock();
         }
+    }
+
+    public void shutdown() {
+        try {
+            for (PooledConnection pooledConnection : availableConnections) {
+                pooledConnection.getConnection().close();
+            }
+        } catch (SQLException e) {
+            String errorMessage = "Sql exception while closing connection during shutdown pool";
+            log.error(errorMessage);
+            throw new PoolException(errorMessage, e);
+        }
+        log.info("The connection pool closed successfully. " +
+                "{} connections have been closed", availableConnections.size());
     }
 
     private PooledConnection getAvailableConnection() {

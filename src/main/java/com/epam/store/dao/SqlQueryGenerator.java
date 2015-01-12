@@ -21,11 +21,10 @@ public class SqlQueryGenerator {
         this.dbMetadataManager = dbMetadataManager;
         nameFormatter = NameFormatter.getInstance();
         Properties queriesProperties = new Properties();
-        InputStream inputStream = SqlQueryGenerator.class.getClassLoader().getResourceAsStream(QUERY_FILE_NAME);
-        try {
+        try (InputStream inputStream = SqlQueryGenerator.class.getClassLoader().getResourceAsStream(QUERY_FILE_NAME)) {
             queriesProperties.load(inputStream);
         } catch (IOException e) {
-            throw new RuntimeException("Error reading sql query file", e);
+            throw new DaoException("Error reading sql query file", e);
         }
         queryTemplateByName = new HashMap<>();
         for (SqlQueryType type : SqlQueryType.values()) {

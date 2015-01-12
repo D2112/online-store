@@ -8,10 +8,7 @@ import com.epam.store.dbpool.ConnectionPool;
 import com.epam.store.dbpool.SqlConnectionPool;
 import com.epam.store.dbpool.SqlPooledConnection;
 import com.epam.store.metadata.DBMetadataManager;
-import com.epam.store.model.Attribute;
-import com.epam.store.model.Price;
-import com.epam.store.model.Product;
-import com.epam.store.model.StringAttribute;
+import com.epam.store.model.*;
 import com.epam.store.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +33,7 @@ public class Test {
 
         Product bread = new Product();
         bread.setName("Pitt's bread");
-        bread.setCategory("Food");
+        bread.setCategory(new Category("Food"));
         bread.setPrice(new Price(new BigDecimal("43")));
 
         List<Attribute> attributeList = new ArrayList<>();

@@ -3,6 +3,5 @@
 <html>
 <head></head>
 <body>
-<c:redirect url="/do/"/>
 </body>
 </html>

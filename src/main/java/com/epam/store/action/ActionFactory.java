@@ -15,15 +15,15 @@ public class ActionFactory {
 
     private ActionFactory() {
         actions = new HashMap<>();
-        actions.put("GET/", new ShowPageAction("home"));
-        actions.put("GET/home", new ShowPageAction("home"));
-        actions.put("GET/signup", new ShowPageAction("signup"));
+        actions.put("GET/", new ShowPageAction("catalog"));
+        actions.put("GET/catalog", new ShowProductsAction());
+        actions.put("GET/login", new ShowPageAction("login"));
         actions.put("GET/registration", new ShowPageAction("registration"));
         actions.put("POST/registration", new RegistrationAction());
-        actions.put("POST/signup", new LoginAction());
+        actions.put("POST/login", new LoginAction());
     }
 
     public Action getAction(Context context) {
-        return actions.get(context.getRequestedPage());
+        return actions.get(context.getRequestedAction());
     }
 }

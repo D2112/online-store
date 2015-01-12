@@ -12,4 +12,8 @@ public class PoolException extends RuntimeException {
     public PoolException(Throwable cause) {
         super(cause);
     }
+
+    public PoolException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

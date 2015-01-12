@@ -1,5 +1,6 @@
 package com.epam.store.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,14 @@ public class Cart extends BaseEntity {
 
     public int productAmount() {
         return products.size();
+    }
+
+    public BigDecimal getTotalPrice() {
+        BigDecimal totalPrice = new BigDecimal(0);
+        for (Product product : products) {
+            totalPrice.add(product.getPrice().getValue());
+            totalPrice.plus();
+        }
     }
 
     @Override

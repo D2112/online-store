@@ -1,4 +1,4 @@
-package com.epam.store.controller.listener;
+package com.epam.store.listener;
 
 import com.epam.store.dao.SqlQueryGenerator;
 import com.epam.store.dao.DaoFactory;
@@ -17,20 +17,25 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
+@WebListener
 public class MyServletContextListener implements ServletContextListener {
     private static final Logger log = LoggerFactory.getLogger(MyServletContextListener.class);
+    private ConnectionPool connectionPool;
 
     @Override
     public void contextInitialized(ServletContextEvent arg) {
         ServletContext servletContext = arg.getServletContext();
-        ConnectionPool connectionPool = new SqlConnectionPool();
-        SqlPooledConnection connection = connectionPool.getConnection();
-        DBMetadataManager dbMetadataManager = new DBMetadataManager(connection.getMetaData());
+        connectionPool = new SqlConnectionPool();
+        DBMetadataManager dbMetadataManager;
+        try (SqlPooledConnection connection = connectionPool.getConnection()) {
+            dbMetadataManager = new DBMetadataManager(connection.getMetaData());
+        }
         SqlQueryGenerator sqlQueryGenerator = new SqlQueryGenerator(dbMetadataManager);
         DaoFactory daoFactory = new JdbcDaoFactory(connectionPool, sqlQueryGenerator);
 
-        //set services to servlet context, the class name is used as a attribute name
+        //set services to servlet context, the class name is used as an attribute name
         servletContext.setAttribute(ProductService.class.getSimpleName(), new ProductService(daoFactory, sqlQueryGenerator));
         servletContext.setAttribute(UserService.class.getSimpleName(), new UserService(daoFactory));
         servletContext.setAttribute(RegistrationService.class.getSimpleName(), new RegistrationService(daoFactory));
@@ -39,6 +44,6 @@ public class MyServletContextListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent arg) {
-        log.info("contextDestroyed...");
+        connectionPool.shutdown();
     }
 }
