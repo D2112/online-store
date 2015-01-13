@@ -3,8 +3,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="page" tagdir="/WEB-INF/tags" %>
 
-<jsp:useBean id="date" class="java.util.Date" />
-
 <html>
 <head>
     <title>Tools Shop</title>

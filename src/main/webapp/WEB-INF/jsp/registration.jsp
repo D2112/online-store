@@ -1,9 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<c:set var="name" value="name"/>
-<c:set var="email" value="email"/>
-
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/static/css/registration-style.css"/>
 
 <html>
@@ -12,13 +9,13 @@
     <h1>Registration</h1>
     <hr>
     <form action="registration" method="post">
-        <input type="text" name="name" placeholder="Name" value="<c:out value="${requestScope.get(name)}"/>" required/>
-        <input type="text" name="email" placeholder="Email" value="<c:out value="${requestScope.get(email)}"/>" required/>
+        <input type="text" name="name" placeholder="Name" value="<c:out value="${requestScope.name}"/>" required/>
+        <input type="text" name="email" placeholder="Email" value="<c:out value="${requestScope.email}"/>" required/>
         <input type="password" name="password" placeholder="Password" required/>
         <input type="password" name="passwordConfirm" placeholder="Confirm Password" required/>
         <span><button type="submit" class="button">Register</button></span>
     </form>
-    <h4><span style="color: red; ">${requestScope.get("registerResult")}</span></h4>
+    <h4><span style="color: red; ">${requestScope.registerResult}</span></h4>
 </div>
 </body>
 </html>

@@ -7,10 +7,8 @@ import com.epam.store.dbpool.ConnectionPool;
 import com.epam.store.dbpool.SqlConnectionPool;
 import com.epam.store.dbpool.SqlPooledConnection;
 import com.epam.store.metadata.DBMetadataManager;
-import com.epam.store.service.Authenticator;
-import com.epam.store.service.ProductService;
-import com.epam.store.service.RegistrationService;
-import com.epam.store.service.UserService;
+import com.epam.store.model.Category;
+import com.epam.store.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +16,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.util.List;
 
 @WebListener
 public class MyServletContextListener implements ServletContextListener {
@@ -36,14 +35,22 @@ public class MyServletContextListener implements ServletContextListener {
         DaoFactory daoFactory = new JdbcDaoFactory(connectionPool, sqlQueryGenerator);
 
         //set services to servlet context, the class name is used as an attribute name
-        servletContext.setAttribute(ProductService.class.getSimpleName(), new ProductService(daoFactory, sqlQueryGenerator));
-        servletContext.setAttribute(UserService.class.getSimpleName(), new UserService(daoFactory));
-        servletContext.setAttribute(RegistrationService.class.getSimpleName(), new RegistrationService(daoFactory));
-        servletContext.setAttribute(Authenticator.class.getSimpleName(), new Authenticator(daoFactory));
+        servletContext.setAttribute(getNameForService(ProductService.class), new ProductService(daoFactory, sqlQueryGenerator));
+        servletContext.setAttribute(getNameForService(UserService.class), new UserService(daoFactory));
+        servletContext.setAttribute(getNameForService(RegistrationService.class), new RegistrationService(daoFactory));
+        servletContext.setAttribute(getNameForService(Authenticator.class), new Authenticator(daoFactory));
+
+        List<Category> categories = new CategoryService(daoFactory).getCategories();
+        servletContext.setAttribute("categories", categories);
+
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent arg) {
         connectionPool.shutdown();
+    }
+
+    private String getNameForService(Class clazz) {
+        return clazz.getSimpleName();
     }
 }

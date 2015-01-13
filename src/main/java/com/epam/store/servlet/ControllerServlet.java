@@ -1,4 +1,4 @@
-package com.epam.store.controller;
+package com.epam.store.servlet;
 
 import com.epam.store.action.Action;
 import com.epam.store.action.ActionFactory;
@@ -27,6 +27,8 @@ public class ControllerServlet extends HttpServlet {
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Context context = new Context(req, resp);
         log.debug("Requested action: " + context.getRequestedAction());
+        log.debug("current URI: " + context.getURI());
+        log.debug("Referer: " + req.getHeader("Referer"));
         Action action = actionFactory.getAction(context);
         if (action == null) {
             log.debug("Action not found");

@@ -314,7 +314,7 @@ img.left_bt {
     padding: 6px 0 0 6px;
 }
 
-a.prod_details {
+.prod_details {
     width: 75px;
     height: 24px;
     display: block;
@@ -324,6 +324,7 @@ a.prod_details {
     text-align: center;
     line-height: 24px;
     text-decoration: none;
+    font-size: 12px;
     color: #159dcc;
 }
 
@@ -340,7 +341,7 @@ a.prod_compare {
     color: #159dcc;
 }
 
-a.prod_buy {
+.prod_buy {
     width: 75px;
     height: 24px;
     display: block;
@@ -350,6 +351,7 @@ a.prod_buy {
     text-align: center;
     line-height: 24px;
     text-decoration: none;
+    font-size: 10px;
     color: #006600;
 }
 
@@ -403,9 +405,7 @@ a.prod_buy {
     margin: 15px 0 0 0;
 }
 
-.thumbs a {
-    padding: 3px;
-}
+
 
 .prod_price_big {
     padding: 5px 0 5px 0;

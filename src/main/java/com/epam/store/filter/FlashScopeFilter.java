@@ -2,8 +2,8 @@ package com.epam.store.filter;
 
 
 
-import com.epam.store.controller.Context;
-import com.epam.store.controller.Scope;
+import com.epam.store.servlet.Context;
+import com.epam.store.servlet.Scope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +29,7 @@ public class FlashScopeFilter implements Filter {
         List<String> attributeNames = context.getAttributeNames(Scope.FLASH);
         if(attributeNames.size() > 0) {
             for (String attributeName : attributeNames) {
-                Object attribute = context.findAttribute(attributeName, Scope.FLASH);
+                Object attribute = context.getAttribute(attributeName, Scope.FLASH);
                 log.debug("Adding attribute {} from flash scope to request", attributeName);
                 context.setAttribute(attributeName, attribute, Scope.REQUEST);
                 context.removeAttribute(attributeName, Scope.FLASH);

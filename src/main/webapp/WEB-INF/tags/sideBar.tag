@@ -6,16 +6,7 @@
 <div class="right_content">
     <page:welcomeLabel user="${param.user}"/>
     <div class="border_box">
-        <div class="shopping_cart">
-            <div class="title_box">Shopping cart</div>
-            <div class="cart_details"> 3 items <br />
-                <span class="border_cart"></span> Total: <span class="value">350$</span> </div>
-            <div class="cart_icon"><a href="#"><img src="../../images/shoppingcart.png" alt="" width="35" height="35" border="0" /></a></div>
-        </div>
-        <div class="title_box">Categories</div>
-        <ul class="left_menu">
-            <li class="even"><a href="catalog?category=guitars">Guitars</a></li>
-            <li class="odd"><a href="#"></a></li>
-        </ul>
+        <page:cart cart="${sessionScope.cart}"/>
+        <page:categories categories="${applicationScope.categories}"/>
     </div>
 </div>

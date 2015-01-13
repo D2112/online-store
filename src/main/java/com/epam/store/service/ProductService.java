@@ -46,6 +46,13 @@ public class ProductService {
         return productsList;
     }
 
+    public Product getProductByID(long id) {
+        try (DaoSession daoSession = daoFactory.getDaoSession()) {
+            Dao<Product> productDao = daoSession.getDao(Product.class);
+            return productDao.find(id);
+        }
+    }
+
     public void addProduct(Product product) {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Product> productDao = daoSession.getDao(Product.class);

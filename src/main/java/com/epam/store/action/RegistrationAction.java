@@ -1,7 +1,7 @@
 package com.epam.store.action;
 
-import com.epam.store.controller.Scope;
-import com.epam.store.controller.Context;
+import com.epam.store.servlet.Scope;
+import com.epam.store.servlet.Context;
 import com.epam.store.service.InputValidator;
 import com.epam.store.service.RegistrationService;
 

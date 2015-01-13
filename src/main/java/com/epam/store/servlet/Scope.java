@@ -1,4 +1,4 @@
-package com.epam.store.controller;
+package com.epam.store.servlet;
 
 public enum Scope {
     FLASH,

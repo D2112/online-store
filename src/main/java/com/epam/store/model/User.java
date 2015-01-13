@@ -7,17 +7,14 @@ public class User extends BaseEntity {
     private String name;
     private String email;
     private Password password;
-    private List<Purchase> purchaseList;
 
     public User() {
-        purchaseList = new ArrayList<>();
     }
 
     public User(String name, String email, Password password) {
         this.name = name;
         this.email = email;
         this.password = password;
-        purchaseList = new ArrayList<>();
     }
 
     public String getName() {
@@ -44,14 +41,6 @@ public class User extends BaseEntity {
         this.password = password;
     }
 
-    public List<Purchase> getPurchaseList() {
-        return purchaseList;
-    }
-
-    public void setPurchaseList(List<Purchase> purchaseList) {
-        this.purchaseList = purchaseList;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -62,9 +51,6 @@ public class User extends BaseEntity {
         if (email != null ? !email.equals(user.email) : user.email != null) return false;
         if (name != null ? !name.equals(user.name) : user.name != null) return false;
         if (password != null ? !password.equals(user.password) : user.password != null) return false;
-        if (purchaseList != null ? !purchaseList.equals(user.purchaseList) : user.purchaseList != null)
-            return false;
-
         return true;
     }
 
@@ -73,7 +59,6 @@ public class User extends BaseEntity {
         int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (password != null ? password.hashCode() : 0);
-        result = 31 * result + (purchaseList != null ? purchaseList.hashCode() : 0);
         return result;
     }
 
@@ -83,7 +68,7 @@ public class User extends BaseEntity {
                 "name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password=" + password +
-                ", purchaseList=" + purchaseList +
+                ", purchaseList=" +
                 '}';
     }
 }

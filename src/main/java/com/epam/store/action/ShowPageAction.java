@@ -1,6 +1,6 @@
 package com.epam.store.action;
 
-import com.epam.store.controller.Context;
+import com.epam.store.servlet.Context;
 
 public class ShowPageAction implements Action {
     private ActionResult result;

@@ -4,7 +4,7 @@
 
 <div id="menu_tab">
     <ul class="menu">
-        <li><a href="home" class="nav">Home</a></li>
+        <li><a href="catalog" class="nav">Home</a></li>
         <li class="divider"></li>
         <li><a href="login" class="nav">Log In</a></li>
     </ul>

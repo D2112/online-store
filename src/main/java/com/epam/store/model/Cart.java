@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cart extends BaseEntity {
+public class Cart {
     private List<Product> products;
 
     public Cart() {
@@ -26,9 +26,9 @@ public class Cart extends BaseEntity {
     public BigDecimal getTotalPrice() {
         BigDecimal totalPrice = new BigDecimal(0);
         for (Product product : products) {
-            totalPrice.add(product.getPrice().getValue());
-            totalPrice.plus();
+            totalPrice = totalPrice.add(product.getPrice().getValue());
         }
+        return totalPrice;
     }
 
     @Override

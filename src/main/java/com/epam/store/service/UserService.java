@@ -6,6 +6,7 @@ import com.epam.store.dao.DaoSession;
 import com.epam.store.model.Purchase;
 import com.epam.store.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserService {
@@ -23,14 +24,17 @@ public class UserService {
             if (userList.size() > 1) throw new ServiceException("More than one user was found");
             if (userList.size() == 0) return null;
             user = userList.get(0);
-            user.setPurchaseList(getUserPurchaseList(user, daoSession));
         }
         return user;
     }
 
-    private List<Purchase> getUserPurchaseList(User user, DaoSession daoSession) {
-        Dao<Purchase> purchaseDao = daoSession.getDao(Purchase.class);
-        return purchaseDao.findByParameter("USER_ID", user.getId());
+    public List<Purchase> getUserPurchaseList(User user) {
+        List<Purchase> purchaseList;
+        try (DaoSession daoSession = daoFactory.getDaoSession()) {
+            Dao<Purchase> purchaseDao = daoSession.getDao(Purchase.class);
+            purchaseList = purchaseDao.findByParameter("USER_ID", user.getId());
+        }
+        return purchaseList;
     }
 
 }

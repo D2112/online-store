@@ -1,17 +1,15 @@
-package com.epam.store.controller;
+package com.epam.store.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.UnaryOperator;
 
 public class Context {
     private static final Logger log = LoggerFactory.getLogger(Context.class);
@@ -32,6 +30,10 @@ public class Context {
         return req.getParameter(parameterName);
     }
 
+    public Map<String, String[]> getParameterMap() {
+        return req.getParameterMap();
+    }
+
     public void setAttribute(String name, Object value, Scope scope) {
         switch (scope) {
             case REQUEST:
@@ -49,7 +51,7 @@ public class Context {
         }
     }
 
-    public Object findAttribute(String name, Scope scope) {
+    public Object getAttribute(String name, Scope scope) {
         Object attributeObject = null;
         switch (scope) {
             case REQUEST:
@@ -120,7 +122,25 @@ public class Context {
 
     @SuppressWarnings("unchecked")
     public <T> T getService(Class<T> serviceClass) {
-        return (T) findAttribute(serviceClass.getSimpleName(), Scope.APPLICATION);
+        return (T) getAttribute(serviceClass.getSimpleName(), Scope.APPLICATION);
+    }
+
+    public String getPreviousURI() {
+        return req.getHeader("Referer").substring(req.getContextPath().length());
+    }
+
+    public String getURI() {
+        String requestURI = req.getAttribute("javax.servlet.forward.request_uri").toString();
+        String queryString = req.getQueryString();
+        if (queryString != null) requestURI += "?" + queryString;
+        return requestURI;
+    }
+
+    public String getURIWithQueryString() {
+        String queryString = req.getQueryString();
+        String uri = getURI();
+        if (queryString != null) uri += "?" + queryString;
+        return uri;
     }
 
     private String getFlashAttributeName(String attributeName) {

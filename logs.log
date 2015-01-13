@@ -349,3 +349,6 @@ Caused by: java.io.IOException: Процесс не может получить 
 2015-01-06 01:29:32 INFO  SqlConnectionPool:41 - Connection pool is initialized successfully. Available connections: 5
 2015-01-06 01:29:43 INFO  SqlConnectionPool:41 - Connection pool is initialized successfully. Available connections: 5
 2015-01-06 01:42:28 INFO  SqlConnectionPool:41 - Connection pool is initialized successfully. Available connections: 5
+2015-01-12 23:15:29 INFO  SqlConnectionPool:41 - Connection pool is initialized successfully. Available connections: 5
+2015-01-12 23:15:42 INFO  SqlConnectionPool:41 - Connection pool is initialized successfully. Available connections: 5
+2015-01-12 23:16:56 INFO  SqlConnectionPool:41 - Connection pool is initialized successfully. Available connections: 5
