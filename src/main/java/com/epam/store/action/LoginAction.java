@@ -17,6 +17,7 @@ class LoginAction implements Action {
         Authenticator authenticator = context.getService(Authenticator.class);
         User authenticatedUser = authenticator.authenticate(email, password);
         if(authenticatedUser == null) {
+            context.setAttribute("email", email, Scope.FLASH);
             context.setAttribute("loginResult", "Error: login or password is wrong", Scope.FLASH);
             return errorResult;
         }

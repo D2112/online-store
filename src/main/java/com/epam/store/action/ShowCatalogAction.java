@@ -7,7 +7,7 @@ import com.epam.store.service.ProductService;
 
 import java.util.List;
 
-public class ShowCategoryAction implements Action {
+public class ShowCatalogAction implements Action {
     private ActionResult actionResult = new ActionResult("catalog");
 
     @Override

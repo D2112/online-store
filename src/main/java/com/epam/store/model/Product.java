@@ -19,6 +19,7 @@ public class Product extends BaseEntity {
         this.name = name;
         this.price = price;
         this.category = category;
+        this.attributes = new ArrayList<>();
     }
 
     public void setAttributes(List<Attribute> attributes) {

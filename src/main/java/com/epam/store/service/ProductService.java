@@ -15,11 +15,9 @@ import java.util.List;
 
 public class ProductService {
     private DaoFactory daoFactory;
-    private SqlQueryGenerator sqlQueryGenerator;
     private AttributeService attributeService;
 
     public ProductService(DaoFactory daoFactory, SqlQueryGenerator sqlQueryGenerator) {
-        this.sqlQueryGenerator = sqlQueryGenerator;
         this.daoFactory = daoFactory;
         attributeService = new AttributeService(daoFactory, sqlQueryGenerator);
     }
@@ -29,18 +27,11 @@ public class ProductService {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Category> categoryDao = daoSession.getDao(Category.class);
             List<Category> categories = categoryDao.findByParameter("name", category);
-            if(categories.size() == 1) {
+            if (categories.size() == 1) {
                 long categoryID = categories.get(0).getId();
                 Dao<Product> productDao = daoSession.getDao(Product.class);
                 productsList = productDao.findByParameter("Category_ID", categoryID);
-                try {
-                    for (Product product : productsList) {
-                        List<Attribute> attributesForProduct = attributeService.getAttributesForProduct(product.getId());
-                        product.setAttributes(attributesForProduct);
-                    }
-                } catch (SQLException e) {
-                    throw new ServiceException(e);
-                }
+                productsList.forEach(this::setAttributesToProduct);
             }
         }
         return productsList;
@@ -49,7 +40,9 @@ public class ProductService {
     public Product getProductByID(long id) {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Product> productDao = daoSession.getDao(Product.class);
-            return productDao.find(id);
+            Product product = productDao.find(id);
+            setAttributesToProduct(product);
+            return product;
         }
     }
 
@@ -59,5 +52,15 @@ public class ProductService {
             productDao.insert(product);
             attributeService.insertAttributes(product.getId(), product.getAttributes());
         }
+    }
+
+    private Product setAttributesToProduct(Product product) {
+        try {
+            List<Attribute> attributesForProduct = attributeService.getAttributesForProduct(product.getId());
+            product.setAttributes(attributesForProduct);
+        } catch (SQLException e) {
+            throw new ServiceException(e);
+        }
+        return product;
     }
 }

@@ -16,10 +16,11 @@ public class ActionFactory {
     private ActionFactory() {
         actions = new HashMap<>();
         actions.put("GET/", new ShowPageAction("catalog"));
-        actions.put("GET/catalog", new ShowCategoryAction());
+        actions.put("GET/catalog", new ShowCatalogAction());
         actions.put("GET/login", new ShowPageAction("login"));
         actions.put("GET/registration", new ShowPageAction("registration"));
         actions.put("GET/cart", new ShowPageAction("cart"));
+        actions.put("GET/details", new ShowProductDetailsAction());
         actions.put("POST/addToCart", new AddToCartAction());
         actions.put("POST/deleteFromCart", new DeleteFromCart());
         actions.put("POST/registration", new RegistrationAction());
