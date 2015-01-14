@@ -5,7 +5,6 @@ import com.epam.store.dao.DaoFactory;
 import com.epam.store.dao.DaoSession;
 import com.epam.store.model.Category;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryService {
@@ -17,7 +16,7 @@ public class CategoryService {
 
     public List<Category> getCategories() {
         List<Category> categoryList;
-        try(DaoSession daoSession = daoFactory.getDaoSession()) {
+        try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Category> categoryDao = daoSession.getDao(Category.class);
             categoryList = categoryDao.findAll();
         }

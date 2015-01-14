@@ -9,17 +9,13 @@ import com.epam.store.dbpool.SqlConnectionPool;
 import com.epam.store.dbpool.SqlPooledConnection;
 import com.epam.store.metadata.DBMetadataManager;
 import com.epam.store.model.*;
-import com.epam.store.service.CategoryService;
 import com.epam.store.service.ProductService;
-import org.joda.money.BigMoney;
-import org.joda.money.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.List;
 
 

@@ -1,9 +1,9 @@
 package com.epam.store.service;
 
-import com.epam.store.dao.SqlQueryGenerator;
 import com.epam.store.dao.Dao;
 import com.epam.store.dao.DaoFactory;
 import com.epam.store.dao.DaoSession;
+import com.epam.store.dao.SqlQueryGenerator;
 import com.epam.store.model.Attribute;
 import com.epam.store.model.Category;
 import com.epam.store.model.Product;

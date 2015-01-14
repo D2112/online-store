@@ -1,8 +1,5 @@
 package com.epam.store.action;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 public class ActionResult {
@@ -30,7 +27,7 @@ public class ActionResult {
     }
 
     public String getParamsQueryString() {
-        if(parameterMap == null || parameterMap.size() == 0) return "";
+        if (parameterMap == null || parameterMap.size() == 0) return "";
         StringBuilder sb = new StringBuilder();
         sb.append('?');
         int counter = 0;
@@ -41,9 +38,9 @@ public class ActionResult {
             String[] values = paramEntry.getValue();
             for (int i = 0; i < values.length; i++) {
                 sb.append(values[i]);
-                if(i != values.length - 1) sb.append('%');
+                if (i != values.length - 1) sb.append('%');
             }
-            if(counter != parameterMap.size() - 1) sb.append('&');
+            if (counter != parameterMap.size() - 1) sb.append('&');
         }
         return sb.toString();
     }

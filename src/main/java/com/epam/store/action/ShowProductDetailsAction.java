@@ -11,7 +11,7 @@ public class ShowProductDetailsAction implements Action {
     @Override
     public ActionResult execute(Context context) {
         String id = context.getParameter("id");
-        if(id != null) {
+        if (id != null) {
             ProductService productService = context.getService(ProductService.class);
             Product product = productService.getProductByID(Long.valueOf(id));
             context.setAttribute("product", product, Scope.REQUEST);

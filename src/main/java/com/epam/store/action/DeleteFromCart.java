@@ -1,8 +1,6 @@
 package com.epam.store.action;
 
 import com.epam.store.model.Cart;
-import com.epam.store.model.Product;
-import com.epam.store.service.ProductService;
 import com.epam.store.servlet.Context;
 import com.epam.store.servlet.Scope;
 import org.slf4j.Logger;

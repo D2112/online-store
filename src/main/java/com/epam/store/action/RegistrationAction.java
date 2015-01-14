@@ -1,9 +1,9 @@
 package com.epam.store.action;
 
-import com.epam.store.servlet.Scope;
-import com.epam.store.servlet.Context;
 import com.epam.store.service.InputValidator;
 import com.epam.store.service.RegistrationService;
+import com.epam.store.servlet.Context;
+import com.epam.store.servlet.Scope;
 
 public class RegistrationAction implements Action {
     private ActionResult registrationResult = new ActionResult("registration", true);
@@ -26,7 +26,7 @@ public class RegistrationAction implements Action {
         if (!inputValidator.isEmailValid(email)) {
             return "Error: incorrect email";
         }
-        if(!inputValidator.isNameValid(name)) {
+        if (!inputValidator.isNameValid(name)) {
             return "Error: incorrect name";
         }
         if (!registrationService.register(name, email, password)) {

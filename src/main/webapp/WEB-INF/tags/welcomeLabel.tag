@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ tag description="Prints user's name"%>
-<%@ attribute name="user" type="com.epam.store.model.User"%>
+<%@ tag description="Prints user's name" %>
+<%@ attribute name="user" type="com.epam.store.model.User" %>
 
 <c:choose>
     <c:when test="${empty user}">

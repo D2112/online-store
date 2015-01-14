@@ -12,5 +12,5 @@
         Total: <span class="value">${cart.totalPrice}</span>
     </div>
     <div class="cart_icon"><a href="cart"><img src="../../static/img/shoppingcart.png" alt="" width="35" height="35"
-                                            border="0"/></a></div>
+                                               border="0"/></a></div>
 </div>

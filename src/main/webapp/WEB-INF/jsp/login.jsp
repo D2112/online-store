@@ -7,9 +7,11 @@
 
 <div align="center" class="registration_box">
     <h1>Sign Up</h1>
+
     <form action="login" method="post">
         <hr>
-        <input type="text" name="email" placeholder="Email" value="<c:out value="${requestScope.get(name)}"/>" required/>
+        <input type="text" name="email" placeholder="Email" value="<c:out value="${requestScope.get(name)}"/>"
+               required/>
         <input type="password" name="password" placeholder="Password" required/>
         <button type="submit" class="button">Log In</button>
     </form>

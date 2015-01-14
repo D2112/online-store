@@ -6,7 +6,6 @@ import com.epam.store.dao.DaoSession;
 import com.epam.store.model.Purchase;
 import com.epam.store.model.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class UserService {

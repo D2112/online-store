@@ -17,7 +17,7 @@ public class Cart {
 
     public boolean removeProduct(long productID) {
         for (Product product : products) {
-            if(product.getId() == productID) {
+            if (product.getId() == productID) {
                 products.remove(product);
                 return true;
             }

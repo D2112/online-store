@@ -1,7 +1,6 @@
 package com.epam.store.filter;
 
 
-
 import com.epam.store.servlet.Context;
 import com.epam.store.servlet.Scope;
 import org.slf4j.Logger;
@@ -14,7 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebFilter(filterName = "FlashScope", servletNames = "Controller", dispatcherTypes = DispatcherType.FORWARD)
+@WebFilter(filterName = "FlashScope",
+        servletNames = {"Controller", "ErrorHandler"}, dispatcherTypes = DispatcherType.FORWARD)
 public class FlashScopeFilter implements Filter {
     private static final Logger log = LoggerFactory.getLogger(FlashScopeFilter.class);
 
@@ -27,7 +27,7 @@ public class FlashScopeFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) servletResponse;
         Context context = new Context(req, resp);
         List<String> attributeNames = context.getAttributeNames(Scope.FLASH);
-        if(attributeNames.size() > 0) {
+        if (attributeNames.size() > 0) {
             for (String attributeName : attributeNames) {
                 Object attribute = context.getAttribute(attributeName, Scope.FLASH);
                 log.debug("Adding attribute {} from flash scope to request", attributeName);
@@ -41,6 +41,7 @@ public class FlashScopeFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
 
     }
+
     public void destroy() {
 
     }

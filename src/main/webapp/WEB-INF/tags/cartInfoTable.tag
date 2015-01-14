@@ -21,7 +21,8 @@
                 <td>${product.price.value}</td>
                 <td>
                     <label>
-                        <input type="checkbox" form="deletingCheckboxes" name="productIdToDelete" value="${product.id}"/>
+                        <input type="checkbox" form="deletingCheckboxes" name="productIdToDelete"
+                               value="${product.id}"/>
                     </label>
                 </td>
             </tr>

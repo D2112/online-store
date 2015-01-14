@@ -3,8 +3,12 @@ package com.epam.store.servlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -20,6 +24,11 @@ public class Context {
     public Context(HttpServletRequest req, HttpServletResponse resp) {
         this.req = req;
         this.resp = resp;
+    }
+
+    public Context(ServletRequest servletRequest, ServletResponse servletResponse) {
+        req = (HttpServletRequest) servletRequest;
+        resp = (HttpServletResponse) servletResponse;
     }
 
     public String getRequestedAction() {
@@ -62,7 +71,7 @@ public class Context {
                 attributeObject = req.getAttribute(name);
                 break;
             case SESSION:
-                if(isSessionExist()) {
+                if (isSessionExist()) {
                     attributeObject = req.getSession().getAttribute(name);
                 }
                 break;
@@ -70,7 +79,7 @@ public class Context {
                 attributeObject = req.getServletContext().getAttribute(name);
                 break;
             case FLASH:
-                if(isSessionExist()) {
+                if (isSessionExist()) {
                     attributeObject = req.getSession().getAttribute(getFlashAttributeName(name));
                 }
                 break;
@@ -78,14 +87,13 @@ public class Context {
         return attributeObject;
     }
 
-
     public void removeAttribute(String name, Scope scope) {
         switch (scope) {
             case REQUEST:
                 req.removeAttribute(name);
                 break;
             case SESSION:
-                if(isSessionExist()) {
+                if (isSessionExist()) {
                     req.getSession().removeAttribute(name);
                 }
                 break;
@@ -93,7 +101,7 @@ public class Context {
                 req.getServletContext().removeAttribute(name);
                 break;
             case FLASH:
-                if(isSessionExist()) {
+                if (isSessionExist()) {
                     req.getSession().removeAttribute(getFlashAttributeName(name));
                 }
                 break;
@@ -107,7 +115,7 @@ public class Context {
                 attributeNames = getListFromEnumeration(req.getAttributeNames());
                 break;
             case SESSION:
-                if(isSessionExist()) {
+                if (isSessionExist()) {
                     attributeNames = getListFromEnumeration(req.getSession().getAttributeNames());
                 }
                 break;
@@ -115,13 +123,25 @@ public class Context {
                 attributeNames = getListFromEnumeration(req.getServletContext().getAttributeNames());
                 break;
             case FLASH:
-                if(isSessionExist()) {
+                if (isSessionExist()) {
                     Enumeration<String> attributeEnumeration = req.getSession().getAttributeNames();
                     attributeNames = getAttributeNamesForFlashScope(attributeEnumeration);
                 }
                 break;
         }
         return attributeNames;
+    }
+
+    public void forward(String path) throws ServletException, IOException {
+        req.getRequestDispatcher(path).forward(req, resp);
+    }
+
+    public void sendRedirect(String location) throws IOException {
+        resp.sendRedirect(location);
+    }
+
+    public String getContextPath() {
+        return req.getContextPath();
     }
 
     @SuppressWarnings("unchecked")
@@ -134,10 +154,7 @@ public class Context {
     }
 
     public String getURI() {
-        String requestURI = req.getAttribute("javax.servlet.forward.request_uri").toString();
-        String queryString = req.getQueryString();
-        if (queryString != null) requestURI += "?" + queryString;
-        return requestURI;
+        return req.getRequestURI().substring(req.getContextPath().length());
     }
 
     public String getURIWithQueryString() {

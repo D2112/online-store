@@ -405,8 +405,6 @@ a.prod_compare {
     margin: 15px 0 0 0;
 }
 
-
-
 .prod_price_big {
     padding: 5px 0 5px 0;
     font-size: 16px;
@@ -578,7 +576,7 @@ tbody tr:nth-child(even) {
 }
 
 tbody tr td:nth-child(2) {
-    text-align:center;
+    text-align: center;
 }
 
 tbody tr td:nth-child(3),

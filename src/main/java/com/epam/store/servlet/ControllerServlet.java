@@ -13,10 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(name="Controller", urlPatterns="/controller/*")
+@WebServlet(name = "Controller", urlPatterns = "/controller/*")
 public class ControllerServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(ControllerServlet.class);
     private ActionFactory actionFactory;
+    private Context context;
 
     @Override
     public void init() throws ServletException {
@@ -25,14 +26,14 @@ public class ControllerServlet extends HttpServlet {
 
     @Override
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Context context = new Context(req, resp);
+        context = new Context(req, resp);
         log.debug("Requested action: " + context.getRequestedAction());
         log.debug("current URI: " + context.getURI());
-        log.debug("Referer: " + req.getHeader("Referer"));
+        log.debug("Referrer: " + req.getHeader("Referrer"));
         Action action = actionFactory.getAction(context);
         if (action == null) {
             log.debug("Action not found");
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Not found");
+            context.forward("/ErrorHandler");
             return;
         }
         log.debug("Found action: " + action.getClass().getSimpleName());
@@ -42,12 +43,12 @@ public class ControllerServlet extends HttpServlet {
 
     private void doForwardOrRedirect(ActionResult result, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (result.isRedirect()) {
-            String location = req.getContextPath() + result.getPageName();
-            resp.sendRedirect(location);
+            String location = context.getContextPath() + result.getPageName();
+            context.sendRedirect(location);
         } else {
             String path = String.format("/WEB-INF/jsp/" + result.getPageName() + ".jsp");
             log.debug("Requested path: " + path);
-            req.getRequestDispatcher(path).forward(req, resp);
+            context.forward(path);
         }
     }
 }

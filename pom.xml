@@ -22,12 +22,8 @@
         <aeonbits.owner.version>1.0.4</aeonbits.owner.version>
     </properties>
 
+
     <dependencies>
-        <dependency>
-            <groupId>org.joda</groupId>
-            <artifactId>joda-money</artifactId>
-            <version>0.10.0</version>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

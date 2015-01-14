@@ -1,8 +1,5 @@
 package com.epam.store.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class User extends BaseEntity {
     private String name;
     private String email;
