@@ -6,10 +6,9 @@
 <div class="title_box">Categories</div>
 <ul class="left_menu">
     <c:set var="count" value="0" scope="page" />
-    <c:forEach items="${categories}" var="category">
-        <c:set var="count" value="${count + 1}" scope="page"/>
+    <c:forEach items="${categories}" var="category" varStatus="loopStatus">
         <c:choose>
-            <c:when test="${count % 2 == 0}">
+            <c:when test="${loopStatus.count % 2 == 0}">
                 <li class="odd"><a href="catalog?category=${category.name}">${category.name}</a></li>
             </c:when>
             <c:otherwise>

@@ -30,6 +30,10 @@ public class Context {
         return req.getParameter(parameterName);
     }
 
+    public String[] getParameterValues(String name) {
+        return req.getParameterValues(name);
+    }
+
     public Map<String, String[]> getParameterMap() {
         return req.getParameterMap();
     }

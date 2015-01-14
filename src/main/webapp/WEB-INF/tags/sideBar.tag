@@ -4,9 +4,9 @@
 <%@ tag description="Writes the HTML code for inserting a right side bar."%>
 
 <div class="right_content">
-    <page:welcomeLabel user="${param.user}"/>
     <div class="border_box">
-        <page:cart cart="${sessionScope.cart}"/>
+        <page:cartPreview cart="${sessionScope.cart}"/>
+        <page:welcomeLabel user="${param.user}"/>
         <page:categories categories="${applicationScope.categories}"/>
     </div>
 </div>

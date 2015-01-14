@@ -15,8 +15,18 @@ public class Cart {
         products.add(product);
     }
 
-    public boolean removeProduct(Product product) {
-        return products.remove(product);
+    public boolean removeProduct(long productID) {
+        for (Product product : products) {
+            if(product.getId() == productID) {
+                products.remove(product);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<Product> getProducts() {
+        return products;
     }
 
     public int productAmount() {

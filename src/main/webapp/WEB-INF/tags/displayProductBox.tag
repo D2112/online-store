@@ -18,7 +18,7 @@
     </div>
     <div class="prod_details_tab">
         <div>
-        <form method="POST" action="AddToCart">
+        <form method="POST" action="addToCart">
             <input type="hidden" name="id" value="${product.id}">
             <button type="submit" class="prod_buy">Add to cart</button>
         </form>
