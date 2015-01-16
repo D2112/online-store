@@ -15,6 +15,6 @@
     </form>
     <a href="registration">or register</a>
 
-    <h4><span style="color: red; ">${requestScope.get("loginResult")}</span></h4>
+    <h4><span style="color: red; ">${loginResult}</span></h4>
 
 </div>

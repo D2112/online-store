@@ -25,7 +25,6 @@ public class Context {
     public Context(HttpServletRequest req, HttpServletResponse resp) {
         this.req = req;
         this.resp = resp;
-        setDefaultEncoding();
     }
 
     public Context(ServletRequest servletRequest, ServletResponse servletResponse) {
@@ -198,14 +197,6 @@ public class Context {
         }
         attributeNames.replaceAll(s -> s.substring(FLASH_ATTRIBUTE_PREFIX.length()));
         return attributeNames;
-    }
-
-    private void setDefaultEncoding() {
-        try {
-            req.setCharacterEncoding("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            log.error("Set wrong encoding", e);
-        }
     }
 }
 

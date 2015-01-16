@@ -13,7 +13,7 @@
         <div class="product_img">
             <a href="..."> <img src="<c:out value="${imagePath}"/>" border="0"/> </a>
         </div>
-        <page:price price="${product.price.value}"/>
+        <page:price value="${product.price.value}"/>
     </div>
     <div class="prod_details_tab">
         <page:addToCartButton product="${product}"/>

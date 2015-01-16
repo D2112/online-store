@@ -17,13 +17,14 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class Test {
     private static final Logger log = LoggerFactory.getLogger(Test.class);
 
     public static void main(String[] args) throws SQLException {
-        ConnectionPool connectionPool = new SqlConnectionPool();
+/*        ConnectionPool connectionPool = new SqlConnectionPool();
         SqlPooledConnection connection = connectionPool.getConnection();
         DBMetadataManager dbMetadataManager = new DBMetadataManager(connection.getMetaData());
         SqlQueryGenerator sqlQueryGenerator = new SqlQueryGenerator(dbMetadataManager);
@@ -49,6 +50,6 @@ public class Test {
         List<Product> food = productService.getProductsForCategory("food");
         for (Product product : food) {
             System.out.println(product);
-        }
+        }*/
     }
 }

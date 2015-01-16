@@ -22,7 +22,7 @@ public class AddToCartAction implements Action {
             if (product != null) {
                 cart.addProduct(product);
                 log.debug("Added to cart: " + product.getName());
-                log.debug("Cart size: " + cart.productAmount());
+                log.debug("Cart size: " + cart.getProductAmount());
             }
         }
         return new ActionResult(context.getPreviousURI(), true);

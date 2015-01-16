@@ -29,7 +29,7 @@ public class Cart {
         return products;
     }
 
-    public int productAmount() {
+    public int getProductAmount() {
         return products.size();
     }
 
