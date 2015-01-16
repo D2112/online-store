@@ -5,7 +5,6 @@
          version="3.1">
 
     <error-page>
-        <exception-type>java.lang.Throwable</exception-type>
         <location>/ErrorHandler</location>
     </error-page>
 </web-app>

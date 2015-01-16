@@ -33,7 +33,7 @@ public class ControllerServlet extends HttpServlet {
         Action action = actionFactory.getAction(context);
         if (action == null) {
             log.debug("Action not found");
-            context.forward("/ErrorHandler");
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
         log.debug("Found action: " + action.getClass().getSimpleName());

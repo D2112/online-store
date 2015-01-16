@@ -22,7 +22,6 @@ class LoginAction implements Action {
             context.setAttribute("loginResult", "Error: login or password is wrong", Scope.FLASH);
             return errorResult;
         }
-
         context.setAttribute("user", authenticatedUser, Scope.SESSION);
         return successfulResult;
     }

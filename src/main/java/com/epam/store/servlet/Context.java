@@ -9,6 +9,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -24,11 +25,11 @@ public class Context {
     public Context(HttpServletRequest req, HttpServletResponse resp) {
         this.req = req;
         this.resp = resp;
+        setDefaultEncoding();
     }
 
     public Context(ServletRequest servletRequest, ServletResponse servletResponse) {
-        req = (HttpServletRequest) servletRequest;
-        resp = (HttpServletResponse) servletResponse;
+        this((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse);
     }
 
     public String getRequestedAction() {
@@ -197,6 +198,14 @@ public class Context {
         }
         attributeNames.replaceAll(s -> s.substring(FLASH_ATTRIBUTE_PREFIX.length()));
         return attributeNames;
+    }
+
+    private void setDefaultEncoding() {
+        try {
+            req.setCharacterEncoding("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.error("Set wrong encoding", e);
+        }
     }
 }
 

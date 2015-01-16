@@ -6,7 +6,7 @@
 <body>
 <center>
     <h1>
-        ERROR: ${requestScope.statusCode}
+        ERROR: ${statusCode}
     </h1>
 </center>
 </body>

@@ -14,9 +14,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class SqlConnectionPool implements ConnectionPool {
     private static final Logger log = LoggerFactory.getLogger(SqlConnectionPool.class);
+    private ConnectionPoolConfig config;
     private Queue<PooledConnection> availableConnections;
     private int usedConnectionsAmount;
-    private ConnectionPoolConfig config;
     private Lock lock;
     private Condition hasAvailableConnection;
 
@@ -31,7 +31,7 @@ public class SqlConnectionPool implements ConnectionPool {
             log.error("Can't find driver class ", e);
             throw new PoolException("Can't find driver class " + config.driver());
         }
-        Timer timer = new Timer("Collector Timer", true);
+        Timer timer = new Timer("Connection collector Timer", true);
         timer.schedule(new ConnectionCollector(), 0, config.connectionIdleTimeout());
 
         //initializing pool with connections
@@ -66,8 +66,8 @@ public class SqlConnectionPool implements ConnectionPool {
                 pooledConnection.getConnection().close();
             }
         } catch (SQLException e) {
-            String errorMessage = "Sql exception while closing connection during shutdown pool";
-            log.error(errorMessage);
+            String errorMessage = "Can't close connection pool";
+            log.error(errorMessage, e);
             throw new PoolException(errorMessage, e);
         }
         log.info("The connection pool closed successfully. " +
@@ -99,15 +99,15 @@ public class SqlConnectionPool implements ConnectionPool {
     }
 
     private PooledConnection createConnection() {
-        PooledConnection connection;
+        PooledConnection pooledConnection;
         try {
-            connection = new PooledConnection(
-                    DriverManager.getConnection(config.url(), config.username(), config.password()));
+            Connection connection = DriverManager.getConnection(config.url(), config.username(), config.password());
+            pooledConnection = new PooledConnection(connection);
         } catch (SQLException e) {
-            log.error("error while creating connection: " + e.getMessage(), e);
-            throw new PoolException("error while creating connection: " + e.getMessage());
+            log.error("Error while creating connection: " + e.getMessage(), e);
+            throw new PoolException("Error while creating connection: " + e.getMessage());
         }
-        return connection;
+        return pooledConnection;
     }
 
     private class PooledConnection implements SqlPooledConnection {
@@ -123,6 +123,7 @@ public class SqlConnectionPool implements ConnectionPool {
             try {
                 return connection.prepareStatement(sql);
             } catch (SQLException e) {
+                log.error("Error while getting preparedStatement from connection");
                 throw new PoolException(e);
             }
         }
@@ -132,6 +133,7 @@ public class SqlConnectionPool implements ConnectionPool {
             try {
                 return connection.getMetaData();
             } catch (SQLException e) {
+                log.error("Error while getting metadata from connection");
                 throw new PoolException(e);
             }
         }
@@ -146,6 +148,7 @@ public class SqlConnectionPool implements ConnectionPool {
             try {
                 connection.setAutoCommit(false);
             } catch (SQLException e) {
+                log.error("Error while setting connection auto-commit");
                 throw new PoolException(e);
             }
         }
@@ -155,6 +158,7 @@ public class SqlConnectionPool implements ConnectionPool {
             try {
                 connection.commit();
             } catch (SQLException e) {
+                log.error("Error while committing");
                 throw new PoolException(e);
             }
         }
