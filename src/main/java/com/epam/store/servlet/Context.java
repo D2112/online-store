@@ -25,6 +25,7 @@ public class Context {
     public Context(HttpServletRequest req, HttpServletResponse resp) {
         this.req = req;
         this.resp = resp;
+        disableCaching();
     }
 
     public Context(ServletRequest servletRequest, ServletResponse servletResponse) {
@@ -197,6 +198,12 @@ public class Context {
         }
         attributeNames.replaceAll(s -> s.substring(FLASH_ATTRIBUTE_PREFIX.length()));
         return attributeNames;
+    }
+
+    private void disableCaching() {
+        resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+        resp.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+        resp.setDateHeader("Expires", 0); // Proxies.
     }
 }
 

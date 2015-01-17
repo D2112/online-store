@@ -542,11 +542,12 @@ a.contact {
     top: 1px;
 }
 
+
 .welcome_label {
     text-align: center;
+    font-size: small;
     padding: 20px 20px 20px 20px;
 }
-
 /*--------------TABLE------------------*/
 
 table {

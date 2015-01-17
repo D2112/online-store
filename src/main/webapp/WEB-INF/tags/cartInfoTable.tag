@@ -9,7 +9,7 @@
         <th>Product</th>
         <th>Category</th>
         <th>Price</th>
-        <th>Total</th>
+        <th>Delete</th>
     </tr>
     </thead>
     <tbody>
