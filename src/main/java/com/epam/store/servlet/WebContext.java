@@ -9,31 +9,32 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class Context {
-    private static final Logger log = LoggerFactory.getLogger(Context.class);
+public class WebContext {
+    private static final Logger log = LoggerFactory.getLogger(WebContext.class);
     private static final String FLASH_ATTRIBUTE_PREFIX = "flash.";
     private HttpServletRequest req;
     private HttpServletResponse resp;
 
-    public Context(HttpServletRequest req, HttpServletResponse resp) {
+    public WebContext(HttpServletRequest req, HttpServletResponse resp) {
         this.req = req;
         this.resp = resp;
-        disableCaching();
+        //disableCaching();
     }
 
-    public Context(ServletRequest servletRequest, ServletResponse servletResponse) {
+    public WebContext(ServletRequest servletRequest, ServletResponse servletResponse) {
         this((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse);
     }
 
     public String getRequestedAction() {
-        return req.getMethod() + req.getPathInfo();
+        return req.getMethod() + "/" + getPageNameFromURN();
     }
 
     public String getParameter(String parameterName) {
@@ -151,11 +152,22 @@ public class Context {
     }
 
     public String getPreviousURI() {
-        return req.getHeader("Referer").substring(req.getContextPath().length());
+        return req.getHeader("Referer").substring(getURL().length());
+    }
+
+    public String getURL() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(req.getScheme());
+        sb.append("://");
+        sb.append(req.getServerName());
+        sb.append(":");
+        sb.append(req.getServerPort());
+        sb.append("/");
+        return sb.toString();
     }
 
     public String getURI() {
-        return req.getRequestURI().substring(req.getContextPath().length());
+        return req.getRequestURI();
     }
 
     public String getURIWithQueryString() {
@@ -163,6 +175,19 @@ public class Context {
         String uri = getURI();
         if (queryString != null) uri += "?" + queryString;
         return uri;
+    }
+
+    public String getPageNameFromURN() {
+        String pageName = "";
+        List<String> names = splitUrnIntoNames(req.getPathInfo());
+        if (names.size() != 0) pageName = names.get(0); //first name in URN list it's requested page
+        return pageName;
+    }
+
+    public List<String> getParametersFromPath() {
+        List<String> parameters = splitUrnIntoNames(req.getPathInfo());
+        if (parameters.size() != 0) parameters.remove(0);
+        return parameters;
     }
 
     private String getFlashAttributeName(String attributeName) {
@@ -190,7 +215,6 @@ public class Context {
      */
     private List<String> getAttributeNamesForFlashScope(Enumeration<String> enumeration) {
         List<String> attributeNames = new CopyOnWriteArrayList<>(getListFromEnumeration(enumeration));
-
         for (String attributeName : attributeNames) {
             if (!attributeName.startsWith(FLASH_ATTRIBUTE_PREFIX)) {
                 attributeNames.remove(attributeName);
@@ -204,6 +228,22 @@ public class Context {
         resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
         resp.setHeader("Pragma", "no-cache"); // HTTP 1.0.
         resp.setDateHeader("Expires", 0); // Proxies.
+    }
+
+    private List<String> splitUrnIntoNames(String urn) {
+        List<String> names = new ArrayList<>();
+        String regex = "[^/]+";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(urn);
+        while (matcher.find()) {
+            String parameter = matcher.group();
+            if (parameter.length() > 0) names.add(matcher.group());
+        }
+        return names;
+    }
+
+    public String getPathInfo() {
+        return req.getPathInfo();
     }
 }
 

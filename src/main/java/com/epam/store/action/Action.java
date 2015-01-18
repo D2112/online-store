@@ -1,8 +1,8 @@
 package com.epam.store.action;
 
 
-import com.epam.store.servlet.Context;
+import com.epam.store.servlet.WebContext;
 
 public interface Action {
-    public ActionResult execute(Context context);
+    public ActionResult execute(WebContext webContext);
 }

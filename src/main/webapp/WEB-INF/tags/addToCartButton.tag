@@ -4,7 +4,7 @@
 <%@ attribute name="product" type="com.epam.store.model.Product" %>
 
 <div>
-    <form method="POST" action="addToCart">
+    <form method="POST" action="<c:url value="/addToCart"/>">
         <input type="hidden" name="id" value="${product.id}">
         <button type="submit" class="prod_buy">Add to cart</button>
     </form>

@@ -1,14 +1,14 @@
 package com.epam.store.action;
 
-import com.epam.store.servlet.Context;
 import com.epam.store.servlet.Scope;
+import com.epam.store.servlet.WebContext;
 
 public class LogoutAction implements Action {
     private ActionResult backToStartPage = new ActionResult("catalog", true);
 
     @Override
-    public ActionResult execute(Context context) {
-        context.removeAttribute("user", Scope.SESSION);
+    public ActionResult execute(WebContext webContext) {
+        webContext.removeAttribute("user", Scope.SESSION);
         return backToStartPage;
     }
 }

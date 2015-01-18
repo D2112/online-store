@@ -2,20 +2,20 @@ package com.epam.store.action;
 
 import com.epam.store.model.Product;
 import com.epam.store.service.ProductService;
-import com.epam.store.servlet.Context;
 import com.epam.store.servlet.Scope;
+import com.epam.store.servlet.WebContext;
 
 public class ShowProductDetailsAction implements Action {
     private ActionResult actionResult = new ActionResult("details");
 
     @Override
-    public ActionResult execute(Context context) {
-        String id = context.getParameter("id");
+    public ActionResult execute(WebContext webContext) {
+        String id = webContext.getParameter("id");
         if (id != null) {
-            ProductService productService = context.getService(ProductService.class);
+            ProductService productService = webContext.getService(ProductService.class);
             Product product = productService.getProductByID(Long.valueOf(id));
-            context.setAttribute("product", product, Scope.REQUEST);
-            context.setAttribute("attributes", product.getAttributes(), Scope.REQUEST);
+            webContext.setAttribute("product", product, Scope.REQUEST);
+            webContext.setAttribute("attributes", product.getAttributes(), Scope.REQUEST);
         }
         return actionResult;
     }

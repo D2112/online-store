@@ -1,6 +1,6 @@
 package com.epam.store.action;
 
-import com.epam.store.servlet.Context;
+import com.epam.store.servlet.WebContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,13 +23,14 @@ public class ActionFactory {
         actions.put("GET/details", new ShowProductDetailsAction());
         actions.put("GET/error", new ShowPageAction("error"));
         actions.put("GET/logout", new LogoutAction());
+        actions.put("GET/registerSuccess", new ShowPageAction("registerSuccess"));
         actions.put("POST/addToCart", new AddToCartAction());
         actions.put("POST/deleteFromCart", new DeleteFromCart());
         actions.put("POST/registration", new RegistrationAction());
         actions.put("POST/login", new LoginAction());
     }
 
-    public Action getAction(Context context) {
-        return actions.get(context.getRequestedAction());
+    public Action getAction(WebContext webContext) {
+        return actions.get(webContext.getRequestedAction());
     }
 }

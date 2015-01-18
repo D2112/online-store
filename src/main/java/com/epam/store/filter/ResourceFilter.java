@@ -1,6 +1,6 @@
 package com.epam.store.filter;
 
-import com.epam.store.servlet.Context;
+import com.epam.store.servlet.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,14 +17,15 @@ public class ResourceFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
-        Context context = new Context(servletRequest, servletResponse);
-        String path = context.getURI();
-        log.debug("path in resource filter: " + path);
+        WebContext webContext = new WebContext(servletRequest, servletResponse);
+        String path = req.getRequestURI().substring(req.getContextPath().length());
 
         if (path.startsWith("/static/")) {
+            log.debug("Filtered static resource: " + path);
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
-            context.forward("/controller/" + path);
+            log.debug("Forward to controller: " + path);
+            req.getRequestDispatcher("/controller" + path).forward(req, servletResponse);
         }
     }
 

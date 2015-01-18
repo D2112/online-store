@@ -17,7 +17,7 @@ import java.io.IOException;
 public class ControllerServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(ControllerServlet.class);
     private ActionFactory actionFactory;
-    private Context context;
+    private WebContext webContext;
 
     @Override
     public void init() throws ServletException {
@@ -26,29 +26,31 @@ public class ControllerServlet extends HttpServlet {
 
     @Override
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        context = new Context(req, resp);
-        log.debug("Requested action: " + context.getRequestedAction());
-        log.debug("current URI: " + context.getURI());
+        webContext = new WebContext(req, resp);
+        log.debug("Requested action: " + webContext.getRequestedAction());
+        log.debug("Context path: " + req.getContextPath());
+        log.debug("current URI: " + webContext.getURI());
         log.debug("Referrer: " + req.getHeader("Referrer"));
-        Action action = actionFactory.getAction(context);
+        Action action = actionFactory.getAction(webContext);
         if (action == null) {
             log.debug("Action not found");
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
         log.debug("Found action: " + action.getClass().getSimpleName());
-        ActionResult result = action.execute(context);
+        ActionResult result = action.execute(webContext);
         doForwardOrRedirect(result, req, resp);
     }
 
     private void doForwardOrRedirect(ActionResult result, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (result.isRedirect()) {
-            String location = context.getContextPath() + result.getPageName();
-            context.sendRedirect(location);
+            String location = webContext.getContextPath() + "/" + result.getPageName();
+            log.debug("Redirect requested location: " + location);
+            webContext.sendRedirect(location);
         } else {
             String path = String.format("/WEB-INF/jsp/" + result.getPageName() + ".jsp");
-            log.debug("Requested path: " + path);
-            context.forward(path);
+            log.debug("Forward requested path: " + path);
+            webContext.forward(path);
         }
     }
 }

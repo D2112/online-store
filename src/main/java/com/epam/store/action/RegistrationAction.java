@@ -2,37 +2,48 @@ package com.epam.store.action;
 
 import com.epam.store.service.InputValidator;
 import com.epam.store.service.RegistrationService;
-import com.epam.store.servlet.Context;
 import com.epam.store.servlet.Scope;
+import com.epam.store.servlet.WebContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RegistrationAction implements Action {
-    private ActionResult registrationResult = new ActionResult("registration", true);
+    private static final Logger log = LoggerFactory.getLogger(RegistrationAction.class);
+    private ActionResult errorResult = new ActionResult("registration", true);
+    private ActionResult successResult = new ActionResult("register-success", true);
 
     @Override
-    public ActionResult execute(Context context) {
-        String name = context.getParameter("name");
-        String email = context.getParameter("email");
-        String password = context.getParameter("password");
-        RegistrationService registrationService = context.getService(RegistrationService.class);
-        String resultMessage = register(name, email, password, registrationService);
-        context.setAttribute("name", name, Scope.FLASH);
-        context.setAttribute("email", email, Scope.FLASH);
-        context.setAttribute("registerResult", resultMessage, Scope.FLASH);
-        return registrationResult;
-    }
+    public ActionResult execute(WebContext webContext) {
+        String name = webContext.getParameter("name");
+        String email = webContext.getParameter("email");
+        String password = webContext.getParameter("password");
+        RegistrationService registrationService = webContext.getService(RegistrationService.class);
 
-    private String register(String name, String email, String password, RegistrationService registrationService) {
-        InputValidator inputValidator = new InputValidator();
-        if (!inputValidator.isEmailValid(email)) {
-            return "Error: incorrect email";
-        }
-        if (!inputValidator.isNameValid(name)) {
-            return "Error: incorrect name";
+        webContext.setAttribute("name", name, Scope.FLASH);
+        webContext.setAttribute("email", email, Scope.FLASH);
+        String errorMessage = checkValidationErrors(name, email);
+        if (errorMessage != null) {
+            webContext.setAttribute("error", errorMessage, Scope.FLASH);
+            log.debug("Registration error: " + errorMessage);
+            return errorResult;
         }
         if (!registrationService.register(name, email, password)) {
-            return "Error: " + email + " is already registered";
+            errorMessage = email + " is already registered";
+            webContext.setAttribute("error", errorMessage, Scope.FLASH);
+            log.debug("Registration error: " + errorMessage);
+            return errorResult;
         }
-        return (email + " successfully registered");
+        return successResult;
+    }
+
+    private String checkValidationErrors(String name, String email) {
+        if (!InputValidator.isEmailValid(email)) {
+            return "Error: incorrect email";
+        }
+        if (!InputValidator.isNameValid(name)) {
+            return "Error: incorrect name";
+        }
+        return null;
     }
 }
 

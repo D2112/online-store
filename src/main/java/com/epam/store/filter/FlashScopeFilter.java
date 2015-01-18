@@ -1,15 +1,13 @@
 package com.epam.store.filter;
 
 
-import com.epam.store.servlet.Context;
 import com.epam.store.servlet.Scope;
+import com.epam.store.servlet.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
@@ -22,20 +20,17 @@ public class FlashScopeFilter implements Filter {
     @SuppressWarnings("unchecked")
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
-        log.debug("Start filtering flash scope");
-        HttpServletRequest req = (HttpServletRequest) servletRequest;
-        HttpServletResponse resp = (HttpServletResponse) servletResponse;
-        Context context = new Context(req, resp);
-        List<String> attributeNames = context.getAttributeNames(Scope.FLASH);
+        WebContext webContext = new WebContext(servletRequest, servletResponse);
+        List<String> attributeNames = webContext.getAttributeNames(Scope.FLASH);
         if (attributeNames.size() > 0) {
             for (String attributeName : attributeNames) {
-                Object attribute = context.getAttribute(attributeName, Scope.FLASH);
+                Object attribute = webContext.getAttribute(attributeName, Scope.FLASH);
                 log.debug("Adding attribute {} from flash scope to request", attributeName);
-                context.setAttribute(attributeName, attribute, Scope.REQUEST);
-                context.removeAttribute(attributeName, Scope.FLASH);
+                webContext.setAttribute(attributeName, attribute, Scope.REQUEST);
+                webContext.removeAttribute(attributeName, Scope.FLASH);
             }
         }
-        filterChain.doFilter(req, resp);
+        filterChain.doFilter(servletRequest, servletResponse);
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {

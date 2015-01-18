@@ -17,20 +17,20 @@ public class ErrorHandler extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Context context = new Context(req, resp);
-        Throwable throwable = (Throwable) context.getAttribute("javax.servlet.error.exception", Scope.REQUEST);
-        Integer statusCode = (Integer) context.getAttribute("javax.servlet.error.status_code", Scope.REQUEST);
-        String requestUri = (String) context.getAttribute("javax.servlet.error.request_uri", Scope.REQUEST);
-        if(requestUri != null) {
+        WebContext webContext = new WebContext(req, resp);
+        Throwable throwable = (Throwable) webContext.getAttribute("javax.servlet.error.exception", Scope.REQUEST);
+        Integer statusCode = (Integer) webContext.getAttribute("javax.servlet.error.status_code", Scope.REQUEST);
+        String requestUri = (String) webContext.getAttribute("javax.servlet.error.request_uri", Scope.REQUEST);
+        if (requestUri != null) {
             log.warn("Error when accessing: " + requestUri);
         }
-        if(statusCode != null) {
+        if (statusCode != null) {
             log.warn("Error status code:" + statusCode);
-            context.setAttribute("statusCode", statusCode, Scope.REQUEST);
+            webContext.setAttribute("statusCode", statusCode, Scope.REQUEST);
         }
-        if(throwable != null) {
+        if (throwable != null) {
             log.warn("Handled exception:", throwable);
         }
-        context.forward(ERROR_PAGE);
+        webContext.forward(ERROR_PAGE);
     }
 }

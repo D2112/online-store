@@ -3,21 +3,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="page" tagdir="/WEB-INF/tags" %>
 
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-<body>
-<div id="main_container">
-    <page:logo/>
-    <div id="main_content">
-        <page:menuTab/>
-        <page:sideBar/>
+<page:genericPage>
+    <jsp:attribute name="leftSideBar">
+        <page:userSideBar/>
+    </jsp:attribute>
+    <jsp:body>
         <page:productDetails product="${param.product}"/>
-    </div>
-    <page:footer/>
-</div>
-</body>
-</body>
-</html>
+    </jsp:body>
+</page:genericPage>

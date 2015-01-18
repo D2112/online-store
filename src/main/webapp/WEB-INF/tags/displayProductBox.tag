@@ -8,17 +8,17 @@
 <div class="prod_box">
     <div class="center_prod_box">
         <div class="product_title">
-            <a href="..."> <c:out value="${product.name}"/> </a>
+            <c:out value="${product.name}"/>
         </div>
         <div class="product_img">
-            <a href="..."> <img src="<c:out value="${imagePath}"/>" border="0"/> </a>
+            <img src="<c:out value="${imagePath}"/>" border="0"/>
         </div>
         <page:price value="${product.price.value}"/>
     </div>
     <div class="prod_details_tab">
         <page:addToCartButton product="${product}"/>
         <div>
-            <form method="GET" action="details">
+            <form method="GET" action="<c:url value="/details"/>">
                 <input type="hidden" name="id" value="${product.id}">
                 <button type="submit" class="prod_details">Details</button>
             </form>

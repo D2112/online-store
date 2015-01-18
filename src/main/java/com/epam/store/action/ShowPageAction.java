@@ -1,6 +1,6 @@
 package com.epam.store.action;
 
-import com.epam.store.servlet.Context;
+import com.epam.store.servlet.WebContext;
 
 public class ShowPageAction implements Action {
     private ActionResult result;
@@ -10,7 +10,7 @@ public class ShowPageAction implements Action {
     }
 
     @Override
-    public ActionResult execute(Context context) {
+    public ActionResult execute(WebContext webContext) {
         return result;
     }
 }

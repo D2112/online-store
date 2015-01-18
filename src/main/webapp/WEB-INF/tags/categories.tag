@@ -7,12 +7,17 @@
 <ul class="left_menu">
     <c:set var="count" value="0" scope="page"/>
     <c:forEach items="${categories}" var="category" varStatus="loopStatus">
+        <c:url var="categoryUrl" value="catalog/${category.name}"/>
         <c:choose>
             <c:when test="${loopStatus.count % 2 == 0}">
-                <li class="odd"><a href="catalog?category=${category.name}">${category.name}</a></li>
+                <li class="odd">
+                    <a href="<c:url value="/catalog/${category.name}"/>">${category.name}</a>
+                </li>
             </c:when>
             <c:otherwise>
-                <li class="even"><a href="catalog?category=${category.name}">${category.name}</a></li>
+                <li class="even">
+                    <a href="<c:url value="/catalog/${category.name}"/>">${category.name}</a>
+                </li>
             </c:otherwise>
         </c:choose>
     </c:forEach>

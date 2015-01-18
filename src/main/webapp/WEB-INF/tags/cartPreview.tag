@@ -11,6 +11,6 @@
         <span class="border_cart"></span>
         Total: <span class="value"><page:price value="${cart.totalPrice}"/></span>
     </div>
-    <div class="cart_icon"><a href="cart"><img src="../../static/img/shoppingcart.png" alt="" width="35" height="35"
+    <div class="cart_icon"><a href="<c:url value="/cart"/>"><img src="../../static/img/shoppingcart.png" alt="" width="35" height="35"
                                                border="0"/></a></div>
 </div>
