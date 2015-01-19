@@ -27,6 +27,13 @@ public class UserService {
         return user;
     }
 
+    public List<User> getAllUsers() {
+        try (DaoSession daoSession = daoFactory.getDaoSession()) {
+            Dao<User> userDao = daoSession.getDao(User.class);
+            return userDao.getAll();
+        }
+    }
+
     public List<Purchase> getUserPurchaseList(User user) {
         List<Purchase> purchaseList;
         try (DaoSession daoSession = daoFactory.getDaoSession()) {

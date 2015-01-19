@@ -9,10 +9,10 @@
     <h1>Registration</h1>
     <hr>
     <form action="<c:url value="/registration"/>" method="post">
-        <input type="text" name="name" placeholder="Name" value="<c:out value="${requestScope.name}"/>" required/>
-        <input type="text" name="email" placeholder="Email" value="<c:out value="${requestScope.email}"/>" required/>
-        <input type="password" name="password" placeholder="Password" required/>
-        <input type="password" name="passwordConfirm" placeholder="Confirm Password" required/>
+        <input type="text" name="name" placeholder="Name" value="<c:out value="${requestScope.name}"/>" required="true"/>
+        <input type="text" name="email" placeholder="Email" value="<c:out value="${requestScope.email}"/>" required="true"/>
+        <input type="password" name="password" placeholder="Password" required="true"/>
+        <input type="password" name="passwordConfirm" placeholder="Confirm Password" required="true"/>
         <span><button type="submit" class="button">Register</button></span>
     </form>
     <h4><span style="color: red;">${error}</span></h4>

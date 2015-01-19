@@ -18,7 +18,7 @@ public class CategoryService {
         List<Category> categoryList;
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Category> categoryDao = daoSession.getDao(Category.class);
-            categoryList = categoryDao.findAll();
+            categoryList = categoryDao.getAll();
         }
         return categoryList;
     }

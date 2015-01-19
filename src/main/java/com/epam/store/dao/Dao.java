@@ -14,7 +14,7 @@ public interface Dao<T extends BaseEntity> {
 
     public boolean delete(long id);
 
-    public List<T> findAll();
+    public List<T> getAll();
 
     public List<T> findByParameter(String paramName, Object paramValue);
 

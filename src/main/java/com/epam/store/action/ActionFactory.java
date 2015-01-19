@@ -23,7 +23,8 @@ public class ActionFactory {
         actions.put("GET/details", new ShowProductDetailsAction());
         actions.put("GET/error", new ShowPageAction("error"));
         actions.put("GET/logout", new LogoutAction());
-        actions.put("GET/registerSuccess", new ShowPageAction("registerSuccess"));
+        actions.put("GET/register-success", new ShowPageAction("register-success"));
+        actions.put("GET/admin", new ShowAdminPageAction());
         actions.put("POST/addToCart", new AddToCartAction());
         actions.put("POST/deleteFromCart", new DeleteFromCart());
         actions.put("POST/registration", new RegistrationAction());

@@ -4,6 +4,7 @@ public class User extends BaseEntity {
     private String name;
     private String email;
     private Password password;
+    private boolean banned;
 
     public User() {
     }
@@ -36,6 +37,14 @@ public class User extends BaseEntity {
 
     public void setPassword(Password password) {
         this.password = password;
+    }
+
+    public Boolean getBanned() {
+        return banned;
+    }
+
+    public void setBanned(Boolean banned) {
+        this.banned = banned;
     }
 
     @Override

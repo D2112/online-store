@@ -17,11 +17,12 @@ public class RegistrationAction implements Action {
         String name = webContext.getParameter("name");
         String email = webContext.getParameter("email");
         String password = webContext.getParameter("password");
+        String passwordConfirm = webContext.getParameter("passwordConfirm");
         RegistrationService registrationService = webContext.getService(RegistrationService.class);
 
         webContext.setAttribute("name", name, Scope.FLASH);
         webContext.setAttribute("email", email, Scope.FLASH);
-        String errorMessage = checkValidationErrors(name, email);
+        String errorMessage = checkValidationErrors(name, email, password, passwordConfirm);
         if (errorMessage != null) {
             webContext.setAttribute("error", errorMessage, Scope.FLASH);
             log.debug("Registration error: " + errorMessage);
@@ -36,12 +37,15 @@ public class RegistrationAction implements Action {
         return successResult;
     }
 
-    private String checkValidationErrors(String name, String email) {
+    private String checkValidationErrors(String name, String email, String password, String passwordConfirm) {
         if (!InputValidator.isEmailValid(email)) {
             return "Error: incorrect email";
         }
         if (!InputValidator.isNameValid(name)) {
             return "Error: incorrect name";
+        }
+        if(!password.equals(passwordConfirm)) {
+            return "Error: passwords are not equal";
         }
         return null;
     }

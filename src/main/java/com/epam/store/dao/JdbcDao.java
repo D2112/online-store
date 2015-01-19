@@ -113,7 +113,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     }
 
     @Override
-    public List<T> findAll() {
+    public List<T> getAll() {
         List<T> list;
         String readAllQuery = sqlQueryGenerator.getQueryForClass(SqlQueryType.READ_ALL, clazz);
         try (PreparedStatement statement = connection.prepareStatement(readAllQuery);

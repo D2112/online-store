@@ -3,9 +3,9 @@
 
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/static/css/style.css"/>
 
-<div class="left_content">
+<div class="filter_menu">
     <div class="title_box">Filter Menu</div>
-    <ul class="left_menu">
+    <ul class="list_menu">
         <li class="filter_node">Something here:</li>
         <li class="filter_element">
             <label><input type="checkbox" name="checkbox" value="value">Text</label>
