@@ -16,7 +16,7 @@ public class ShowCatalogAction implements Action {
     @Override
     public ActionResult execute(WebContext webContext) {
         ProductService productService = webContext.getService(ProductService.class);
-        List<String> parametersFromPath = webContext.getParametersFromPath(); //category's parameter passes as a path part
+        List<String> parametersFromPath = webContext.getParametersFromURI(); //category's parameter passes as a path part
         if (parametersFromPath.size() > 0) {
             String category = parametersFromPath.iterator().next();
             log.debug("Showing category: " + category);

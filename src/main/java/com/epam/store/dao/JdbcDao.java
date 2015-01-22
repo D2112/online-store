@@ -181,19 +181,22 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     }
 
     private void prepareStatementForInsert(PreparedStatement statement, T entity) throws SQLException {
-        int paramToSetIndex = 1;
+        int parameterIndex = 1;
         for (DatabaseColumn column : table.getColumns()) {
             String fieldName = column.getFieldName();
             if (!entityMetadata.hasField(fieldName)) continue;
             if (column.isForeignKey()) {
-                Object dependencyEntity = entityMetadata.invokeGetterByFieldName(fieldName, entity);
-                Long dependencyIdToSet = insertDependency(fieldName, dependencyEntity).getId();
-                statement.setLong(paramToSetIndex, dependencyIdToSet);
+                BaseEntity dependencyEntity = (BaseEntity) entityMetadata.invokeGetterByFieldName(fieldName, entity);
+                Long dependencyID = dependencyEntity.getId();
+                if(dependencyID == null) {
+                    dependencyID = insertDependency(fieldName, dependencyEntity).getId();
+                }
+                statement.setLong(parameterIndex, dependencyID);
             } else {
                 Object valueToSet = entityMetadata.invokeGetterByFieldName(fieldName, entity);
-                statement.setObject(paramToSetIndex, valueToSet);
+                statement.setObject(parameterIndex, valueToSet);
             }
-            paramToSetIndex++;
+            parameterIndex++;
         }
     }
 

@@ -20,8 +20,14 @@ import java.util.regex.Pattern;
 public class WebContext {
     private static final Logger log = LoggerFactory.getLogger(WebContext.class);
     private static final String FLASH_ATTRIBUTE_PREFIX = "flash.";
+    private static List<String> pagesWithURIParameters;
     private HttpServletRequest req;
     private HttpServletResponse resp;
+
+    static {
+        pagesWithURIParameters = new ArrayList<>();
+        pagesWithURIParameters.add("catalog");
+    }
 
     public WebContext(HttpServletRequest req, HttpServletResponse resp) {
         this.req = req;
@@ -34,7 +40,7 @@ public class WebContext {
     }
 
     public String getRequestedAction() {
-        return req.getMethod() + "/" + getPageNameFromURN();
+        return req.getMethod() + getPagePathFromURI();
     }
 
     public String getParameter(String parameterName) {
@@ -61,7 +67,7 @@ public class WebContext {
                 req.getServletContext().setAttribute(name, value);
                 break;
             case FLASH:
-                req.getSession().setAttribute(getFlashAttributeName(name), value);
+                req.getSession().setAttribute(addFlashPrefixToName(name), value);
                 break;
         }
     }
@@ -82,7 +88,8 @@ public class WebContext {
                 break;
             case FLASH:
                 if (isSessionExist()) {
-                    attributeObject = req.getSession().getAttribute(getFlashAttributeName(name));
+                    attributeObject = req.getSession().getAttribute(addFlashPrefixToName(name));
+                    if(attributeObject == null) attributeObject = req.getAttribute(name);
                 }
                 break;
         }
@@ -104,7 +111,7 @@ public class WebContext {
                 break;
             case FLASH:
                 if (isSessionExist()) {
-                    req.getSession().removeAttribute(getFlashAttributeName(name));
+                    req.getSession().removeAttribute(addFlashPrefixToName(name));
                 }
                 break;
         }
@@ -170,6 +177,39 @@ public class WebContext {
         return req.getRequestURI();
     }
 
+    private String getPagePathFromURI() {
+        List<String> pathSegments = splitIntoSegments(req.getPathInfo());
+        StringBuilder sb = new StringBuilder();
+        for (String segment : pathSegments) {
+            sb.append("/");
+            sb.append(segment);
+            if(pagesWithURIParameters.contains(segment)) {
+                return sb.toString();
+            }
+        }
+        if(sb.length() == 0) sb.append("/");
+        return sb.toString();
+    }
+
+    public List<String> getParametersFromURI() {
+        String pathInfo = req.getPathInfo();
+        String parameterString = pathInfo.substring(getPagePathFromURI().length());
+        return splitIntoSegments(parameterString);
+    }
+
+     private List<String> splitIntoSegments(String uri) {
+        String path = req.getPathInfo();
+        List<String> names = new ArrayList<>();
+        String regex = "[^/]+";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(uri);
+        while (matcher.find()) {
+            String parameter = matcher.group();
+            if (parameter.length() > 0) names.add(matcher.group());
+        }
+        return names;
+    }
+
     public String getURIWithQueryString() {
         String queryString = req.getQueryString();
         String uri = getURI();
@@ -177,20 +217,7 @@ public class WebContext {
         return uri;
     }
 
-    public String getPageNameFromURN() {
-        String pageName = "";
-        List<String> names = splitUrnIntoNames(req.getPathInfo());
-        if (names.size() != 0) pageName = names.get(0); //first name in URN list it's requested page
-        return pageName;
-    }
-
-    public List<String> getParametersFromPath() {
-        List<String> parameters = splitUrnIntoNames(req.getPathInfo());
-        if (parameters.size() != 0) parameters.remove(0);
-        return parameters;
-    }
-
-    private String getFlashAttributeName(String attributeName) {
+    private String addFlashPrefixToName(String attributeName) {
         return FLASH_ATTRIBUTE_PREFIX + attributeName;
     }
 
@@ -228,18 +255,6 @@ public class WebContext {
         resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
         resp.setHeader("Pragma", "no-cache"); // HTTP 1.0.
         resp.setDateHeader("Expires", 0); // Proxies.
-    }
-
-    private List<String> splitUrnIntoNames(String urn) {
-        List<String> names = new ArrayList<>();
-        String regex = "[^/]+";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(urn);
-        while (matcher.find()) {
-            String parameter = matcher.group();
-            if (parameter.length() > 0) names.add(matcher.group());
-        }
-        return names;
     }
 
     public String getPathInfo() {

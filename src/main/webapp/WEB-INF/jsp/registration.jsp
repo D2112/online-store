@@ -15,7 +15,7 @@
         <input type="password" name="passwordConfirm" placeholder="Confirm Password" required="true"/>
         <span><button type="submit" class="button">Register</button></span>
     </form>
-    <h4><span style="color: red;">${error}</span></h4>
+    <h4><span class="error_message">${error}</span></h4>
 </div>
 </body>
 </html>

@@ -14,10 +14,12 @@
             <div class="details_big_box">
                 <div class="product_title_big">Description:</div>
                 <div class="specifications">
+                    <span>${product.description}</span><br/>
+                    <br/>
                     <c:forEach var="attribute" items="${requestScope.attributes}">
                         ${attribute.name}: <span class="blue">${attribute.valueAsString}</span><br/>
                     </c:forEach>
-                    Price: <span class="blue">${product.price.value}</span><br/>
+                    Price: <span class="blue"><page:price value="${product.price.value}"/></span><br/>
                 </div>
                 <page:addToCartButton product="${product}"/>
             </div>

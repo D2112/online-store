@@ -11,6 +11,6 @@
         <page:welcomeLabel user="${param.user}"/>
     </jsp:attribute>
     <jsp:attribute name="thirdElement">
-        <page:categories categories="${applicationScope.categories}"/>
+        <page:categoriesList categories="${applicationScope.categories}"/>
     </jsp:attribute>
 </page:genericSideBar>

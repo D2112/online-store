@@ -27,10 +27,10 @@ public class EntityMetadata<T extends BaseEntity> {
         getterByFieldName = new LinkedHashMap<>();
         this.type = type;
 
-        addFieldsNamesFromFields(type.getSuperclass().getDeclaredFields());
+        addFieldsNamesFromFields(type.getSuperclass().getDeclaredFields()); //getting names from superclass
         addFieldsNamesFromFields(type.getDeclaredFields());
 
-        addSetterAndGettersFromMethods(type.getSuperclass().getDeclaredMethods());
+        addSetterAndGettersFromMethods(type.getSuperclass().getDeclaredMethods());//getting methods names from superclass
         addSetterAndGettersFromMethods(type.getDeclaredMethods());
     }
 
@@ -42,7 +42,7 @@ public class EntityMetadata<T extends BaseEntity> {
             }
         } catch (NoSuchFieldException e) {
             log.error("Exception while getting field type from entity: ", e);
-            e.printStackTrace();
+            throw new MetadataException(e);
         }
         return null;
     }
@@ -63,7 +63,7 @@ public class EntityMetadata<T extends BaseEntity> {
         try {
             setterByFieldName.get(fieldName).invoke(targetToInvoke, args);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            throw new MetadataException(e);
         }
     }
 
@@ -71,9 +71,8 @@ public class EntityMetadata<T extends BaseEntity> {
         try {
             return getterByFieldName.get(fieldName).invoke(targetToInvoke);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            throw new MetadataException(e);
         }
-        return null;
     }
 
     private String getFieldNameFromMethodName(String methodName) {

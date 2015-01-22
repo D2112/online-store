@@ -12,10 +12,6 @@ p {
     margin: 0;
 }
 
-label {
-
-}
-
 #main_container {
     width: 1000px;
     height: auto;
@@ -33,6 +29,11 @@ label {
 
 #main_content {
     clear: both;
+}
+
+.error_message {
+    text-align: center;
+    color: red;
 }
 
 /*---------------- menu tab----------------------*/
@@ -110,6 +111,23 @@ a.nav:hover {
 
 .product_name_input {
     width:200px;
+}
+
+.attribute_input {
+    width: 100%;
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #C9C9C9;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset, -5px -5px 0 0
+    #F5F5F6, 5px 5px 0 0
+    #F5F5F6, 5px 0 0 0
+    #F5F5F6, 0 5px 0 0
+    #F5F5F6, 5px -5px 0 0
+    #F5F5F6, -5px 5px 0 0
+    #F5F5F6;
+    color: #545658;
+    padding: 4px;
+    font-size: 14px;
+
 }
 
 .attributes_table {
@@ -405,7 +423,7 @@ span.blue {
 }
 
 /*--------------button------------------*/
-.myButton {
+.baseButton {
     -moz-box-shadow: inset 0px 1px 0px 0px #ffffff;
     -webkit-box-shadow: inset 0px 1px 0px 0px #ffffff;
     box-shadow: inset 0px 1px 0px 0px #ffffff;
@@ -431,6 +449,11 @@ span.blue {
     text-decoration: none;
     text-shadow: 0 1px 0 #ffffff;
 }
+.baseButton.creating_product_button {
+    width: 300px;
+    color:#000000;
+}
+
 
 .welcome_label {
     text-align: center;

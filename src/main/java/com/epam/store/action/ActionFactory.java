@@ -24,7 +24,11 @@ public class ActionFactory {
         actions.put("GET/error", new ShowPageAction("error"));
         actions.put("GET/logout", new LogoutAction());
         actions.put("GET/register-success", new ShowPageAction("register-success"));
-        actions.put("GET/admin", new ShowAdminPageAction());
+        actions.put("GET/admin", new ShowPageAction("admin"));
+        actions.put("GET/admin/users", new ShowUsersListAction());
+        actions.put("GET/admin/creating-product", new ShowCreatingProductPageAction(false));
+        actions.put("POST/admin/creating-product", new ShowCreatingProductPageAction(true));
+        actions.put("POST/admin/creating-product/create", new CreateProductAction());
         actions.put("POST/addToCart", new AddToCartAction());
         actions.put("POST/deleteFromCart", new DeleteFromCart());
         actions.put("POST/registration", new RegistrationAction());

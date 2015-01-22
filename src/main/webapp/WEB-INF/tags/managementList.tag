@@ -5,7 +5,7 @@
 <div class="title_box">Management</div>
 <ul class="list_menu">
     <li class="odd">
-        <a href="<c:url value="/admin/products"/>">Create Product</a>
+        <a href="<c:url value="/admin/creating-product"/>">Create Product</a>
     </li>
     <li class="even">
         <a href="<c:url value="/admin/users"/>">Users</a>

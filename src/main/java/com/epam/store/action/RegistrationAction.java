@@ -1,6 +1,5 @@
 package com.epam.store.action;
 
-import com.epam.store.service.InputValidator;
 import com.epam.store.service.RegistrationService;
 import com.epam.store.servlet.Scope;
 import com.epam.store.servlet.WebContext;
@@ -38,10 +37,10 @@ public class RegistrationAction implements Action {
     }
 
     private String checkValidationErrors(String name, String email, String password, String passwordConfirm) {
-        if (!InputValidator.isEmailValid(email)) {
+        if (!RegexValidator.isEmailValid(email)) {
             return "Error: incorrect email";
         }
-        if (!InputValidator.isNameValid(name)) {
+        if (!RegexValidator.isNameValid(name)) {
             return "Error: incorrect name";
         }
         if(!password.equals(passwordConfirm)) {

@@ -13,6 +13,7 @@ import com.epam.store.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.lang.model.element.Name;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,32 +25,6 @@ public class Test {
     private static final Logger log = LoggerFactory.getLogger(Test.class);
 
     public static void main(String[] args) throws SQLException {
-/*        ConnectionPool connectionPool = new SqlConnectionPool();
-        SqlPooledConnection connection = connectionPool.getConnection();
-        DBMetadataManager dbMetadataManager = new DBMetadataManager(connection.getMetaData());
-        SqlQueryGenerator sqlQueryGenerator = new SqlQueryGenerator(dbMetadataManager);
-
-        DaoFactory daoFactory = new JdbcDaoFactory(connectionPool, sqlQueryGenerator);
-        DaoSession daoSession = daoFactory.getDaoSession();
-
-        Product bread = new Product();
-        bread.setName("Pitt's bread");
-        bread.setCategory(new Category("Food"));
-        bread.setPrice(new Price(new BigDecimal("43")));
-
-        List<Attribute> attributeList = new ArrayList<>();
-        StringAttribute stringAttribute = new StringAttribute("high");
-        stringAttribute.setName("damage resistance");
-        attributeList.add(stringAttribute);
-
-        bread.setAttributes(attributeList);
-
-        ProductService productService = new ProductService(daoFactory, sqlQueryGenerator);
-        productService.addProduct(bread);
-
-        List<Product> food = productService.getProductsForCategory("food");
-        for (Product product : food) {
-            System.out.println(product);
-        }*/
+        System.out.println(NameFormatter.getInstance().getFieldNameFromColumnName("ROLE_NAME"));
     }
 }

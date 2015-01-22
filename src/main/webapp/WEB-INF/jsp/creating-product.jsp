@@ -7,10 +7,6 @@
         <page:adminSideBar/>
     </jsp:attribute>
     <jsp:body>
-        <c:choose>
-            <c:when test="${users != null}">
-                <page:usersTable users="${users}"/>
-            </c:when>
-        </c:choose>
+        <page:creatingProductForm/>
     </jsp:body>
 </page:genericPage>

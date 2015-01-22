@@ -8,6 +8,7 @@ import java.util.List;
 public class Product extends BaseEntity {
     private String name;
     private Category category;
+    private String description;
     private Price price;
     private List<Attribute> attributes;
 
@@ -15,10 +16,11 @@ public class Product extends BaseEntity {
         attributes = new ArrayList<>();
     }
 
-    public Product(String name, Category category, Price price) {
+    public Product(String name, Category category, String description, Price price) {
         this.name = name;
         this.price = price;
         this.category = category;
+        this.description = description;
         this.attributes = new ArrayList<>();
     }
 
@@ -44,6 +46,14 @@ public class Product extends BaseEntity {
 
     public void setPrice(Price price) {
         this.price = price;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Category getCategory() {
