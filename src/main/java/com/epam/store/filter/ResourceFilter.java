@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @WebFilter(filterName = "ResourceFilter", urlPatterns = "/*", dispatcherTypes = DispatcherType.REQUEST)
@@ -16,16 +15,14 @@ public class ResourceFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
-        HttpServletRequest req = (HttpServletRequest) servletRequest;
         WebContext webContext = new WebContext(servletRequest, servletResponse);
-        String path = req.getRequestURI().substring(req.getContextPath().length());
-
+        String path = webContext.getURI();
         if (path.startsWith("/static/")) {
             log.debug("Filtered static resource: " + path);
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
             log.debug("Forward to controller: " + path);
-            req.getRequestDispatcher("/controller" + path).forward(req, servletResponse);
+            webContext.forward("/controller" + path);
         }
     }
 

@@ -29,6 +29,8 @@
     <tr>
         <th colspan="2">Total:</th>
         <th><page:price value="${cart.totalPrice}"/></th>
-        <th><button type="submit" form="deletingCheckboxes" class="baseButton">Delete Selected</button></th>
+        <th>
+            <button type="submit" form="deletingCheckboxes" class="base_button">Delete Selected</button>
+        </th>
     </tr>
 </table>

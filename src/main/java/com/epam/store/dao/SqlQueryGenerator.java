@@ -1,9 +1,9 @@
 package com.epam.store.dao;
 
-import com.epam.store.NameFormatter;
 import com.epam.store.metadata.DBMetadataManager;
 import com.epam.store.metadata.DatabaseColumn;
 import com.epam.store.metadata.DatabaseTable;
+import com.epam.store.metadata.NameFormatter;
 import com.epam.store.model.BaseEntity;
 
 import java.io.IOException;

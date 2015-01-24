@@ -28,13 +28,12 @@ public class ControllerServlet extends HttpServlet {
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         webContext = new WebContext(req, resp);
         log.debug("Requested action: " + webContext.getRequestedAction());
-        log.debug("Context path: " + req.getContextPath());
         log.debug("current URI: " + webContext.getURI());
         log.debug("Referrer: " + req.getHeader("Referrer"));
         Action action = actionFactory.getAction(webContext);
         if (action == null) {
             log.debug("Action not found");
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            webContext.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
         log.debug("Found action: " + action.getClass().getSimpleName());
@@ -48,7 +47,7 @@ public class ControllerServlet extends HttpServlet {
             log.debug("Redirect requested location: " + location);
             webContext.sendRedirect(location);
         } else {
-            String path = String.format("/WEB-INF/jsp/" + result.getPageName() + ".jsp");
+            String path = "/WEB-INF/jsp/" + result.getPageName() + ".jsp";
             log.debug("Forward requested path: " + path);
             webContext.forward(path);
         }

@@ -19,6 +19,7 @@ public class RegistrationAction implements Action {
         String passwordConfirm = webContext.getParameter("passwordConfirm");
         RegistrationService registrationService = webContext.getService(RegistrationService.class);
 
+        //set attributes to flash scope for displaying after redirect if error
         webContext.setAttribute("name", name, Scope.FLASH);
         webContext.setAttribute("email", email, Scope.FLASH);
         String errorMessage = checkValidationErrors(name, email, password, passwordConfirm);

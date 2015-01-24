@@ -104,7 +104,7 @@ a.nav:hover {
     padding-right: 15px;
 }
 
-.creating_form_input {
+.input_field {
     padding-top: 20px;
     padding-left: 16px;
 }
@@ -423,7 +423,7 @@ span.blue {
 }
 
 /*--------------button------------------*/
-.baseButton {
+.base_button {
     -moz-box-shadow: inset 0px 1px 0px 0px #ffffff;
     -webkit-box-shadow: inset 0px 1px 0px 0px #ffffff;
     box-shadow: inset 0px 1px 0px 0px #ffffff;
@@ -449,7 +449,8 @@ span.blue {
     text-decoration: none;
     text-shadow: 0 1px 0 #ffffff;
 }
-.baseButton.creating_product_button {
+
+.base_button.creating_product_button {
     width: 300px;
     color:#000000;
 }

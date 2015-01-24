@@ -1,6 +1,5 @@
 package com.epam.store.metadata;
 
-import com.epam.store.NameFormatter;
 import com.epam.store.model.BaseEntity;
 
 import java.sql.DatabaseMetaData;

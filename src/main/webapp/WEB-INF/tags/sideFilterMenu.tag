@@ -14,6 +14,6 @@
     <input type="text" name="keyword" class="keyword_input" placeholder="type a keyword here"/>
 
     <div align="right">
-        <button type="button" class="baseButton">Apply Filter</button>
+        <button type="button" class="base_button">Apply Filter</button>
     </div>
 </div>

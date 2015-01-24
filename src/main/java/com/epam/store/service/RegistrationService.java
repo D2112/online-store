@@ -4,6 +4,7 @@ import com.epam.store.PasswordEncryptor;
 import com.epam.store.dao.Dao;
 import com.epam.store.dao.DaoFactory;
 import com.epam.store.dao.DaoSession;
+import com.epam.store.model.Role;
 import com.epam.store.model.User;
 
 import java.util.List;
@@ -25,6 +26,11 @@ public class RegistrationService {
             User user = new User();
             user.setName(name);
             user.setEmail(email);
+            Dao<Role> roleDao = daoSession.getDao(Role.class);
+            List<Role> roleList = roleDao.findByParameter("name", Role.USER_ROLE_NAME);
+            if (roleList.size() != 1) throw new ServiceException("Found more than one role for user");
+            Role userRole = roleList.iterator().next();
+            user.setRole(userRole);
             user.setPassword(passwordEncryptor.encrypt(password));
             userDao.insert(user);
         }

@@ -149,6 +149,10 @@ public class WebContext {
         resp.sendRedirect(location);
     }
 
+    public void sendError(int error) throws IOException {
+        resp.sendError(error);
+    }
+
     public String getContextPath() {
         return req.getContextPath();
     }
@@ -198,7 +202,6 @@ public class WebContext {
     }
 
      private List<String> splitIntoSegments(String uri) {
-        String path = req.getPathInfo();
         List<String> names = new ArrayList<>();
         String regex = "[^/]+";
         Pattern pattern = Pattern.compile(regex);
