@@ -7,6 +7,6 @@
 
 <div class="center_content">
     <c:forEach items="${products}" var="product">
-        <page:displayProductBox product="${product}" imagePath="../../static/img/p1.jpg"/>
+        <page:displayProductBox product="${product}"/>
     </c:forEach>
 </div>

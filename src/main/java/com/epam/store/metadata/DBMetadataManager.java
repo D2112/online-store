@@ -12,36 +12,41 @@ import java.util.Map;
 
 public class DBMetadataManager {
     private static final String DELETED_COLUMN_NAME = "DELETED";
-    private Map<String, List<String>> columnNamesByTableName;
-    private Map<Class, DatabaseTable> tables;
+    private Map<String, DatabaseTable> tables;
     private NameFormatter nameFormatter;
 
     public DBMetadataManager(DatabaseMetaData databaseMetaData) {
         nameFormatter = NameFormatter.getInstance();
-        tables = new HashMap<>();
-        columnNamesByTableName = getColumnsByTableNameMap(databaseMetaData);
+        tables = createTables(databaseMetaData);
     }
 
     public DatabaseTable getTableForClass(Class<? extends BaseEntity> entity) {
-        if (tables.containsKey(entity)) return tables.get(entity);
-        DatabaseTable table = createTable(nameFormatter.getTableNameForClass(entity));
-        tables.put(entity, table);
-        return table;
+        String tableName = nameFormatter.getTableNameForClass(entity);
+        return tables.get(tableName);
     }
 
-    private DatabaseTable createTable(String tableName) {
-        List<String> columnsNames = columnNamesByTableName.get(tableName);
-        List<DatabaseColumn> columns = createColumns(tableName, columnsNames);
-        String tablePrimaryKeyName = nameFormatter.getPrimaryKeyNameForTable(tableName);
-        return new DatabaseTable(tableName, tablePrimaryKeyName, columns);
+    private Map<String, DatabaseTable> createTables(DatabaseMetaData databaseMetaData) {
+        Map<String, DatabaseTable> tables = new HashMap<>();
+        Map<String, List<String>> columnNamesByTableName = getColumnsByTableNameMap(databaseMetaData);
+        for (Map.Entry<String, List<String>> entry : columnNamesByTableName.entrySet()) {
+            String tableName = entry.getKey();
+            List<String> columnNames = entry.getValue();
+            List<DatabaseColumn> columns = createColumns(tableName, columnNames, databaseMetaData);
+            String tablePrimaryKeyName = nameFormatter.getPrimaryKeyNameForTable(tableName);
+            DatabaseTable databaseTable = new DatabaseTable(tableName, tablePrimaryKeyName, columns);
+            tables.put(tableName, databaseTable);
+        }
+        return tables;
     }
 
-    private List<DatabaseColumn> createColumns(String tableName, List<String> columnNames) {
+    private List<DatabaseColumn> createColumns(String tableName, List<String> columnNames, DatabaseMetaData databaseMetaData) {
         List<DatabaseColumn> columnsList = new ArrayList<>();
+        List<String> uniqueConstraintColumns = getUniqueConstraintColumns(tableName, databaseMetaData);
         for (String columnName : columnNames) {
             String fieldName = nameFormatter.getFieldNameFromColumnName(columnName);
             boolean foreignKey = isColumnForeignID(tableName, columnName);
-            DatabaseColumn column = new DatabaseColumn(columnName, fieldName, foreignKey);
+            boolean unique = uniqueConstraintColumns.contains(columnName);
+            DatabaseColumn column = new DatabaseColumn(columnName, fieldName, foreignKey, unique);
             columnsList.add(column);
         }
         return columnsList;
@@ -63,9 +68,24 @@ public class DBMetadataManager {
                 columnsByTableName.put(tableName, columnsList);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new MetadataException(e);
         }
         return columnsByTableName;
+    }
+
+    private List<String> getUniqueConstraintColumns(String tableName, DatabaseMetaData databaseMetaData) {
+        ArrayList<String> uniqueColumns = new ArrayList<>();
+        try {
+            ResultSet indexInfo = databaseMetaData.getIndexInfo(null, null, tableName, true, false);
+            while (indexInfo.next()) {
+                String columnName = indexInfo.getString("COLUMN_NAME");
+                boolean unique = !indexInfo.getBoolean("NON_UNIQUE");
+                if (unique) uniqueColumns.add(columnName);
+            }
+        } catch (SQLException e) {
+            throw new MetadataException(e);
+        }
+        return uniqueColumns;
     }
 
     private boolean isColumnForeignID(String tableName, String columnName) {

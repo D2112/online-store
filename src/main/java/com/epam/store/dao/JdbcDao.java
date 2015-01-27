@@ -5,6 +5,8 @@ import com.epam.store.metadata.DatabaseColumn;
 import com.epam.store.metadata.DatabaseTable;
 import com.epam.store.metadata.EntityMetadata;
 import com.epam.store.model.BaseEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 class JdbcDao<T extends BaseEntity> implements Dao<T> {
+    private static final Logger log = LoggerFactory.getLogger(JdbcDao.class);
     private final Class<T> clazz;
     private DaoSession daoSession;
     private SqlPooledConnection connection;
@@ -186,14 +189,14 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
             String fieldName = column.getFieldName();
             if (!entityMetadata.hasField(fieldName)) continue;
             if (column.isForeignKey()) {
-                BaseEntity dependencyEntity = (BaseEntity) entityMetadata.invokeGetterByFieldName(fieldName, entity);
+                BaseEntity dependencyEntity = (BaseEntity) entityMetadata.invokeGetter(fieldName, entity);
                 Long dependencyID = dependencyEntity.getId();
                 if(dependencyID == null) {
                     dependencyID = insertDependency(fieldName, dependencyEntity).getId();
                 }
                 statement.setLong(parameterIndex, dependencyID);
             } else {
-                Object valueToSet = entityMetadata.invokeGetterByFieldName(fieldName, entity);
+                Object valueToSet = entityMetadata.invokeGetter(fieldName, entity);
                 statement.setObject(parameterIndex, valueToSet);
             }
             parameterIndex++;
@@ -211,7 +214,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
             String fieldName = column.getFieldName();
             if (!entityMetadata.hasField(fieldName)) continue;
             if (column.isForeignKey()) {
-                BaseEntity entityToDelete = (BaseEntity) entityMetadata.invokeGetterByFieldName(fieldName, entity);
+                BaseEntity entityToDelete = (BaseEntity) entityMetadata.invokeGetter(fieldName, entity);
                 Class<T> type = entityMetadata.getFieldType(fieldName);
                 Dao dao = daoSession.getDao(type);
                 dao.delete(entityToDelete.getId());

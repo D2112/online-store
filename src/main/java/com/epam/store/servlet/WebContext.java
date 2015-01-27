@@ -8,6 +8,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -27,12 +28,13 @@ public class WebContext {
     static {
         pagesWithURIParameters = new ArrayList<>();
         pagesWithURIParameters.add("catalog");
+        pagesWithURIParameters.add("image");
     }
 
     public WebContext(HttpServletRequest req, HttpServletResponse resp) {
         this.req = req;
         this.resp = resp;
-        //disableCaching();
+        disableCaching();
     }
 
     public WebContext(ServletRequest servletRequest, ServletResponse servletResponse) {
@@ -262,6 +264,10 @@ public class WebContext {
 
     public String getPathInfo() {
         return req.getPathInfo();
+    }
+
+    public Part getPart(String fileName) throws IOException, ServletException {
+        return req.getPart(fileName);
     }
 }
 

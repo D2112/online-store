@@ -20,6 +20,9 @@ public class ResourceFilter implements Filter {
         if (path.startsWith("/static/")) {
             log.debug("Filtered static resource: " + path);
             filterChain.doFilter(servletRequest, servletResponse);
+        } else if (path.startsWith("/image/")) {
+            log.debug("Forward to image servlet: " + path);
+            webContext.forward("/image" + path);
         } else {
             log.debug("Forward to controller: " + path);
             webContext.forward("/controller" + path);

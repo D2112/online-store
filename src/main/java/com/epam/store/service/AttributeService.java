@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 class AttributeService {
+    public static final String ATTRIBUTE_NAME = "name";
+    public static final String ATTRIBUTE_VALUE = "value";
     private DaoFactory daoFactory;
     private SqlQueryGenerator sqlQueryGenerator;
     private List<Class> attributeClasses;
@@ -33,23 +35,28 @@ class AttributeService {
     public void insertAttributes(long productID, List<Attribute> attributeList) {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             SqlPooledConnection connection = daoSession.getConnection();
-            daoSession.beginTransaction();
             Dao<Attribute> attributeDao = daoSession.getDao(Attribute.class);
             for (Attribute attribute : attributeList) {
-                EntityMetadata attributeMetadata = new EntityMetadata(attribute.getClass());
-                Attribute inserted = attributeDao.insert(attribute);
+                //try to find attribute with the same name because attribute name must be unique
+                Long attributeID = readAttributeID(attribute.getName(), connection);
+                //if the attribute not found insert new one and get ID from inserted
+                if (attributeID == null) {
+                    attributeID = attributeDao.insert(attribute).getId();
+                }
+                //inserting attribute
                 String insertAttributeQuery = sqlQueryGenerator.getQueryForClass(SqlQueryType.INSERT, attribute.getClass());
-                long attributeID = inserted.getId();
+                //metadata needs for getting value from one of several attribute class
+                //because every class has different types of value
+                EntityMetadata attributeMetadata = new EntityMetadata(attribute.getClass());
                 try (PreparedStatement statement = connection.prepareStatement(insertAttributeQuery)) {
                     statement.setLong(1, attributeID);
                     statement.setLong(2, productID);
-                    statement.setObject(3, attributeMetadata.invokeGetterByFieldName("value", attribute));
-                    int insertedAmount = statement.executeUpdate();
+                    statement.setObject(3, attributeMetadata.invokeGetter(ATTRIBUTE_VALUE, attribute));
+                    statement.executeUpdate();
                 } catch (SQLException e) {
                     throw new ServiceException(e);
                 }
             }
-            daoSession.endTransaction();
         }
     }
 
@@ -59,7 +66,8 @@ class AttributeService {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             for (Class attributeClass : attributeClasses) {
                 String sqlQuery = sqlQueryGenerator.getFindByParameterQuery(attributeClass, "PRODUCT_ID");
-                List attributesOfConcreteClass = getAttributesOfConcreteClass(productID, sqlQuery, attributeClass, daoSession.getConnection());
+                List<Attribute> attributesOfConcreteClass =
+                        getAttributesOfConcreteClass(productID, sqlQuery, attributeClass, daoSession.getConnection());
                 attributeList.addAll(attributesOfConcreteClass);
             }
         }
@@ -80,8 +88,8 @@ class AttributeService {
                 Long attributeID = rs.getLong("ATTRIBUTE_ID");
                 String attributeName = readAttributeName(attributeID, connection);
                 Object value = rs.getObject("VALUE");
-                attributeEntityMetadata.invokeSetterByFieldName("name", attribute, attributeName);
-                attributeEntityMetadata.invokeSetterByFieldName("value", attribute, value);
+                attributeEntityMetadata.invokeSetterByFieldName(ATTRIBUTE_NAME, attribute, attributeName);
+                attributeEntityMetadata.invokeSetterByFieldName(ATTRIBUTE_VALUE, attribute, value);
                 attributeList.add(attribute);
             }
         } catch (SQLException | InstantiationException | IllegalAccessException e) {
@@ -103,5 +111,19 @@ class AttributeService {
             throw new ServiceException(e);
         }
         return attributeName;
+    }
+
+    private Long readAttributeID(String attributeName, SqlPooledConnection connection) {
+        String findAttributeByNameQuery = sqlQueryGenerator.getFindByParameterQuery(Attribute.class, ATTRIBUTE_NAME);
+        try (PreparedStatement statement = connection.prepareStatement(findAttributeByNameQuery)) {
+            statement.setString(1, attributeName);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getLong(1);
+            }
+        } catch (SQLException e) {
+            throw new ServiceException(e);
+        }
+        return null;
     }
 }

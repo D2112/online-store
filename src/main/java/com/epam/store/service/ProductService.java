@@ -63,4 +63,13 @@ public class ProductService {
         }
         return product;
     }
+
+    public Product getProductByName(String productName) {
+        try (DaoSession daoSession = daoFactory.getDaoSession()) {
+            Dao<Product> productDao = daoSession.getDao(Product.class);
+            List<Product> products = productDao.findByParameter("name", productName);
+            if (products.size() == 1) return products.iterator().next();
+            return null;
+        }
+    }
 }

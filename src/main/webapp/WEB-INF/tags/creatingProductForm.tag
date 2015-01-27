@@ -4,7 +4,9 @@
 
 <div class="creating_form">
     <h4 class="error_message"><span>${resultMessage}</span></h4>
-    <form id="creatingProduct" action="<c:url value="creating-product/create"/>" method="POST">
+
+    <form id="creatingProduct" action="<c:url value="creating-product/create"/>" method="POST"
+          enctype="multipart/form-data">
         <fieldset>
             <legend>Creating product</legend>
             <page:selectCategoriesMenu/>
@@ -13,6 +15,11 @@
             <page:inputTextField label="Price:" inputName="price" value="${price}" formName="creatingProduct"/>
             <page:inputTextArea label="Description:" inputName="description" value="${description}"
                                 formName="creatingProduct"/>
+            <br/>
+            <label class="input_field"> Image:
+                <input type="file" name="image"/>
+            </label>
+            <br/>
             <page:attibutesMenu/>
             <div class="center_text" style="padding-top: 20px">
                 <button type="submit" form="creatingProduct" class="base_button creating_product_button">

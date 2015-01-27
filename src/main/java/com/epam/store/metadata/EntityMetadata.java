@@ -67,7 +67,7 @@ public class EntityMetadata<T extends BaseEntity> {
         }
     }
 
-    public Object invokeGetterByFieldName(String fieldName, Object targetToInvoke) {
+    public Object invokeGetter(String fieldName, Object targetToInvoke) {
         try {
             return getterByFieldName.get(fieldName).invoke(targetToInvoke);
         } catch (IllegalAccessException | InvocationTargetException e) {

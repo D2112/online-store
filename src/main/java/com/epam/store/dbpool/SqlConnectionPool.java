@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.LinkedList;
-import java.util.Queue;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.Condition;
@@ -15,14 +15,15 @@ import java.util.concurrent.locks.ReentrantLock;
 public class SqlConnectionPool implements ConnectionPool {
     private static final Logger log = LoggerFactory.getLogger(SqlConnectionPool.class);
     private ConnectionPoolConfig config;
-    private Queue<PooledConnection> availableConnections;
-    private int usedConnectionsAmount;
+    private List<PooledConnection> availableConnections;
+    private List<PooledConnection> usedConnections;
     private Lock lock;
     private Condition hasAvailableConnection;
 
     public SqlConnectionPool() {
         config = new ConnectionPoolConfig();
         availableConnections = new LinkedList<>();
+        usedConnections = new LinkedList<>();
         lock = new ReentrantLock();
         hasAvailableConnection = lock.newCondition();
         try {
@@ -52,18 +53,22 @@ public class SqlConnectionPool implements ConnectionPool {
                     log.warn("InterruptedException in thread: " + Thread.currentThread().getName(), e);
                 }
             }
-            PooledConnection connection = getAvailableConnection();
-            usedConnectionsAmount++;
-            return connection;
+            return getAvailableConnection();
         } finally {
             lock.unlock();
         }
     }
 
     public void shutdown() {
+        int closedCount = 0;
         try {
             for (PooledConnection pooledConnection : availableConnections) {
-                pooledConnection.getConnection().close();
+                closeConnection(pooledConnection);
+                closedCount++;
+            }
+            for (PooledConnection usedConnection : usedConnections) {
+                closeConnection(usedConnection);
+                closedCount++;
             }
         } catch (SQLException e) {
             String errorMessage = "Can't close connection pool";
@@ -71,31 +76,39 @@ public class SqlConnectionPool implements ConnectionPool {
             throw new PoolException(errorMessage, e);
         }
         log.info("The connection pool closed successfully. " +
-                "{} connections have been closed", availableConnections.size());
+                "{} connections have been closed", closedCount);
     }
 
     private PooledConnection getAvailableConnection() {
         if (availableConnections.size() == 0) {
             return createConnection();
         }
-        return availableConnections.poll();
+        PooledConnection connection = availableConnections.iterator().next();
+        availableConnections.remove(connection);
+        usedConnections.add(connection);
+        return connection;
     }
 
     private boolean noAvailableConnections() {
-        return usedConnectionsAmount == config.maxConnections() && availableConnections.size() == 0;
+        return (availableConnections.size() == 0) && (config.maxConnections() == usedConnections.size());
     }
 
     private void releaseConnection(PooledConnection connection) {
         lock.lock();
         try {
-            if (availableConnections.contains(connection)) return;
-            connection.setLastAccessTimeStamp(System.currentTimeMillis());
-            availableConnections.add(connection);
-            usedConnectionsAmount--;
-            hasAvailableConnection.signal();
+            if (usedConnections.remove(connection)) {
+                connection.setLastAccessTimeStamp(System.currentTimeMillis());
+                availableConnections.add(connection);
+                hasAvailableConnection.signal();
+            }
         } finally {
             lock.unlock();
         }
+    }
+
+    private boolean closeConnection(PooledConnection connection) throws SQLException {
+        connection.getConnection().close();
+        return availableConnections.remove(connection) || usedConnections.remove(connection);
     }
 
     private PooledConnection createConnection() {
@@ -187,7 +200,7 @@ public class SqlConnectionPool implements ConnectionPool {
 
         private void close(PooledConnection pooledConnection) {
             try {
-                pooledConnection.getConnection().close();
+                closeConnection(pooledConnection);
             } catch (SQLException e) {
                 log.error("Error on close connection: " + e.getMessage(), e);
                 throw new PoolException("Error on close connection: " + e.getMessage());
@@ -211,7 +224,7 @@ public class SqlConnectionPool implements ConnectionPool {
             int redundantAmount = availableConnections.size() - config.maxIdleConnections();
             if (redundantAmount > 0) {
                 for (int i = 0; i < redundantAmount; i++) {
-                    close(availableConnections.poll());
+                    close(availableConnections.get(i));
                 }
             }
         }

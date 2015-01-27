@@ -3,7 +3,6 @@
 <%@ tag description="Writes the HTML code for inserting a product view." %>
 <%@ taglib prefix="page" tagdir="/WEB-INF/tags" %>
 <%@ attribute name="product" type="com.epam.store.model.Product" %>
-<%@ attribute name="imagePath" %>
 
 <div class="prod_box">
     <div class="center_prod_box">
@@ -11,7 +10,7 @@
             <c:out value="${product.name}"/>
         </div>
         <div class="product_img">
-            <img src="<c:out value="${imagePath}"/>" border="0"/>
+            <img src="<c:out value="/image/${product.image.id}"/>" border="0"/>
         </div>
         <page:price value="${product.price.value}"/>
     </div>

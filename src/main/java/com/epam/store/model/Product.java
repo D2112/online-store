@@ -10,17 +10,19 @@ public class Product extends BaseEntity {
     private Category category;
     private String description;
     private Price price;
+    private Image image;
     private List<Attribute> attributes;
 
     public Product() {
         attributes = new ArrayList<>();
     }
 
-    public Product(String name, Category category, String description, Price price) {
+    public Product(String name, Category category, String description, Price price, Image image) {
         this.name = name;
         this.price = price;
         this.category = category;
         this.description = description;
+        this.image = image;
         this.attributes = new ArrayList<>();
     }
 
@@ -64,6 +66,14 @@ public class Product extends BaseEntity {
         this.category = category;
     }
 
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -74,6 +84,8 @@ public class Product extends BaseEntity {
 
         if (attributes != null ? !attributes.equals(product.attributes) : product.attributes != null) return false;
         if (category != null ? !category.equals(product.category) : product.category != null) return false;
+        if (description != null ? !description.equals(product.description) : product.description != null) return false;
+        if (image != null ? !image.equals(product.image) : product.image != null) return false;
         if (name != null ? !name.equals(product.name) : product.name != null) return false;
         if (price != null ? !price.equals(product.price) : product.price != null) return false;
 
@@ -85,7 +97,9 @@ public class Product extends BaseEntity {
         int result = super.hashCode();
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (category != null ? category.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (price != null ? price.hashCode() : 0);
+        result = 31 * result + (image != null ? image.hashCode() : 0);
         result = 31 * result + (attributes != null ? attributes.hashCode() : 0);
         return result;
     }
@@ -94,9 +108,11 @@ public class Product extends BaseEntity {
     public String toString() {
         return "Product{" +
                 "name='" + name + '\'' +
-                ", category='" + category + '\'' +
+                ", category=" + category +
+                ", description='" + description + '\'' +
                 ", price=" + price +
+                ", image=" + image +
                 ", attributes=" + attributes +
-                '}';
+                "} " + super.toString();
     }
 }

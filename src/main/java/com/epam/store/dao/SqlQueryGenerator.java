@@ -5,12 +5,15 @@ import com.epam.store.metadata.DatabaseColumn;
 import com.epam.store.metadata.DatabaseTable;
 import com.epam.store.metadata.NameFormatter;
 import com.epam.store.model.BaseEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
 public class SqlQueryGenerator {
+    private static final Logger log = LoggerFactory.getLogger(SqlQueryGenerator.class);
     private static final String QUERY_FILE_NAME = "query.properties";
     private static final String FIND_BY_PARAMETERS_QUERY_NAME = "FIND_BY_PARAMETERS";
     private Map<String, String> queryTemplateByName;
@@ -64,6 +67,7 @@ public class SqlQueryGenerator {
         if (type == SqlQueryType.INSERT) {
             query = String.format(templateWithTableName, generateParametersString(columns.size()));
         }
+        log.debug("Generated query " + type + ": " + query);
         return query;
     }
 
