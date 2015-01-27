@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+@WebAction(path = "GET/catalog")
 public class ShowCatalogAction implements Action {
     private static final Logger log = LoggerFactory.getLogger(ShowCatalogAction.class);
     private ActionResult actionResult = new ActionResult("catalog");

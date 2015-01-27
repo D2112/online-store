@@ -4,6 +4,7 @@ import com.epam.store.service.UserService;
 import com.epam.store.servlet.Scope;
 import com.epam.store.servlet.WebContext;
 
+@WebAction(path = "GET/admin/users")
 public class ShowUsersListAction implements Action {
     private ActionResult adminPage = new ActionResult("admin");
 

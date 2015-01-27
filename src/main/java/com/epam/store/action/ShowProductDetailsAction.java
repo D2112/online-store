@@ -5,6 +5,7 @@ import com.epam.store.service.ProductService;
 import com.epam.store.servlet.Scope;
 import com.epam.store.servlet.WebContext;
 
+@WebAction(path = "GET/details")
 public class ShowProductDetailsAction implements Action {
     private ActionResult actionResult = new ActionResult("details");
 

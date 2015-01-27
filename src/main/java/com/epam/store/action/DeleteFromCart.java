@@ -6,6 +6,7 @@ import com.epam.store.servlet.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@WebAction(path = "POST/deleteFromCart")
 public class DeleteFromCart implements Action {
     private static final Logger log = LoggerFactory.getLogger(DeleteFromCart.class);
 

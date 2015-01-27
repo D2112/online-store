@@ -8,6 +8,7 @@ import com.epam.store.servlet.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@WebAction(path = "POST/addToCart")
 public class AddToCartAction implements Action {
     private static final Logger log = LoggerFactory.getLogger(AddToCartAction.class);
 

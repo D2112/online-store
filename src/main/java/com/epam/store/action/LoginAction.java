@@ -6,6 +6,7 @@ import com.epam.store.service.Authenticator;
 import com.epam.store.servlet.Scope;
 import com.epam.store.servlet.WebContext;
 
+@WebAction(path = "POST/login")
 class LoginAction implements Action {
     private ActionResult errorResult = new ActionResult("login", true);
     private ActionResult successfulResult = new ActionResult("catalog", true);

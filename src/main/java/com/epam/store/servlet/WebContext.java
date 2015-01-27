@@ -183,7 +183,7 @@ public class WebContext {
         return req.getRequestURI();
     }
 
-    private String getPagePathFromURI() {
+    public String getPagePathFromURI() {
         List<String> pathSegments = splitIntoSegments(req.getPathInfo());
         StringBuilder sb = new StringBuilder();
         for (String segment : pathSegments) {

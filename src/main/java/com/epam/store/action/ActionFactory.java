@@ -1,12 +1,16 @@
 package com.epam.store.action;
 
 import com.epam.store.servlet.WebContext;
+import org.reflections.Reflections;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ActionFactory {
-    static private ActionFactory instance = new ActionFactory();
+    private static final String ACTIONS_PACKAGE = "com.epam.store.action";
+    private static final String START_PAGE = "catalog";
+    private static ActionFactory instance = new ActionFactory();
     private Map<String, Action> actions;
 
     static public ActionFactory getInstance() {
@@ -14,28 +18,32 @@ public class ActionFactory {
     }
 
     private ActionFactory() {
-        actions = new HashMap<>();
-        actions.put("GET/", new ShowPageAction("catalog"));
-        actions.put("GET/catalog", new ShowCatalogAction());
-        actions.put("GET/login", new ShowPageAction("login"));
-        actions.put("GET/registration", new ShowPageAction("registration"));
-        actions.put("GET/cart", new ShowPageAction("cart"));
-        actions.put("GET/details", new ShowProductDetailsAction());
-        actions.put("GET/error", new ShowPageAction("error"));
-        actions.put("GET/logout", new LogoutAction());
-        actions.put("GET/register-success", new ShowPageAction("register-success"));
-        actions.put("GET/admin", new ShowPageAction("admin"));
-        actions.put("GET/admin/users", new ShowUsersListAction());
-        actions.put("GET/admin/creating-product", new ShowCreatingProductPageAction(false));
-        actions.put("POST/admin/creating-product", new ShowCreatingProductPageAction(true));
-        actions.put("POST/admin/creating-product/create", new CreateProductAction());
-        actions.put("POST/addToCart", new AddToCartAction());
-        actions.put("POST/deleteFromCart", new DeleteFromCart());
-        actions.put("POST/registration", new RegistrationAction());
-        actions.put("POST/login", new LoginAction());
+        actions = initializeActions();
+        //Map start page
+        actions.put("GET/", new ShowPageAction(START_PAGE));
     }
 
     public Action getAction(WebContext webContext) {
-        return actions.get(webContext.getRequestedAction());
+        Action action = actions.get(webContext.getRequestedAction());
+        if (action == null) action = new ShowPageAction(webContext.getPagePathFromURI());
+        return action;
+    }
+
+    private Map<String, Action> initializeActions() {
+        Map<String, Action> actionsMap = new HashMap<>();
+        Reflections reflections = new Reflections(ACTIONS_PACKAGE);
+        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(WebAction.class);
+        for (Class<?> actionClass : annotated) {
+            WebAction annotation = actionClass.getAnnotation(WebAction.class);
+            String path = annotation.path();
+            Action actionObject;
+            try {
+                actionObject = (Action) actionClass.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new ActionException("Error during Action Factory initialization", e);
+            }
+            actionsMap.put(path, actionObject);
+        }
+        return actionsMap;
     }
 }

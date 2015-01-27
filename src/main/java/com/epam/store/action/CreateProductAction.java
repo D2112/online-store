@@ -13,6 +13,8 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.*;
 
+
+@WebAction(path = "POST/admin/creating-product/create")
 public class CreateProductAction extends AbstractCreatingProductAction {
     private static final String EMPTY_STRING = "";
     private static final String CATEGORIES_LIST_NAME = "categories";

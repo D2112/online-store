@@ -11,8 +11,6 @@ public abstract class AbstractCreatingProductAction implements Action {
     /**
      * Gets parameters and sets they to flash scope
      * for displaying on the same page if error occurred
-     *
-     * @param webContext
      */
     protected void setAttributesToFlashScope(WebContext webContext) {
         webContext.setAttribute("attributesAmount", webContext.getParameter("attributesAmount"), Scope.FLASH);
