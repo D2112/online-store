@@ -31,12 +31,7 @@ public class ControllerServlet extends HttpServlet {
         log.debug("current URI: " + webContext.getURI());
         log.debug("Referrer: " + req.getHeader("Referrer"));
         Action action = actionFactory.getAction(webContext);
-/*        if (action == null) {
-            log.debug("Action not found");
-            webContext.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }*/
-        log.debug("Found action: " + action.getClass().getSimpleName());
+        log.debug("Executing action: " + action.getClass().getSimpleName());
         ActionResult result = action.execute(webContext);
         doForwardOrRedirect(result, req, resp);
     }

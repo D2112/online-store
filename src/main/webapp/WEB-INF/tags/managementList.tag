@@ -8,9 +8,12 @@
         <a href="<c:url value="/admin/creating-product"/>">Create Product</a>
     </li>
     <li class="even">
-        <a href="<c:url value="/admin/users"/>">Users</a>
+        <a href="<c:url value="/admin/categories"/>">Categories</a>
     </li>
     <li class="odd">
-        <a href="<c:url value="/  "/>">Black list</a>
+        <a href="<c:url value="/admin/users"/>">Users</a>
+    </li>
+    <li class="even">
+        <a href="<c:url value="/admin/black-list"/>">Black list</a>
     </li>
 </ul>

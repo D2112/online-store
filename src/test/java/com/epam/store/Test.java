@@ -2,18 +2,21 @@ package com.epam.store;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 
 
 public class Test {
     private static final Logger log = LoggerFactory.getLogger(Test.class);
 
-    public static void main(String[] args) throws SQLException, IOException {
-        System.out.println(Files.probeContentType(Paths.get("E:/123.jpg")));
+    public static void main(String[] args) throws SQLException, IOException, XMLStreamException, SAXException {
+        //System.out.println(Files.probeContentType(Paths.get("E:/123.jpg")));
+
+
+
 
 
 /*        ConnectionPool cp = new SqlConnectionPool();

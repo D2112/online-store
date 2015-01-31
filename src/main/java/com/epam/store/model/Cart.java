@@ -25,6 +25,10 @@ public class Cart {
         return false;
     }
 
+    public void removeAllProducts() {
+        products.removeAll(products);
+    }
+
     public List<Product> getProducts() {
         return products;
     }
@@ -57,4 +61,5 @@ public class Cart {
     public int hashCode() {
         return products != null ? products.hashCode() : 0;
     }
+
 }

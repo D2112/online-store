@@ -3,6 +3,8 @@ package com.epam.store.model;
 public class Role extends BaseEntity {
     public static final String USER_ROLE_NAME = "User";
     public static final String ADMIN_ROLE_NAME = "Admin";
+    public static final int USER_ROLE_ID = 1;
+    public static final int ADMIN_ROLE_ID = 2;
     private String name;
 
     public Role() {

@@ -66,15 +66,15 @@ class AttributeService {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             for (Class attributeClass : attributeClasses) {
                 String sqlQuery = sqlQueryGenerator.getFindByParameterQuery(attributeClass, "PRODUCT_ID");
-                List<Attribute> attributesOfConcreteClass =
-                        getAttributesOfConcreteClass(productID, sqlQuery, attributeClass, daoSession.getConnection());
-                attributeList.addAll(attributesOfConcreteClass);
+                List<Attribute> attributesOfCertainClass =
+                        getAttributesOfCertainClass(productID, sqlQuery, attributeClass, daoSession.getConnection());
+                attributeList.addAll(attributesOfCertainClass);
             }
         }
         return attributeList;
     }
 
-    private <T extends Attribute> List<Attribute> getAttributesOfConcreteClass(
+    private <T extends Attribute> List<Attribute> getAttributesOfCertainClass(
             long productID, String query, Class<T> clazz, SqlPooledConnection connection) {
 
         List<Attribute> attributeList = new ArrayList<>();

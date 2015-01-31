@@ -1,20 +1,21 @@
 package com.epam.store.model;
 
-import java.sql.Date;
 
 public class Purchase extends BaseEntity {
     private Product product;
     private Price price;
     private Date date;
+    private Status status;
 
     public Purchase() {
 
     }
 
-    public Purchase(Product product, Price price, Date date) {
+    public Purchase(Product product, Price price, Date date, Status status) {
         this.product = product;
         this.price = price;
         this.date = date;
+        this.status = status;
     }
 
     public Product getProduct() {
@@ -39,6 +40,14 @@ public class Purchase extends BaseEntity {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     @Override

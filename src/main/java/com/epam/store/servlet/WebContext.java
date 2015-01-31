@@ -1,5 +1,6 @@
 package com.epam.store.servlet;
 
+import com.epam.store.config.PageConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,9 +27,7 @@ public class WebContext {
     private HttpServletResponse resp;
 
     static {
-        pagesWithURIParameters = new ArrayList<>();
-        pagesWithURIParameters.add("catalog");
-        pagesWithURIParameters.add("image");
+        pagesWithURIParameters = PageConfig.getInstance().getPagesWithUriParameters();
     }
 
     public WebContext(HttpServletRequest req, HttpServletResponse resp) {
@@ -195,6 +194,12 @@ public class WebContext {
         }
         if(sb.length() == 0) sb.append("/");
         return sb.toString();
+    }
+
+    public String getFirstParameterFromURI() {
+        List<String> parametersFromURI = getParametersFromURI();
+        if (parametersFromURI.size() == 0) return null;
+        return parametersFromURI.iterator().next();
     }
 
     public List<String> getParametersFromURI() {

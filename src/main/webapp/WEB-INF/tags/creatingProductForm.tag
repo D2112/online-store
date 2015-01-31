@@ -9,7 +9,7 @@
           enctype="multipart/form-data">
         <fieldset>
             <legend>Creating product</legend>
-            <page:selectCategoriesMenu/>
+            <page:selectCategoriesMenu formName="creatingProduct"/>
             <page:inputTextField label="Name:" inputName="productName" value="${productName}"
                                  formName="creatingProduct"/>
             <page:inputTextField label="Price:" inputName="price" value="${price}" formName="creatingProduct"/>

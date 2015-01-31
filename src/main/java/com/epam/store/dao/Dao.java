@@ -19,4 +19,6 @@ public interface Dao<T extends BaseEntity> {
     public List<T> findByParameter(String paramName, Object paramValue);
 
     public List<T> findByParameters(Map<String, Object> parameters);
+
+    public T findFirstByParameter(String paramName, Object paramValue);
 }

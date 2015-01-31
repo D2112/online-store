@@ -13,7 +13,14 @@
             </c:when>
             <c:otherwise>
                 <div class="center_text">
-                    <h2>Your shopping cart is empty</h2>
+                    <h2>
+                        <c:if test="${cartMessage != null}">
+                            ${cartMessage}
+                        </c:if>
+                        <c:otherwise>
+                            Your shopping cart is empty
+                        </c:otherwise>
+                    </h2>
                 </div>
             </c:otherwise>
         </c:choose>

@@ -155,6 +155,13 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
         return findByParameters(map);
     }
 
+    @Override
+    public T findFirstByParameter(String paramName, Object paramValue) {
+        List<T> list = findByParameter(paramName, paramValue);
+        if (list.size() == 0) return null;
+        return list.iterator().next();
+    }
+
     private List<T> parseResultSet(ResultSet rs) throws SQLException {
         List<T> resultList = new ArrayList<>();
         while (rs.next()) {
@@ -188,6 +195,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
         for (DatabaseColumn column : table.getColumns()) {
             String fieldName = column.getFieldName();
             if (!entityMetadata.hasField(fieldName)) continue;
+            log.debug("setting to insert statement " + fieldName);
             if (column.isForeignKey()) {
                 BaseEntity dependencyEntity = (BaseEntity) entityMetadata.invokeGetter(fieldName, entity);
                 Long dependencyID = dependencyEntity.getId();

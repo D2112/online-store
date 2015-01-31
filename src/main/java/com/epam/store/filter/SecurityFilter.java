@@ -17,6 +17,7 @@ public class SecurityFilter implements Filter {
     private static final Logger log = LoggerFactory.getLogger(SecurityFilter.class);
     public static final String ADMIN_PAGE_PREFIX = "/admin";
     public static final String USER_PAGE_PREFIX = "/user";
+    public static final String LOGIN_PAGE_NAME = "/login";
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -26,7 +27,7 @@ public class SecurityFilter implements Filter {
         log.debug("Path: " + path);
         log.debug("User: " + user);
 
-        //if path is not secret and available for all
+        //if path is not secret and available for all go further
         if (!path.startsWith(ADMIN_PAGE_PREFIX) && !path.startsWith(USER_PAGE_PREFIX)) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
@@ -38,6 +39,9 @@ public class SecurityFilter implements Filter {
                 filterChain.doFilter(servletRequest, servletResponse);
                 return;
             }
+        } else if (path.startsWith(USER_PAGE_PREFIX)) {
+            webContext.sendRedirect(LOGIN_PAGE_NAME);
+            return;
         }
         webContext.sendError(HttpServletResponse.SC_FORBIDDEN);
     }
