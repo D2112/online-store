@@ -1,0 +1,13 @@
+<com:pages-config xmlns:com="com.epam.store.pages">
+
+    <com:page-mapping>
+        <page-name>category-management</page-name>
+        <uri>admin/categories</uri>
+    </com:page-mapping>
+
+    <com:pages-with-uri-parameters>
+        <page-name>catalog</page-name>
+        <page-name>image</page-name>
+        <page-name>purchase-list</page-name>
+    </com:pages-with-uri-parameters>
+</com:pages-config>
