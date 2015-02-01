@@ -31,9 +31,18 @@ p {
     clear: both;
 }
 
+.message {
+    text-align: center;
+}
+
 .error_message {
     text-align: center;
     color: red;
+}
+
+.success_message {
+    text-align: center;
+    color: green;
 }
 
 /*---------------- menu tab----------------------*/

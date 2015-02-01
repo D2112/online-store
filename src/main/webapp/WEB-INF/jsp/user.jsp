@@ -5,13 +5,9 @@
     <jsp:attribute name="leftSideBar">
         <page:userSideBar/>
     </jsp:attribute>
-    <jsp:attribute name="rightSideBar">
-        <page:sideFilterMenu/>
-    </jsp:attribute>
     <jsp:body>
-        <page:displayProducts products="${products}"/>
+        <page:userPersonalData user="${sessionScope.user}"/>
+        <h2>Order list:<h2>
+        <page:orderList orderList="${orderList}"/>
     </jsp:body>
 </page:genericPage>
-
-
-

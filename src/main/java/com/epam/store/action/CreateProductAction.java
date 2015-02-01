@@ -33,7 +33,7 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         String validationErrorMessage = validateInputData(webContext);
         if (validationErrorMessage != null) {
             super.setAttributesToFlashScope(webContext); //for displaying on page if error
-            webContext.setAttribute("resultMessage", validationErrorMessage, Scope.FLASH);
+            webContext.setAttribute("errorMessage", validationErrorMessage, Scope.FLASH);
             return previousPage;
         }
         try {
@@ -46,11 +46,11 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         Product productByName = productService.getProductByName(productName);
         if (productByName != null) {
             super.setAttributesToFlashScope(webContext); //for displaying on page if error
-            webContext.setAttribute("resultMessage", "Product with the same name already exists", Scope.FLASH);
+            webContext.setAttribute("errorMessage", "Product with the same name already exists", Scope.FLASH);
             return previousPage;
         }
         productService.addProduct(createProduct(webContext));
-        webContext.setAttribute("resultMessage", "Product has been created", Scope.FLASH);
+        webContext.setAttribute("successMessage", "Product has been created", Scope.FLASH);
         return previousPage; //redirect to previous page with message;
     }
 

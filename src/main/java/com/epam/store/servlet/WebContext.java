@@ -34,6 +34,7 @@ public class WebContext {
         this.req = req;
         this.resp = resp;
         disableCaching();
+
     }
 
     public WebContext(ServletRequest servletRequest, ServletResponse servletResponse) {
@@ -227,6 +228,14 @@ public class WebContext {
         return uri;
     }
 
+    public String getPathInfo() {
+        return req.getPathInfo();
+    }
+
+    public Part getPart(String fileName) throws IOException, ServletException {
+        return req.getPart(fileName);
+    }
+
     private String addFlashPrefixToName(String attributeName) {
         return FLASH_ATTRIBUTE_PREFIX + attributeName;
     }
@@ -247,7 +256,6 @@ public class WebContext {
     /**
      * Remove all names without flash prefix from the list,
      * and then remove flash prefix of the remaining names
-     *
      * @return List of flash attribute names without flash prefix
      */
     private List<String> getAttributeNamesForFlashScope(Enumeration<String> enumeration) {
@@ -265,14 +273,6 @@ public class WebContext {
         resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
         resp.setHeader("Pragma", "no-cache"); // HTTP 1.0.
         resp.setDateHeader("Expires", 0); // Proxies.
-    }
-
-    public String getPathInfo() {
-        return req.getPathInfo();
-    }
-
-    public Part getPart(String fileName) throws IOException, ServletException {
-        return req.getPart(fileName);
     }
 }
 

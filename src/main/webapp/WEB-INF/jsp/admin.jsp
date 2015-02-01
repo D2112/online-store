@@ -15,7 +15,7 @@
                 <page:blackListTable blackList="${blackList}"/>
             </c:when>
             <c:when test="${orderList != null}">
-                <page:purchaseList orderList="${orderList}"/>
+                <page:orderList orderList="${orderList}"/>
             </c:when>
         </c:choose>
     </jsp:body>

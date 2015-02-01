@@ -3,13 +3,12 @@
 <%@ taglib prefix="page" tagdir="/WEB-INF/tags" %>
 
 <div class="creating_form">
-    <h4 class="error_message"><span>${resultMessage}</span></h4>
-
+    <page:findAndDisplayMessage/>
     <form id="creatingProduct" action="<c:url value="creating-product/create"/>" method="POST"
           enctype="multipart/form-data">
         <fieldset>
             <legend>Creating product</legend>
-            <page:selectCategoriesMenu formName="creatingProduct"/>
+            <page:selectCategoriesMenu formName="creatingProduct" label="Select Category:"/>
             <page:inputTextField label="Name:" inputName="productName" value="${productName}"
                                  formName="creatingProduct"/>
             <page:inputTextField label="Price:" inputName="price" value="${price}" formName="creatingProduct"/>

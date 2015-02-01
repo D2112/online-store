@@ -11,17 +11,11 @@
             <c:when test="${cart.productAmount != 0}">
                 <page:cartInfoTable cart="${sessionScope.cart}"/>
             </c:when>
+            <c:when test="${cartMessage != null}">
+                <page:message text="${cartMessage}"/>
+            </c:when>
             <c:otherwise>
-                <div class="center_text">
-                    <h2>
-                        <c:if test="${cartMessage != null}">
-                            ${cartMessage}
-                        </c:if>
-                        <c:otherwise>
-                            Your shopping cart is empty
-                        </c:otherwise>
-                    </h2>
-                </div>
+                <page:message text="Your shopping cart is empty"/>
             </c:otherwise>
         </c:choose>
     </jsp:body>
