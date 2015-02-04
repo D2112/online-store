@@ -19,13 +19,14 @@ p {
     padding: 0;
     background-color: #FFFFFF;
 }
-
 #header {
     width: 1000px;
     height: 136px;
     background: url(/image/3) no-repeat 0 0;
+    position: relative;
     margin: auto;
 }
+
 
 #main_content {
     clear: both;
@@ -103,6 +104,12 @@ a.nav:hover {
 
 .left_text {
     text-align: left;
+}
+
+.language {
+    position: absolute;
+    bottom: 0;
+    right: 0;
 }
 
 /*---------------- Creating product menu----------------------*/

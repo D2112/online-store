@@ -7,14 +7,10 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
+import javax.servlet.http.*;
+import javax.servlet.jsp.jstl.core.Config;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,7 +18,8 @@ import java.util.regex.Pattern;
 public class WebContext {
     private static final Logger log = LoggerFactory.getLogger(WebContext.class);
     private static final String FLASH_ATTRIBUTE_PREFIX = "flash.";
-    private static List<String> pagesWithURIParameters;
+    private static final String MESSAGES_BUNDLE_BASENAME = "i18n.MessagesBundle";
+    private static final List<String> pagesWithURIParameters;
     private HttpServletRequest req;
     private HttpServletResponse resp;
 
@@ -159,11 +156,6 @@ public class WebContext {
         return req.getContextPath();
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> T getService(Class<T> serviceClass) {
-        return (T) getAttribute(serviceClass.getSimpleName(), Scope.APPLICATION);
-    }
-
     public String getPreviousURI() {
         return req.getHeader("Referer").substring(getURL().length());
     }
@@ -209,18 +201,6 @@ public class WebContext {
         return splitIntoSegments(parameterString);
     }
 
-     private List<String> splitIntoSegments(String uri) {
-        List<String> names = new ArrayList<>();
-        String regex = "[^/]+";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(uri);
-        while (matcher.find()) {
-            String parameter = matcher.group();
-            if (parameter.length() > 0) names.add(matcher.group());
-        }
-        return names;
-    }
-
     public String getURIWithQueryString() {
         String queryString = req.getQueryString();
         String uri = getURI();
@@ -234,6 +214,67 @@ public class WebContext {
 
     public Part getPart(String fileName) throws IOException, ServletException {
         return req.getPart(fileName);
+    }
+
+    public ResourceBundle getMessagesBundle() {
+        Locale currentLocale = (Locale) req.getSession().getAttribute("locale");
+        return ResourceBundle.getBundle(MESSAGES_BUNDLE_BASENAME, currentLocale);
+    }
+
+    public void setJstlFormatterLocale(Locale locale) {
+        Config.set(req.getSession(), Config.FMT_LOCALE, locale);
+    }
+
+    public void addCookie(Cookie cookie) {
+        resp.addCookie(cookie);
+    }
+
+    public void addLangCookie(Locale locale) {
+        Cookie cookie = new Cookie("lang", locale.getLanguage());
+        cookie.setMaxAge(Integer.MAX_VALUE);
+        addCookie(cookie);
+    }
+
+    public Cookie findCookie(String name) {
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : req.getCookies()) {
+                if (name.equals(cookie.getName())) {
+                    return cookie;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Cookie[] getCookies() {
+        return req.getCookies();
+    }
+
+    public void setLocale(Locale locale) {
+        setAttribute("locale", locale, Scope.SESSION);
+        setJstlFormatterLocale(locale);
+    }
+
+    public HttpSession getSession() {
+        return req.getSession();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getService(Class<T> serviceClass) {
+        return (T) getAttribute(serviceClass.getSimpleName(), Scope.APPLICATION);
+    }
+
+    private List<String> splitIntoSegments(String uri) {
+        List<String> names = new ArrayList<>();
+        String regex = "[^/]+";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(uri);
+        while (matcher.find()) {
+            String parameter = matcher.group();
+            if (parameter.length() > 0) names.add(matcher.group());
+        }
+        return names;
     }
 
     private String addFlashPrefixToName(String attributeName) {

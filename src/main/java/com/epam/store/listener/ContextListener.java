@@ -17,7 +17,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @WebListener
@@ -44,8 +43,6 @@ public class ContextListener implements ServletContextListener {
         servletContext.setAttribute(getNameForService(Authenticator.class), new Authenticator(daoFactory));
         CategoryService categoryService = new CategoryService(daoFactory);
         servletContext.setAttribute(getNameForService(CategoryService.class), categoryService);
-
-        servletContext.setAttribute("locale", new Locale("ru_RU"));
 
         List<Category> categories = new CopyOnWriteArrayList<>(categoryService.getCategories());
         servletContext.setAttribute("categories", categories);

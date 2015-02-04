@@ -18,6 +18,7 @@ import java.util.*;
 public class CreateProductAction extends AbstractCreatingProductAction {
     private static final String EMPTY_STRING = "";
     private static final String CATEGORIES_LIST_NAME = "categories";
+    private ResourceBundle messagesBundle;
     private String categoryName;
     private String productName;
     private String price;
@@ -28,6 +29,10 @@ public class CreateProductAction extends AbstractCreatingProductAction {
 
     @Override
     public ActionResult execute(WebContext webContext) {
+        messagesBundle = webContext.getMessagesBundle();
+        String alreadyExistError = messagesBundle.getString("creating-product.error.alreadyExist");
+        String successMessage = messagesBundle.getString("creating-product.message.success");
+
         ActionResult previousPage = new ActionResult(webContext.getPreviousURI(), true);
         getParametersFromRequest(webContext);
         String validationErrorMessage = validateInputData(webContext);
@@ -46,11 +51,11 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         Product productByName = productService.getProductByName(productName);
         if (productByName != null) {
             super.setAttributesToFlashScope(webContext); //for displaying on page if error
-            webContext.setAttribute("errorMessage", "Product with the same name already exists", Scope.FLASH);
+            webContext.setAttribute("errorMessage", alreadyExistError, Scope.FLASH);
             return previousPage;
         }
         productService.addProduct(createProduct(webContext));
-        webContext.setAttribute("successMessage", "Product has been created", Scope.FLASH);
+        webContext.setAttribute("successMessage", successMessage, Scope.FLASH);
         return previousPage; //redirect to previous page with message;
     }
 
@@ -135,14 +140,14 @@ public class CreateProductAction extends AbstractCreatingProductAction {
      * Validates input data for empty fields,
      * duplicate attribute names, checks is price a number
      *
-     * @return message with validation error and null if there is no validation errors
+     * @return message with validation error or null if there is no validation errors
      */
     private String validateInputData(WebContext webContext) {
-        if (isFieldsEmpty()) return "Some fields are not filled";
-        if (hasAttributesDuplicateNames()) return "Attribute has duplicated names";
+        if (isFieldsEmpty()) return messagesBundle.getString("creating-product.error.notFilled");
+        if (hasAttributesDuplicateNames()) return messagesBundle.getString("creating-product.error.duplicate");
         //if price is not a number
         if (!RegexValidator.isIntegerNumber(price) && !RegexValidator.isDecimalNumber(price)) {
-            return "Invalid Price";
+            return messagesBundle.getString("creating-product.error.price");
         }
         return null;
     }

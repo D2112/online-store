@@ -1,9 +1,9 @@
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/static/css/style.css"/>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ tag description="Writes the HTML code for output categories menu." %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ attribute name="categories" required="true" type="java.util.Collection" %>
 
-<div class="title_box">Categories</div>
+<div class="title_box"><fmt:message key="main.label.categories"/></div>
 <ul class="list_menu">
     <c:set var="count" value="0" scope="page"/>
     <c:forEach items="${categories}" var="category" varStatus="loopStatus">

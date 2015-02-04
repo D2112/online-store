@@ -21,8 +21,9 @@ public class RegistrationService {
     public boolean register(String name, String email, String password) {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<User> userDao = daoSession.getDao(User.class);
-            List<User> userList = userDao.findByParameter("email", email);
-            if (userList.size() > 0) return false;
+            //check if user with the same email exist
+            User userByEmail = userDao.findFirstByParameter("email", email);
+            if (userByEmail != null) return false;
             User user = new User();
             user.setName(name);
             user.setEmail(email);

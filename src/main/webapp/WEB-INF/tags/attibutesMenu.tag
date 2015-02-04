@@ -1,12 +1,13 @@
 <%@tag description="displays creating product form" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <div class="input_field">
-    <label>Attributes:<br></label>
+    <label><fmt:message key="creating-product.label.attributes"/>:<br></label>
     <table class="attributes_table">
         <tr>
-            <th>Attribute name</th>
-            <th>Value</th>
+            <th><fmt:message key="creating-product.label.attributeName"/></th>
+            <th><fmt:message key="creating-product.label.value"/></th>
         </tr>
         <c:forEach begin="1" end="${attributesAmount}" varStatus="index">
             <c:if test="${not empty attributeNames}">
@@ -25,7 +26,8 @@
         <tr>
             <th colspan="2">
                 <button form="creatingProduct" formaction="<c:url value="creating-product/setAttributesAmount"/>"
-                        type="submit" class="base_button">Set attributes number
+                        type="submit" class="base_button">
+                    <fmt:message key="creating-product.button.setAttributesNumber"/>
                 </button>
                 <input form="creatingProduct" type="number" name="attributesAmount"
                        value="${attributesAmount}" min="0" max="20"/>

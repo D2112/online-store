@@ -1,15 +1,17 @@
 <%@tag description="Overall side bar template" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="page" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ attribute name="orderList" required="true" type="java.util.Collection" %>
+
 
 <div class="center_text">
     <table>
         <c:forEach items="${orderList}" var="order">
             <tr>
                 <th><page:date date="${order.date}"/></th>
-                <th>Total price: ${order.totalPrice}</th>
-                <th>Status</th>
+                <th><fmt:message key="order-list.label.totalPrice"/>: <page:price value="${order.totalPrice}"/></th>
+                <th><fmt:message key="order-list.label.status"/></th>
             </tr>
             <c:forEach items="${order.purchaseList}" var="purchase">
                 <tr>
