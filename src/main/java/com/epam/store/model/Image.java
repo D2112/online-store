@@ -3,6 +3,8 @@ package com.epam.store.model;
 import java.util.Arrays;
 
 public class Image extends BaseEntity {
+    public static final int STANDARD_WIDTH = 120;
+    public static final int STANDARD_HEIGHT = 100;
     private String name;
     private String contentType;
     private byte[] content;

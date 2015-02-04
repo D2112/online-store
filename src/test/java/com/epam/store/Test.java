@@ -6,21 +6,26 @@ import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 
 public class Test {
     private static final Logger log = LoggerFactory.getLogger(Test.class);
 
     public static void main(String[] args) throws SQLException, IOException, XMLStreamException, SAXException {
-        ResourceBundle labels = ResourceBundle.getBundle("i18n.MessagesBundle", new Locale("ru"));
+/*        ResourceBundle labels = ResourceBundle.getBundle("i18n.MessagesBundle", new Locale("ru"));
         System.out.println(labels.getString("adding-category.message.emptyCategory"));
-        System.out.println(Locale.ENGLISH);
+        System.out.println(Locale.ENGLISH);*/
 
 
-
+        Path path = Paths.get("C:/rus1.jpg");
+        byte[] image = Files.readAllBytes(path);
+        System.out.println(image.length);
+        byte[] resize = Images.resize(image, 256, 256);
+        System.out.println(resize.length);
 
 
 

@@ -1,5 +1,6 @@
 package com.epam.store.action;
 
+import com.epam.store.Images;
 import com.epam.store.model.*;
 import com.epam.store.service.ProductService;
 import com.epam.store.servlet.Scope;
@@ -157,7 +158,6 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         String imageName = part.getSubmittedFileName();
         String contentType = part.getContentType();
         InputStream content = part.getInputStream();
-        //todo move the buffer size to constant
         byte[] buffer = new byte[8192];
         int bytesRead;
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -165,6 +165,7 @@ public class CreateProductAction extends AbstractCreatingProductAction {
             output.write(buffer, 0, bytesRead);
         }
         byte[] imageBytes = output.toByteArray();
-        return new Image(imageName, contentType, imageBytes);
+        byte[] resizeImage = Images.resize(imageBytes, Image.STANDARD_WIDTH, Image.STANDARD_HEIGHT);
+        return new Image(imageName, contentType, resizeImage);
     }
 }
