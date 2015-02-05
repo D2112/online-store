@@ -16,13 +16,6 @@
     </div>
     <div class="prod_details_tab">
         <page:addToCartButton product="${product}"/>
-        <div>
-            <form method="GET" action="<c:url value="/details"/>">
-                <input type="hidden" name="id" value="${product.id}">
-                <button type="submit" class="prod_details">
-                    <fmt:message key="product.button.details"/>
-                </button>
-            </form>
-        </div>
+        <page:detailsButton product="${product}"/>
     </div>
 </div>

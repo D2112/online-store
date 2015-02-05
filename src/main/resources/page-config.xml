@@ -9,5 +9,7 @@
         <page-name>catalog</page-name>
         <page-name>image</page-name>
         <page-name>purchase-list</page-name>
+        <page-name>products</page-name>
+        <page-name>details</page-name>
     </com:pages-with-uri-parameters>
 </com:pages-config>

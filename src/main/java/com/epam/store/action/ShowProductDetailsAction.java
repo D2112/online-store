@@ -11,7 +11,7 @@ public class ShowProductDetailsAction implements Action {
 
     @Override
     public ActionResult execute(WebContext webContext) {
-        String id = webContext.getParameter("id");
+        String id = webContext.getFirstParameterFromURI();
         if (id != null) {
             ProductService productService = webContext.getService(ProductService.class);
             Product product = productService.getProductByID(Long.valueOf(id));

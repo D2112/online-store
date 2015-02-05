@@ -17,6 +17,13 @@
             <c:when test="${orderList != null}">
                 <page:orderList orderList="${orderList}"/>
             </c:when>
+            <c:when test="${products != null}">
+                <form id="selectCategory" method="GET" action="/admin/changeCategory/${categoryName}">
+                    <page:selectCategoriesMenu formName="selectCategory" paramName="categoryName"/>
+                    <button type="submit">Change Category</button>
+                </form>
+                <page:productsTable products="${products}"/>
+            </c:when>
         </c:choose>
     </jsp:body>
 </page:genericPage>

@@ -22,11 +22,11 @@ public class ProductService {
         attributeService = new AttributeService(daoFactory, sqlQueryGenerator);
     }
 
-    public List<Product> getProductsForCategory(String category) {
+    public List<Product> getProductsForCategory(String categoryName) {
         List<Product> productsList = new ArrayList<>();
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Category> categoryDao = daoSession.getDao(Category.class);
-            List<Category> categories = categoryDao.findByParameter("name", category);
+            List<Category> categories = categoryDao.findByParameter("name", categoryName);
             if (categories.size() == 1) {
                 long categoryID = categories.get(0).getId();
                 Dao<Product> productDao = daoSession.getDao(Product.class);
@@ -70,6 +70,22 @@ public class ProductService {
             List<Product> products = productDao.findByParameter("name", productName);
             if (products.size() == 1) return products.iterator().next();
             return null;
+        }
+    }
+
+    public void deleteProduct(long id) {
+        Product product = getProductByID(id);
+        attributeService.deleteAttributes(product.getAttributes());
+        try (DaoSession daoSession = daoFactory.getDaoSession()) {
+/*            //deleting price
+            Dao<Price> priceDao = daoSession.getDao(Price.class);
+            priceDao.delete(product.getPrice().getId());
+            //deleting image
+            Dao<Image> imageDao = daoSession.getDao(Image.class);
+            imageDao.delete(product.getImage().getId());*/
+            //deleting product
+            Dao<Product> productDao = daoSession.getDao(Product.class);
+            productDao.delete(product.getId());
         }
     }
 }

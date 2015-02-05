@@ -29,16 +29,14 @@ public class SqlConnectionPool implements ConnectionPool {
         try {
             Class.forName(config.driver());
         } catch (ClassNotFoundException e) {
-            log.error("Can't find driver class ", e);
-            throw new PoolException("Can't find driver class " + config.driver());
+            String errorMessage = "Can't find driver class " + config.driver();
+            log.error(errorMessage, e);
+            throw new PoolException(errorMessage);
         }
         Timer timer = new Timer("Connection collector Timer", true);
         timer.schedule(new ConnectionCollector(), 0, config.connectionIdleTimeout());
 
-        //initializing pool with connections
-        for (int i = 0; i < config.minConnections(); i++) {
-            availableConnections.add(createConnection());
-        }
+        initializePoolWithMinimumConnections();
         log.info("Connection pool is initialized successfully. Available connections: " + availableConnections.size());
     }
 
@@ -53,7 +51,10 @@ public class SqlConnectionPool implements ConnectionPool {
                     log.warn("InterruptedException in thread: " + Thread.currentThread().getName(), e);
                 }
             }
-            return getAvailableConnection();
+            PooledConnection availableConnection = getAvailableConnection();
+            availableConnections.remove(availableConnection);
+            usedConnections.add(availableConnection);
+            return availableConnection;
         } finally {
             lock.unlock();
         }
@@ -81,12 +82,18 @@ public class SqlConnectionPool implements ConnectionPool {
 
     private PooledConnection getAvailableConnection() {
         if (availableConnections.size() == 0) {
-            return createConnection();
+            initializePoolWithMinimumConnections();
+            return availableConnections.iterator().next();
         }
-        PooledConnection connection = availableConnections.iterator().next();
-        availableConnections.remove(connection);
-        usedConnections.add(connection);
-        return connection;
+        for (PooledConnection availableConnection : availableConnections) {
+            //check for the case if database is down
+            if (availableConnection.isAlive()) {
+                return availableConnection;
+            } else {
+                availableConnections.remove(availableConnection);//remove dead connection
+            }
+        }
+        throw new PoolException("Database is down");
     }
 
     private boolean noAvailableConnections() {
@@ -121,6 +128,16 @@ public class SqlConnectionPool implements ConnectionPool {
             throw new PoolException("Error while creating connection: " + e.getMessage());
         }
         return pooledConnection;
+    }
+
+    private void initializePoolWithMinimumConnections() {
+        for (int i = 0; i < config.minConnections(); i++) {
+            availableConnections.add(createConnection());
+        }
+    }
+
+    private boolean isDatabaseAlive() {
+        return false;
     }
 
     private class PooledConnection implements SqlPooledConnection {
@@ -186,6 +203,15 @@ public class SqlConnectionPool implements ConnectionPool {
 
         private long getLastAccessTimeStamp() {
             return lastAccessTimeStamp;
+        }
+
+        private boolean isAlive() {
+            try {
+                return connection.isValid(config.getConnectionValidTimeout());
+            } catch (SQLException e) {
+                log.error("connection alive check has failed", e);
+                return false;
+            }
         }
     }
 

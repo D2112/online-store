@@ -14,7 +14,8 @@
         <fmt:message key="creating-product.label.description" var="descriptionLabel"/>
         <fieldset>
             <legend><fmt:message key="admin.label.header"/></legend>
-            <page:selectCategoriesMenu formName="creatingProduct" label="${selectCategoryLabel}:"/>
+            <page:selectCategoriesMenu formName="creatingProduct" paramName="categoryName"
+                                       label="${selectCategoryLabel}:"/>
             <page:inputTextField label="${nameLabel}:" inputName="productName" value="${productName}"
                                  formName="creatingProduct"/>
             <page:inputTextField label="${priceLabel}:" inputName="price" value="${price}" formName="creatingProduct"/>

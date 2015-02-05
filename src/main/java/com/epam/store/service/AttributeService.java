@@ -74,6 +74,15 @@ class AttributeService {
         return attributeList;
     }
 
+    public void deleteAttributes(List<Attribute> attributeList) {
+        try (DaoSession daoSession = daoFactory.getDaoSession()) {
+            for (Attribute attribute : attributeList) {
+                Dao<? extends Attribute> dao = daoSession.getDao(attribute.getClass());
+                dao.delete(attribute.getId());
+            }
+        }
+    }
+
     private <T extends Attribute> List<Attribute> getAttributesOfCertainClass(
             long productID, String query, Class<T> clazz, SqlPooledConnection connection) {
 

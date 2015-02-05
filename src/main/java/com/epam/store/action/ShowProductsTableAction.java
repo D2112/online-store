@@ -6,17 +6,18 @@ import com.epam.store.servlet.WebContext;
 
 import java.util.List;
 
-@WebAction(path = "GET/catalog")
-public class ShowCatalogAction extends AbstractShowProductsAction {
-    private ActionResult catalogPage = new ActionResult("catalog");
+@WebAction(path = "GET/admin/products")
+public class ShowProductsTableAction extends AbstractShowProductsAction {
+    private ActionResult adminPage = new ActionResult("product-management");
 
     @Override
     public ActionResult execute(WebContext webContext) {
-        String categoryName = super.getCategoryNameFromPath(webContext);
+        String categoryName = webContext.getParameter("category");
         if (categoryName != null) {
             List<Product> products = super.getProducts(webContext, categoryName);
             webContext.setAttribute("products", products, Scope.REQUEST);
+            webContext.setAttribute("category", categoryName, Scope.FLASH);
         }
-        return catalogPage;
+        return adminPage;
     }
 }

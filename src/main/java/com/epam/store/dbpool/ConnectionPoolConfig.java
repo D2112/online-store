@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 class ConnectionPoolConfig {
     private long connectionIdleTimeout;
+    private int connectionValidTimeout;
     private int maxConnections;
     private int minConnections;
     private int maxIdleConnections;
@@ -19,6 +20,7 @@ class ConnectionPoolConfig {
     ConnectionPoolConfig() {
         PoolConfig config = ConfigFactory.create(PoolConfig.class);
         connectionIdleTimeout = TimeUnit.MINUTES.toMillis(config.connectionIdleTimeout());
+        connectionValidTimeout = config.connectionValidTimeout();
         maxConnections = config.maxConnections();
         minConnections = config.minConnections();
         maxIdleConnections = config.maxIdleConnections();
@@ -31,6 +33,10 @@ class ConnectionPoolConfig {
 
     public long connectionIdleTimeout() {
         return connectionIdleTimeout;
+    }
+
+    public int getConnectionValidTimeout() {
+        return connectionValidTimeout;
     }
 
     public int maxConnections() {
@@ -65,6 +71,7 @@ class ConnectionPoolConfig {
         return url;
     }
 
+
     @Config.Sources("classpath:database.properties")
     interface PoolConfig extends Config {
 
@@ -78,6 +85,9 @@ class ConnectionPoolConfig {
 
         @DefaultValue("5")//minutes
         public long connectionIdleTimeout();
+
+        @DefaultValue("5")//sec
+        public int connectionValidTimeout();
 
         @DefaultValue("100")
         public int maxConnections();
