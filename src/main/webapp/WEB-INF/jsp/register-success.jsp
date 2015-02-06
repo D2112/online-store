@@ -9,7 +9,7 @@
 <body>
     <div style="text-align: center;">
         <h1><fmt:message key="registration-success.label.successHeader"/></h1>
-        <label>Now You may
+        <label>
             <a href="<c:url value="/login"/>"><fmt:message key="registration-success.label.login"/></a>
         </label>
     </div>

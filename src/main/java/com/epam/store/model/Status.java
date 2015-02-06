@@ -3,6 +3,7 @@ package com.epam.store.model;
 public class Status extends BaseEntity {
     public static final String PAID = "Paid";
     public static final String UNPAID = "Unpaid";
+    public static final String DELIVERY = "Delivery";
     public static final String CANCELED = "Canceled";
     private String name;
 

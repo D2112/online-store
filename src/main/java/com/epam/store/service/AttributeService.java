@@ -5,7 +5,7 @@ import com.epam.store.dbpool.SqlPooledConnection;
 import com.epam.store.metadata.EntityMetadata;
 import com.epam.store.model.Attribute;
 import com.epam.store.model.DecimalAttribute;
-import com.epam.store.model.IntAttribute;
+import com.epam.store.model.IntegerAttribute;
 import com.epam.store.model.StringAttribute;
 
 import java.sql.PreparedStatement;
@@ -27,7 +27,7 @@ class AttributeService {
 
         attributeClasses = new ArrayList<>();
         attributeClasses.add(StringAttribute.class);
-        attributeClasses.add(IntAttribute.class);
+        attributeClasses.add(IntegerAttribute.class);
         attributeClasses.add(DecimalAttribute.class);
     }
 

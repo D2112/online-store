@@ -19,7 +19,7 @@
 
         <form id="deleteCategory" action="<c:url value="categories/delete"/>" method="POST">
             <fmt:message key="adding-category.label.selectToDelete" var="selectToDeleteLabel"/>
-            <page:selectCategoriesMenu formName="deleteCategory" label="${selectToDeleteLabel}:"/>
+            <page:selectCategoriesMenu formName="deleteCategory" paramName="category" label="${selectToDeleteLabel}:"/>
             <button type="submit" class="base_button">
                 <fmt:message key="adding-category.button.deleteCategory"/>
             </button>

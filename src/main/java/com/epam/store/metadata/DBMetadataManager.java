@@ -22,7 +22,9 @@ public class DBMetadataManager {
 
     public DatabaseTable getTableForClass(Class<? extends BaseEntity> entity) {
         String tableName = nameFormatter.getTableNameForClass(entity);
-        return tables.get(tableName);
+        DatabaseTable databaseTable = tables.get(tableName);
+        if (databaseTable == null) throw new MetadataException("Can't find table " + tableName);
+        return databaseTable;
     }
 
     private Map<String, DatabaseTable> createTables(DatabaseMetaData databaseMetaData) {

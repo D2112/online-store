@@ -10,32 +10,29 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Properties;
 
 public class SqlQueryGenerator {
     private static final Logger log = LoggerFactory.getLogger(SqlQueryGenerator.class);
     private static final String QUERY_FILE_NAME = "query.properties";
     private static final String FIND_BY_PARAMETERS_QUERY_NAME = "FIND_BY_PARAMETERS";
-    private Map<String, String> queryTemplateByName;
+    private static final String PUBLIC_TABLES_COUNT_QUERY_NAME = "PUBLIC_TABLES_COUNT";
+    private Properties queries;
     private DBMetadataManager dbMetadataManager;
     private NameFormatter nameFormatter;
 
     public SqlQueryGenerator(DBMetadataManager dbMetadataManager) {
         this.dbMetadataManager = dbMetadataManager;
         nameFormatter = NameFormatter.getInstance();
-        Properties queriesProperties = new Properties();
+        queries = new Properties();
         try (InputStream inputStream = SqlQueryGenerator.class.getClassLoader().getResourceAsStream(QUERY_FILE_NAME)) {
-            queriesProperties.load(inputStream);
+            queries.load(inputStream);
         } catch (IOException e) {
             throw new DaoException("Error reading sql query file", e);
         }
-        queryTemplateByName = new HashMap<>();
-        for (SqlQueryType type : SqlQueryType.values()) {
-            String query = queriesProperties.getProperty(type.name());
-            queryTemplateByName.put(type.name(), query);
-        }
-        String searchQuery = queriesProperties.getProperty(FIND_BY_PARAMETERS_QUERY_NAME);
-        queryTemplateByName.put(FIND_BY_PARAMETERS_QUERY_NAME, searchQuery);
     }
 
     public String getQueryForClass(SqlQueryType type, Class<? extends BaseEntity> entityClass) {
@@ -45,7 +42,7 @@ public class SqlQueryGenerator {
 
     public String getFindByParametersQuery(Class<? extends BaseEntity> entityClass, Collection<String> parametersNames) {
         String tableName = nameFormatter.getTableNameForClass(entityClass);
-        String templateQuery = queryTemplateByName.get(FIND_BY_PARAMETERS_QUERY_NAME);
+        String templateQuery = queries.getProperty(FIND_BY_PARAMETERS_QUERY_NAME);
         String templateWithTableName = String.format(templateQuery, tableName, "%s");
         return String.format(templateWithTableName, generateParametersWithNameString(parametersNames, true));
     }
@@ -56,9 +53,13 @@ public class SqlQueryGenerator {
         return getFindByParametersQuery(entityClass, parameters);
     }
 
+    public String getPublicTablesCountQuery() {
+        return queries.getProperty(PUBLIC_TABLES_COUNT_QUERY_NAME);
+    }
+
     private String generateQuery(SqlQueryType type, DatabaseTable table) {
         List<DatabaseColumn> columns = table.getColumns();
-        String templateQuery = queryTemplateByName.get(type.name());
+        String templateQuery = queries.getProperty(type.name());
         String templateWithTableName = String.format(templateQuery, table.getName(), "%s");
         String query = templateWithTableName;
         if (type == SqlQueryType.UPDATE_BY_ID) {

@@ -31,8 +31,8 @@ public class DecimalAttribute extends Attribute {
             DecimalAttribute other = (DecimalAttribute) o;
             return other.getValue().compareTo(this.getValue());
         }
-        if (o.getClass() == IntAttribute.class) {
-            IntAttribute other = (IntAttribute) o;
+        if (o.getClass() == IntegerAttribute.class) {
+            IntegerAttribute other = (IntegerAttribute) o;
             int otherValue = other.getValue();
             return Integer.compare(this.getValue().intValue(), otherValue);
         }

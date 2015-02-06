@@ -66,7 +66,7 @@ public class CreateProductAction extends AbstractCreatingProductAction {
             Attribute attribute = null;
             String value = attributeValues.get(i);
             if (RegexValidator.isIntegerNumber(value)) {
-                attribute = new IntAttribute(Integer.valueOf(value));
+                attribute = new IntegerAttribute(Integer.valueOf(value));
             }
             if (RegexValidator.isDecimalNumber(value)) {
                 attribute = new DecimalAttribute(parseStringToBigDecimal(value));

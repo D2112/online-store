@@ -159,6 +159,16 @@ public class SqlConnectionPool implements ConnectionPool {
         }
 
         @Override
+        public Statement createStatement() {
+            try {
+                return connection.createStatement();
+            } catch (SQLException e) {
+                log.error("Error while creating statement");
+                throw new PoolException(e);
+            }
+        }
+
+        @Override
         public DatabaseMetaData getMetaData() {
             try {
                 return connection.getMetaData();
@@ -220,8 +230,13 @@ public class SqlConnectionPool implements ConnectionPool {
         @Override
         public void run() {
             if (availableConnections.size() == config.minIdleConnections()) return;
-            closeTimeoutConnections();
-            closeRedundantConnections();
+            lock.lock();
+            try {
+                closeTimeoutConnections();
+                closeRedundantConnections();
+            } finally {
+                lock.unlock();
+            }
         }
 
         private void close(PooledConnection pooledConnection) {

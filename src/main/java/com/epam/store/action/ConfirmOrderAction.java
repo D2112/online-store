@@ -11,7 +11,7 @@ import java.util.ResourceBundle;
 
 @WebAction(path = "POST/user/confirmOrder")
 public class ConfirmOrderAction implements Action {
-    private static final String DEFAULT_STATUS = Status.UNPAID;
+    private static final String DEFAULT_STATUS = Status.DELIVERY;
     private ActionResult toCartPage = new ActionResult("cart", true);
 
     @Override

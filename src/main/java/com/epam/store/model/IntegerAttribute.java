@@ -1,12 +1,12 @@
 package com.epam.store.model;
 
-public class IntAttribute extends Attribute {
+public class IntegerAttribute extends Attribute {
     private Integer value;
 
-    public IntAttribute() {
+    public IntegerAttribute() {
     }
 
-    public IntAttribute(Integer value) {
+    public IntegerAttribute(Integer value) {
         this.value = value;
     }
 
@@ -26,7 +26,7 @@ public class IntAttribute extends Attribute {
     @Override
     public int compareTo(Attribute o) {
         if (this.getClass() == o.getClass()) {
-            IntAttribute other = (IntAttribute) o;
+            IntegerAttribute other = (IntegerAttribute) o;
             return Integer.compare(this.getValue(), other.getValue());
         }
         if (o.getClass() == DecimalAttribute.class) {

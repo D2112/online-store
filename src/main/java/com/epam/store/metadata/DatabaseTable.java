@@ -1,7 +1,5 @@
 package com.epam.store.metadata;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 
 public class DatabaseTable {
@@ -16,7 +14,7 @@ public class DatabaseTable {
     }
 
     public List<DatabaseColumn> getColumns() {
-        return ImmutableList.copyOf(columns);
+        return columns;
     }
 
     public String getName() {
