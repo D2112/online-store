@@ -53,7 +53,7 @@ public class ActionFactory {
                 actionsMap.put(keyPath, actionObject);
             }
         }
-        //get unannotated uri-paths and map them to default shows page action
+        //get unannotated uri-paths and map them to default show page action
         Map<String, String> uriByPageName = pageConfig.getUriByJspPageNameMap();
         for (Map.Entry<String, String> entry : uriByPageName.entrySet()) {
             String pageName = entry.getKey();

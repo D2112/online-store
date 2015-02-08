@@ -8,7 +8,9 @@ import com.epam.store.dbpool.SqlConnectionPool;
 import com.epam.store.dbpool.SqlPooledConnection;
 import com.epam.store.metadata.DBMetadataManager;
 import com.epam.store.model.Category;
-import com.epam.store.service.*;
+import com.epam.store.service.CategoryService;
+import com.epam.store.service.ProductService;
+import com.epam.store.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +59,6 @@ public class ContextListener implements ServletContextListener {
         //set services to servlet context, the class name is used as an attribute name
         servletContext.setAttribute(getNameForService(ProductService.class), new ProductService(daoFactory, sqlQueryGenerator));
         servletContext.setAttribute(getNameForService(UserService.class), new UserService(daoFactory, sqlQueryGenerator));
-        servletContext.setAttribute(getNameForService(RegistrationService.class), new RegistrationService(daoFactory));
-        servletContext.setAttribute(getNameForService(Authenticator.class), new Authenticator(daoFactory));
         CategoryService categoryService = new CategoryService(daoFactory);
         servletContext.setAttribute(getNameForService(CategoryService.class), categoryService);
 

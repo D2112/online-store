@@ -19,7 +19,7 @@ public class LoginAction implements Action {
         String email = webContext.getParameter("email");
         String password = webContext.getParameter("password");
         UserService userService = webContext.getService(UserService.class);
-        User authenticatedUser = userService.authenticate(email, password);
+        User authenticatedUser = userService.authenticateUser(email, password);
         if (authenticatedUser == null) {
             webContext.setAttribute("email", email, Scope.FLASH);
             webContext.setAttribute("loginResult", messagesBundle.getString("login.error.notFound"), Scope.FLASH);

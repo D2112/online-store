@@ -28,7 +28,7 @@ public class ConfirmOrderAction implements Action {
             purchaseList.add(new Purchase(product, product.getPrice(), currentDate, new Status(DEFAULT_STATUS)));
         }
         UserService userService = webContext.getService(UserService.class);
-        userService.addPurchaseList(user.getId(), purchaseList);
+        userService.addPurchaseListToUser(user.getId(), purchaseList);
         cart.removeAllProducts();
         webContext.setAttribute("successMessage", successMessage, Scope.FLASH);
         return toCartPage;

@@ -49,7 +49,7 @@ public class SqlQueryGenerator {
      * @param type        of query
      * @param entityClass - some entity class which collates with database table
      *                    needs to take table name from class name
-     * @return SQL query with "wildcard" parameters (like ?) for Prepared Statement
+     * @return Parametrized SQL query for Prepared Statement
      */
     public String generateQueryForClass(SqlQueryType type, Class<? extends BaseEntity> entityClass) {
         DatabaseTable databaseTable = dbMetadataManager.getTableForClass(entityClass);
@@ -64,7 +64,7 @@ public class SqlQueryGenerator {
      * @param entityClass     - some entity class which collates with database table
      *                        needs to take table name from class name
      * @param parametersNames which are equals to database column names
-     * @return SQL query with "wildcard" parameters (like ?) for Prepared Statement
+     * @return Parametrized SQL query for Prepared Statement
      */
     public String generateFindByParametersQuery(Class<? extends BaseEntity> entityClass,
                                                 Collection<String> parametersNames) {
@@ -83,7 +83,7 @@ public class SqlQueryGenerator {
      * @param entityClass   - some entity class which collates with database table
      *                      needs to take table name from class name
      * @param parameterName parameter which equal to database column name
-     * @return SQL query with "wildcard" parameters (like ?) for Prepared Statement
+     * @return Parametrized SQL query for Prepared Statement
      */
     public String generateFindByParameterQuery(Class<? extends BaseEntity> entityClass, String parameterName) {
         List<String> parameters = new ArrayList<>();

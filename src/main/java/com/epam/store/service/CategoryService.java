@@ -8,6 +8,7 @@ import com.epam.store.model.Category;
 import java.util.List;
 
 public class CategoryService {
+    private static final String CATEGORY_NAME_COLUMN = "NAME";
     private DaoFactory daoFactory;
 
     public CategoryService(DaoFactory daoFactory) {
@@ -27,7 +28,7 @@ public class CategoryService {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Category> categoryDao = daoSession.getDao(Category.class);
             //check if there exist the same category
-            Category categoryFromDatabase = categoryDao.findFirstByParameter("name", categoryName);
+            Category categoryFromDatabase = categoryDao.findFirstByParameter(CATEGORY_NAME_COLUMN, categoryName);
             if (categoryFromDatabase != null) return null;
             Category category = new Category(categoryName);
             return categoryDao.insert(category);
@@ -45,7 +46,7 @@ public class CategoryService {
     public Category getCategory(String categoryName) {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Category> categoryDao = daoSession.getDao(Category.class);
-            return categoryDao.findFirstByParameter("name", categoryName);
+            return categoryDao.findFirstByParameter(CATEGORY_NAME_COLUMN, categoryName);
         }
     }
 }
