@@ -4,10 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -60,17 +57,16 @@ public class SqlConnectionPool implements ConnectionPool {
         }
     }
 
+    /**
+     * Closes all connections regardless of is connection used right now or not
+     *
+     * @throws PoolException if can't close one of the connections
+     */
     public void shutdown() {
-        int closedCount = 0;
+        int closedCount = availableConnections.size() + usedConnections.size();
         try {
-            for (PooledConnection pooledConnection : availableConnections) {
-                closeConnection(pooledConnection);
-                closedCount++;
-            }
-            for (PooledConnection usedConnection : usedConnections) {
-                closeConnection(usedConnection);
-                closedCount++;
-            }
+            closeConnections(availableConnections);
+            closeConnections(usedConnections);
         } catch (SQLException e) {
             String errorMessage = "Can't close connection pool";
             log.error(errorMessage, e);
@@ -80,6 +76,19 @@ public class SqlConnectionPool implements ConnectionPool {
                 "{} connections have been closed", closedCount);
     }
 
+    /**
+     * Gets available connection from the available connections list
+     * Before getting the connection method checks whether the list size is 0
+     * if it is, then probably database was down and connection pool
+     * needs to initialize with connection again. Otherwise method iterates
+     * the list and get first alive connection
+     * at the same time removes dead connections if such are present.
+     * If there is no alive connections it means database is or was down.
+     * At last method shall try to return new connection, if database down at present
+     * will be thrown {@link PoolException}
+     * @return PooledConnection
+     * @throws PoolException if all available connections is dead
+     */
     private PooledConnection getAvailableConnection() {
         if (availableConnections.size() == 0) {
             initializePoolWithMinimumConnections();
@@ -93,7 +102,7 @@ public class SqlConnectionPool implements ConnectionPool {
                 availableConnections.remove(availableConnection);//remove dead connection
             }
         }
-        throw new PoolException("Database is down");
+        return createConnection();
     }
 
     private boolean noAvailableConnections() {
@@ -118,14 +127,25 @@ public class SqlConnectionPool implements ConnectionPool {
         return availableConnections.remove(connection) || usedConnections.remove(connection);
     }
 
+    private boolean closeConnections(List<PooledConnection> connections) throws SQLException {
+        int closed = 0;
+        for (PooledConnection connection : connections) {
+            if (availableConnections.remove(connection) || usedConnections.remove(connection)) {
+                connection.getConnection().close();
+            }
+        }
+        return closed == connections.size();
+    }
+
     private PooledConnection createConnection() {
         PooledConnection pooledConnection;
         try {
             Connection connection = DriverManager.getConnection(config.url(), config.username(), config.password());
             pooledConnection = new PooledConnection(connection);
         } catch (SQLException e) {
-            log.error("Error while creating connection: " + e.getMessage(), e);
-            throw new PoolException("Error while creating connection: " + e.getMessage());
+            String errorMessage = "Error while creating connection: " + e.getMessage() + ", probably database is down";
+            log.error(errorMessage, e);
+            throw new PoolException(errorMessage, e);
         }
         return pooledConnection;
     }
@@ -136,10 +156,11 @@ public class SqlConnectionPool implements ConnectionPool {
         }
     }
 
-    private boolean isDatabaseAlive() {
-        return false;
-    }
-
+    /**
+     * A wrapper for {@link Connection} class, instead closing the connection
+     * it delegates to connection pool for closing. And also it have
+     * last access time for knowing if connection expired
+     */
     private class PooledConnection implements SqlPooledConnection {
         private Connection connection;
         private long lastAccessTimeStamp;
@@ -225,6 +246,13 @@ public class SqlConnectionPool implements ConnectionPool {
         }
     }
 
+    /**
+     * Collects all timeout and redundant connections
+     * regularly after a certain time
+     * (the time depends on config connectionIdleTimeout)
+     * and delegates them to connection pool method
+     * {@link #closeConnections(List)} for closing
+     */
     private class ConnectionCollector extends TimerTask {
 
         @Override
@@ -232,42 +260,43 @@ public class SqlConnectionPool implements ConnectionPool {
             if (availableConnections.size() == config.minIdleConnections()) return;
             lock.lock();
             try {
-                closeTimeoutConnections();
-                closeRedundantConnections();
+                List<PooledConnection> connectionsToClose = new ArrayList<>();
+                connectionsToClose.addAll(collectTimeoutConnections());
+                connectionsToClose.addAll(collectRedundantConnections());
+                closeConnections(connectionsToClose);
+            } catch (SQLException e) {
+                String errorMessage = "Error on close connection: " + e.getMessage();
+                log.error(errorMessage, e);
+                throw new PoolException(errorMessage, e);
             } finally {
                 lock.unlock();
             }
         }
 
-        private void close(PooledConnection pooledConnection) {
-            try {
-                closeConnection(pooledConnection);
-            } catch (SQLException e) {
-                log.error("Error on close connection: " + e.getMessage(), e);
-                throw new PoolException("Error on close connection: " + e.getMessage());
-            }
-        }
-
-        private void closeTimeoutConnections() {
+        private List<PooledConnection> collectTimeoutConnections() {
+            List<PooledConnection> connectionsToClose = new ArrayList<>();
             for (PooledConnection pooledConnection : availableConnections) {
                 if (availableConnections.size() > config.minIdleConnections()) {
                     long currentTime = System.currentTimeMillis();
                     long lastAccessTime = pooledConnection.getLastAccessTimeStamp();
                     long idleTime = currentTime - ((lastAccessTime == 0) ? currentTime : lastAccessTime);
                     if (idleTime > config.connectionIdleTimeout()) {
-                        close(pooledConnection);
+                        connectionsToClose.add(pooledConnection);
                     }
                 }
             }
+            return connectionsToClose;
         }
 
-        private void closeRedundantConnections() {
+        private List<PooledConnection> collectRedundantConnections() {
+            List<PooledConnection> connectionsToClose = new ArrayList<>();
             int redundantAmount = availableConnections.size() - config.maxIdleConnections();
             if (redundantAmount > 0) {
                 for (int i = 0; i < redundantAmount; i++) {
-                    close(availableConnections.get(i));
+                    connectionsToClose.add(availableConnections.get(i));
                 }
             }
+            return connectionsToClose;
         }
     }
 }

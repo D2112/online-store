@@ -26,25 +26,6 @@ public class ActionResult {
         return page;
     }
 
-    public String getParamsQueryString() {
-        if (parameterMap == null || parameterMap.size() == 0) return "";
-        StringBuilder sb = new StringBuilder();
-        sb.append('?');
-        int counter = 0;
-        for (Map.Entry<String, String[]> paramEntry : parameterMap.entrySet()) {
-            counter++;
-            sb.append(paramEntry.getKey());
-            sb.append('=');
-            String[] values = paramEntry.getValue();
-            for (int i = 0; i < values.length; i++) {
-                sb.append(values[i]);
-                if (i != values.length - 1) sb.append('%');
-            }
-            if (counter != parameterMap.size() - 1) sb.append('&');
-        }
-        return sb.toString();
-    }
-
     public boolean isRedirect() {
         return redirect;
     }

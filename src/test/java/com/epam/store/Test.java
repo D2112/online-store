@@ -1,5 +1,7 @@
 package com.epam.store;
 
+import com.epam.store.config.ConfigParser;
+import com.epam.store.config.PageConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -7,6 +9,8 @@ import org.xml.sax.SAXException;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 
 public class Test {
@@ -17,7 +21,11 @@ public class Test {
         System.out.println(labels.getString("adding-category.message.emptyCategory"));
         System.out.println(Locale.ENGLISH);*/
 
-
+        PageConfig pageConfig = ConfigParser.getInstance().getPageConfig();
+        List<String> pagesWithUriParameters = pageConfig.getPagesWithUriParameters();
+        Map<String, String> uriByJspPageNameMap = pageConfig.getUriByJspPageNameMap();
+        String startPage = pageConfig.getStartPage();
+        System.out.println();
 
 /*
         ConnectionPool cp = new SqlConnectionPool();

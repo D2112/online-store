@@ -44,7 +44,7 @@ class AttributeService {
                     attributeID = attributeDao.insert(attribute).getId();
                 }
                 //inserting attribute
-                String insertAttributeQuery = sqlQueryGenerator.getQueryForClass(SqlQueryType.INSERT, attribute.getClass());
+                String insertAttributeQuery = sqlQueryGenerator.generateQueryForClass(SqlQueryType.INSERT, attribute.getClass());
                 //metadata needs for getting value from one of several attribute class
                 //because every class has different types of value
                 EntityMetadata attributeMetadata = new EntityMetadata(attribute.getClass());
@@ -65,7 +65,7 @@ class AttributeService {
         List<Attribute> attributeList = new ArrayList<>();
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             for (Class attributeClass : attributeClasses) {
-                String sqlQuery = sqlQueryGenerator.getFindByParameterQuery(attributeClass, "PRODUCT_ID");
+                String sqlQuery = sqlQueryGenerator.generateFindByParameterQuery(attributeClass, "PRODUCT_ID");
                 List<Attribute> attributesOfCertainClass =
                         getAttributesOfCertainClass(productID, sqlQuery, attributeClass, daoSession.getConnection());
                 attributeList.addAll(attributesOfCertainClass);
@@ -89,7 +89,6 @@ class AttributeService {
         List<Attribute> attributeList = new ArrayList<>();
         EntityMetadata<T> attributeEntityMetadata = new EntityMetadata<>(clazz);
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-
             statement.setLong(1, productID);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
@@ -108,7 +107,7 @@ class AttributeService {
     }
 
     private String readAttributeName(long attributeID, SqlPooledConnection connection) {
-        String sqlQuery = sqlQueryGenerator.getQueryForClass(SqlQueryType.FIND_BY_ID, Attribute.class);
+        String sqlQuery = sqlQueryGenerator.generateQueryForClass(SqlQueryType.FIND_BY_ID, Attribute.class);
         String attributeName = null;
         try (PreparedStatement statement = connection.prepareStatement(sqlQuery)) {
             statement.setLong(1, attributeID);
@@ -123,7 +122,7 @@ class AttributeService {
     }
 
     private Long readAttributeID(String attributeName, SqlPooledConnection connection) {
-        String findAttributeByNameQuery = sqlQueryGenerator.getFindByParameterQuery(Attribute.class, ATTRIBUTE_NAME);
+        String findAttributeByNameQuery = sqlQueryGenerator.generateFindByParameterQuery(Attribute.class, ATTRIBUTE_NAME);
         try (PreparedStatement statement = connection.prepareStatement(findAttributeByNameQuery)) {
             statement.setString(1, attributeName);
             ResultSet rs = statement.executeQuery();

@@ -1,5 +1,7 @@
 <com:pages-config xmlns:com="com.epam.store.pages">
 
+    <start-page>catalog</start-page>
+
     <com:page-mapping>
         <page-name>category-management</page-name>
         <uri>admin/categories</uri>

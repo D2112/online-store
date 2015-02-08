@@ -3,9 +3,11 @@
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:pgs="com.epam.store.pages">
 
+
     <xs:element name="pages-config">
         <xs:complexType>
             <xs:sequence>
+                <xs:element name="start-page" type="xs:string" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="pgs:page-mapping" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="pgs:pages-with-uri-parameters"/>
             </xs:sequence>

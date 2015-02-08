@@ -1,6 +1,6 @@
 package com.epam.store.action;
 
-import com.epam.store.service.RegistrationService;
+import com.epam.store.service.UserService;
 import com.epam.store.servlet.Scope;
 import com.epam.store.servlet.WebContext;
 import org.slf4j.Logger;
@@ -23,8 +23,7 @@ public class RegistrationAction implements Action {
         String email = webContext.getParameter("email");
         String password = webContext.getParameter("password");
         String passwordConfirm = webContext.getParameter("passwordConfirm");
-        RegistrationService registrationService = webContext.getService(RegistrationService.class);
-
+        UserService userService = webContext.getService(UserService.class);
         //set attributes to flash scope for displaying after redirect if error
         webContext.setAttribute("name", name, Scope.FLASH);
         webContext.setAttribute("email", email, Scope.FLASH);
@@ -34,12 +33,13 @@ public class RegistrationAction implements Action {
             log.debug("Registration error: " + errorMessage);
             return errorResult;
         }
-        if (!registrationService.register(name, email, password)) {
+        if (userService.findUser(email) != null) {
             errorMessage = email + messagesBundle.getString("registration.error.registered");
             webContext.setAttribute("error", errorMessage, Scope.FLASH);
             log.debug("Registration error: " + errorMessage);
             return errorResult;
         }
+        userService.registerUser(name, email, password);
         return successResult;
     }
 

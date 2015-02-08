@@ -1,8 +1,9 @@
 package com.epam.store.action;
 
+import com.epam.store.config.ConfigParser;
 import com.epam.store.config.PageConfig;
+import com.epam.store.metadata.AnnotationManager;
 import com.epam.store.servlet.WebContext;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,6 @@ import java.util.Set;
 public class ActionFactory {
     private static final Logger log = LoggerFactory.getLogger(ActionFactory.class);
     private static final String ACTIONS_PACKAGE = "com.epam.store.action";
-    private static final String START_PAGE = "catalog";
     private static ActionFactory instance = new ActionFactory();
     private Map<String, Action> actions;
 
@@ -22,9 +22,9 @@ public class ActionFactory {
     }
 
     private ActionFactory() {
-        actions = initializeActions();
-        //Map start page
-        actions.put("GET/", new ShowPageAction(START_PAGE));
+        PageConfig pageConfig = ConfigParser.getInstance().getPageConfig();
+        actions = initializeWebActions(pageConfig);
+        mapStartPage(pageConfig.getStartPage());
     }
 
     public Action getAction(WebContext webContext) {
@@ -36,10 +36,9 @@ public class ActionFactory {
         return action;
     }
 
-    private Map<String, Action> initializeActions() {
+    private Map<String, Action> initializeWebActions(PageConfig pageConfig) {
         Map<String, Action> actionsMap = new HashMap<>();
-        Reflections reflections = new Reflections(ACTIONS_PACKAGE);
-        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(WebAction.class);
+        Set<Class<?>> annotated = AnnotationManager.getAnnotatedClasses(ACTIONS_PACKAGE, WebAction.class);
         for (Class<?> actionClass : annotated) {
             WebAction annotation = actionClass.getAnnotation(WebAction.class);
             String[] paths = annotation.path();
@@ -54,8 +53,8 @@ public class ActionFactory {
                 actionsMap.put(keyPath, actionObject);
             }
         }
-        //get unannotated pages and map them to default shows page action
-        HashMap<String, String> uriByPageName = PageConfig.getInstance().getUriByPageNameMap();
+        //get unannotated uri-paths and map them to default shows page action
+        Map<String, String> uriByPageName = pageConfig.getUriByJspPageNameMap();
         for (Map.Entry<String, String> entry : uriByPageName.entrySet()) {
             String pageName = entry.getKey();
             String keyPath = "GET/" + entry.getValue();
@@ -63,5 +62,9 @@ public class ActionFactory {
             log.debug("Path: " + keyPath + ", mapped with default show page action");
         }
         return actionsMap;
+    }
+
+    private void mapStartPage(String pageName) {
+        actions.put("GET/", new ShowPageAction(pageName));
     }
 }

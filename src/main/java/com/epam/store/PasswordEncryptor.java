@@ -12,16 +12,8 @@ import java.security.SecureRandom;
 
 public class PasswordEncryptor {
     private static Logger logger = LoggerFactory.getLogger(PasswordEncryptor.class.getName());
-    private static PasswordEncryptor instance = new PasswordEncryptor();
 
-    public static PasswordEncryptor getInstance() {
-        return instance;
-    }
-
-    private PasswordEncryptor() {
-    }
-
-    public Password encrypt(String password) {
+    public static Password encrypt(String password) {
         byte[] saltBytes = new byte[16];
         new SecureRandom().nextBytes(saltBytes);
 
@@ -32,14 +24,14 @@ public class PasswordEncryptor {
         return new Password(hash, salt);
     }
 
-    public boolean comparePassword(String password, Password encryptedPassword) {
+    public static boolean comparePassword(String password, Password encryptedPassword) {
         byte[] saltBytes = DatatypeConverter.parseHexBinary(encryptedPassword.getSalt());
         byte[] hashBytes = getHashBytes(password, saltBytes);
         String hash = new BigInteger(1, hashBytes).toString(16);
         return encryptedPassword.getHash().equals(hash);
     }
 
-    private byte[] getHashBytes(String password, byte[] saltBytes) {
+    public static byte[] getHashBytes(String password, byte[] saltBytes) {
         byte[] passBytes = password.getBytes();
         byte[] hashBytes = new byte[saltBytes.length + passBytes.length];
         System.arraycopy(passBytes, 0, hashBytes, 0, passBytes.length);

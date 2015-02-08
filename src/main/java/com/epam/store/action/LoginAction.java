@@ -2,7 +2,7 @@ package com.epam.store.action;
 
 
 import com.epam.store.model.User;
-import com.epam.store.service.Authenticator;
+import com.epam.store.service.UserService;
 import com.epam.store.servlet.Scope;
 import com.epam.store.servlet.WebContext;
 
@@ -18,11 +18,11 @@ public class LoginAction implements Action {
         ResourceBundle messagesBundle = webContext.getMessagesBundle();
         String email = webContext.getParameter("email");
         String password = webContext.getParameter("password");
-        Authenticator authenticator = webContext.getService(Authenticator.class);
-        User authenticatedUser = authenticator.authenticate(email, password);
+        UserService userService = webContext.getService(UserService.class);
+        User authenticatedUser = userService.authenticate(email, password);
         if (authenticatedUser == null) {
             webContext.setAttribute("email", email, Scope.FLASH);
-            webContext.setAttribute("loginResult", messagesBundle.getString("login.error.wrong"), Scope.FLASH);
+            webContext.setAttribute("loginResult", messagesBundle.getString("login.error.notFound"), Scope.FLASH);
             return errorResult;
         }
         if (authenticatedUser.getBanned()) {

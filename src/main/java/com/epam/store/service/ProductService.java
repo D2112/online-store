@@ -77,13 +77,6 @@ public class ProductService {
         Product product = getProductByID(id);
         attributeService.deleteAttributes(product.getAttributes());
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
-/*            //deleting price
-            Dao<Price> priceDao = daoSession.getDao(Price.class);
-            priceDao.delete(product.getPrice().getId());
-            //deleting image
-            Dao<Image> imageDao = daoSession.getDao(Image.class);
-            imageDao.delete(product.getImage().getId());*/
-            //deleting product
             Dao<Product> productDao = daoSession.getDao(Product.class);
             productDao.delete(product.getId());
         }

@@ -1,6 +1,6 @@
 package com.epam.store.servlet;
 
-import com.epam.store.config.PageConfig;
+import com.epam.store.config.ConfigParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,7 @@ public class WebContext {
     private HttpServletResponse resp;
 
     static {
-        pagesWithURIParameters = PageConfig.getInstance().getPagesWithUriParameters();
+        pagesWithURIParameters = ConfigParser.getInstance().getPageConfig().getPagesWithUriParameters();
     }
 
     public WebContext(HttpServletRequest req, HttpServletResponse resp) {
@@ -199,13 +199,6 @@ public class WebContext {
         String pathInfo = req.getPathInfo();
         String parameterString = pathInfo.substring(getPagePathFromURI().length());
         return splitIntoSegments(parameterString);
-    }
-
-    public String getURIWithQueryString() {
-        String queryString = req.getQueryString();
-        String uri = getURI();
-        if (queryString != null) uri += "?" + queryString;
-        return uri;
     }
 
     public String getPathInfo() {

@@ -4,11 +4,6 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
-    <filter-mapping>
-        <filter-name>LanguageFilter</filter-name>
-        <servlet-name>Controller</servlet-name>
-    </filter-mapping>
-
     <context-param>
         <param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
         <param-value>i18n.MessagesBundle</param-value>

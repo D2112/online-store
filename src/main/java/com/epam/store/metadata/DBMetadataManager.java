@@ -10,6 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Contains database tables and columns.
+ * All data read only one time while creating instance of this class
+ * So if need actual database information,
+ * needs to create instance again.
+ * The tables from this class doesn't contain primary key column
+ * and the Deleted column
+ */
 public class DBMetadataManager {
     private static final String DELETED_COLUMN_NAME = "DELETED";
     private Map<String, DatabaseTable> tables;
@@ -20,8 +28,13 @@ public class DBMetadataManager {
         tables = createTables(databaseMetaData);
     }
 
-    public DatabaseTable getTableForClass(Class<? extends BaseEntity> entity) {
-        String tableName = nameFormatter.getTableNameForClass(entity);
+    /**
+     * @param clazz needs to take name from it
+     * @return A database table class {@link DatabaseTable}
+     * @throws MetadataException if table with such name don't exist
+     */
+    public DatabaseTable getTableForClass(Class<? extends BaseEntity> clazz) {
+        String tableName = nameFormatter.getTableNameForClass(clazz);
         DatabaseTable databaseTable = tables.get(tableName);
         if (databaseTable == null) throw new MetadataException("Can't find table " + tableName);
         return databaseTable;
@@ -94,7 +107,9 @@ public class DBMetadataManager {
         return columnName.endsWith(DatabaseColumn.ID_SUFFIX) && !columnName.startsWith(tableName);
     }
 
+
     private boolean isColumnUnnecessary(String tableName, String columnName) {
+        //Unnecessary for query is primary key and DELETED columns
         return columnName.equals(nameFormatter.getPrimaryKeyNameForTable(tableName))
                 || columnName.equalsIgnoreCase(DELETED_COLUMN_NAME);
     }
