@@ -66,6 +66,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
 
     /**
      * {@inheritDoc}
+     *
      * @throws DaoException if found more than one record
      */
     @Override
@@ -91,8 +92,9 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
 
     /**
      * {@inheritDoc}
+     *
      * @throws DaoException if updated more than one record
-     * or if error occurred during execute sql query
+     *                      or if error occurred during execute sql query
      */
     @Override
     public boolean update(T object) {
@@ -112,8 +114,9 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
 
     /**
      * {@inheritDoc}
+     *
      * @throws DaoException if deleted more than one record
-     * or if error occurred during execute sql query
+     *                      or if error occurred during execute sql query
      */
     @Override
     public boolean delete(long id) {
@@ -137,6 +140,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
 
     /**
      * {@inheritDoc}
+     *
      * @throws DaoException if error occurred during execute sql query
      */
     @Override
@@ -155,8 +159,9 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
 
     /**
      * {@inheritDoc}
+     *
      * @throws DaoException if deleted more than one record
-     * or if error occurred during execute sql query.
+     *                      or if error occurred during execute sql query.
      */
     @Override
     public List<T> findByParameters(Map<String, Object> parameters) {
@@ -201,11 +206,12 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
      * Gets values from {@link java.sql.ResultSet} and creates objects using them
      * if entity contains other non-primitive objects,
      * then calls specific dao of it class and read it.
+     *
      * @param rs is the {@link java.sql.ResultSet}
      * @return List of objects
      * @throws SQLException
      * @throws DaoException if there problems with instance
-     * object or access to it getters or setter
+     *                      object or access to it getters or setter
      */
     private List<T> parseResultSet(ResultSet rs) throws SQLException {
         List<T> resultList = new ArrayList<>();
@@ -241,8 +247,9 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
      * if entity contains other entity objects,
      * then calls specific dao of it class and read it
      * and sets to statement their id.
+     *
      * @param statement to prepare
-     * @param entity to take from it values
+     * @param entity    to take from it values
      * @throws SQLException
      */
     private void prepareStatementForInsert(PreparedStatement statement, T entity) throws SQLException {
@@ -256,7 +263,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
                 BaseEntity dependencyEntity = (BaseEntity) entityMetadata.invokeGetter(fieldName, entity);
                 Long dependencyID = dependencyEntity.getId();
                 //if dependency object hasn't id, then insert it and get it's id to set to statement
-                if(dependencyID == null) {
+                if (dependencyID == null) {
                     dependencyID = insertDependency(fieldName, dependencyEntity).getId();
                 }
                 statement.setLong(statementParameterIndex, dependencyID);
@@ -274,8 +281,9 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
      * Sets to statement all field from the entity-parameter,
      * the main difference from {@link #prepareStatementForInsert(java.sql.PreparedStatement, T)
      * it's setting to last parameter in statement id of entity which need to be updated.
+     *
      * @param statement to prepare.
-     * @param entity to take from it values.
+     * @param entity    to take from it values.
      * @throws SQLException
      */
     private void prepareStatementForUpdate(PreparedStatement statement, T entity) throws SQLException {
@@ -289,6 +297,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     /**
      * Delete all entities which contains in entity-parameter
      * if such are exist
+     *
      * @param entity which contains other entities
      * @throws SQLException
      */
@@ -310,6 +319,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
      * parsing result set and there foreign keys.
      * This method gets type of dependency within metadata by field name
      * and then via DAO of this type trying to find entity
+     *
      * @param fieldName field name of dependency which need to be read
      * @return Found object as {@link com.epam.store.model.BaseEntity}
      */
@@ -322,6 +332,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     /**
      * Gets type of the entity's field and gets DAO by this type.
      * Then DAO is used to insert another entity
+     *
      * @return inserted entity as {@link com.epam.store.model.BaseEntity}
      * with id from database
      */

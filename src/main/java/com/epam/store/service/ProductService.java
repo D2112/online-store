@@ -14,6 +14,8 @@ import java.util.List;
 
 
 public class ProductService {
+    private static final String PRODUCT_NAME_COLUMN = "NAME";
+    private static final String CATEGORY_ID_COLUMN = "CATEGORY_ID";
     private DaoFactory daoFactory;
     private AttributeService attributeService;
 
@@ -26,11 +28,11 @@ public class ProductService {
         List<Product> productsList = new ArrayList<>();
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Category> categoryDao = daoSession.getDao(Category.class);
-            List<Category> categories = categoryDao.findByParameter("name", categoryName);
+            List<Category> categories = categoryDao.findByParameter(PRODUCT_NAME_COLUMN, categoryName);
             if (categories.size() == 1) {
                 long categoryID = categories.get(0).getId();
                 Dao<Product> productDao = daoSession.getDao(Product.class);
-                productsList = productDao.findByParameter("Category_ID", categoryID);
+                productsList = productDao.findByParameter(CATEGORY_ID_COLUMN, categoryID);
                 productsList.forEach(this::setAttributesToProduct);
             }
         }
@@ -67,7 +69,7 @@ public class ProductService {
     public Product getProductByName(String productName) {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Product> productDao = daoSession.getDao(Product.class);
-            List<Product> products = productDao.findByParameter("name", productName);
+            List<Product> products = productDao.findByParameter(PRODUCT_NAME_COLUMN, productName);
             if (products.size() == 1) return products.iterator().next();
             return null;
         }

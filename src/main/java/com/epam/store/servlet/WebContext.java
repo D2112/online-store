@@ -88,7 +88,7 @@ public class WebContext {
             case FLASH:
                 if (isSessionExist()) {
                     attributeObject = req.getSession().getAttribute(addFlashPrefixToName(name));
-                    if(attributeObject == null) attributeObject = req.getAttribute(name);
+                    if (attributeObject == null) attributeObject = req.getAttribute(name);
                 }
                 break;
         }
@@ -181,11 +181,11 @@ public class WebContext {
         for (String segment : pathSegments) {
             sb.append("/");
             sb.append(segment);
-            if(pagesWithURIParameters.contains(segment)) {
+            if (pagesWithURIParameters.contains(segment)) {
                 return sb.toString();
             }
         }
-        if(sb.length() == 0) sb.append("/");
+        if (sb.length() == 0) sb.append("/");
         return sb.toString();
     }
 
@@ -290,6 +290,7 @@ public class WebContext {
     /**
      * Remove all names without flash prefix from the list,
      * and then remove flash prefix of the remaining names
+     *
      * @return List of flash attribute names without flash prefix
      */
     private List<String> getAttributeNamesForFlashScope(Enumeration<String> enumeration) {

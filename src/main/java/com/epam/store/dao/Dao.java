@@ -17,6 +17,7 @@ public interface Dao<T extends BaseEntity> {
 
     /**
      * Tries to find record with specified id
+     *
      * @param id of the record
      * @return found object or null if nothing was found
      */
@@ -24,6 +25,7 @@ public interface Dao<T extends BaseEntity> {
 
     /**
      * Updates record in database with data from object
+     *
      * @param object to be updated
      * @return true if record was successfully updated or false if not
      */
@@ -31,6 +33,7 @@ public interface Dao<T extends BaseEntity> {
 
     /**
      * Deletes record in database with specified id
+     *
      * @param id of the record to be deleted
      * @return true if record was successfully deleted or false if not
      */
@@ -38,12 +41,14 @@ public interface Dao<T extends BaseEntity> {
 
     /**
      * Gets all records
+     *
      * @return List of the found objects
      */
     public List<T> getAll();
 
     /**
      * Finds list of records with specified parameters.
+     *
      * @param parameters Map of parameters to search, the string key is name of parameter,
      *                   and the Object is a value.
      * @return List of objects corresponding specified parameters.
@@ -60,6 +65,7 @@ public interface Dao<T extends BaseEntity> {
     /**
      * Finds list of records by corresponding specified parameter
      * and return only first object from list
+     *
      * @return first found object or null if nothing was found
      */
     public T findFirstByParameter(String paramName, Object paramValue);

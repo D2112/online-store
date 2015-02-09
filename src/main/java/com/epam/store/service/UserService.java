@@ -53,6 +53,7 @@ public class UserService {
     /**
      * Checks if in database exist user with such email and password.
      * And return found user if exist.
+     *
      * @param email    user's email
      * @param password user's password
      * @return User object from database, or null, if such user didn't found

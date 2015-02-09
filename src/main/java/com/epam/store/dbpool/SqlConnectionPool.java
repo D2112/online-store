@@ -86,6 +86,7 @@ public class SqlConnectionPool implements ConnectionPool {
      * If there is no alive connections it means database is or was down.
      * At last method shall try to return new connection, if database down at present
      * will be thrown {@link PoolException}
+     *
      * @return PooledConnection
      * @throws PoolException if all available connections is dead
      */

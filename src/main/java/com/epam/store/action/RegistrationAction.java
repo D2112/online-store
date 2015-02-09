@@ -50,7 +50,7 @@ public class RegistrationAction implements Action {
         if (!RegexValidator.isNameValid(name)) {
             return messagesBundle.getString("registration.error.name");
         }
-        if(!password.equals(passwordConfirm)) {
+        if (!password.equals(passwordConfirm)) {
             return messagesBundle.getString("registration.error.password");
         }
         return null;
