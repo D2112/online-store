@@ -4,9 +4,7 @@ import com.epam.store.dao.Dao;
 import com.epam.store.dao.DaoFactory;
 import com.epam.store.dao.DaoSession;
 import com.epam.store.dao.SqlQueryGenerator;
-import com.epam.store.model.Attribute;
-import com.epam.store.model.Category;
-import com.epam.store.model.Product;
+import com.epam.store.model.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -80,7 +78,16 @@ public class ProductService {
         attributeService.deleteAttributes(product.getAttributes());
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Product> productDao = daoSession.getDao(Product.class);
+            daoSession.beginTransaction();
+            //deleting price
+            Dao<Price> priceDao = daoSession.getDao(Price.class);
+            priceDao.delete(product.getPrice().getId());
+            //deleting image
+            Dao<Image> imageDao = daoSession.getDao(Image.class);
+            imageDao.delete(product.getImage().getId());
+            //deleting product
             productDao.delete(product.getId());
+            daoSession.endTransaction();
         }
     }
 }

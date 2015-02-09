@@ -33,7 +33,6 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         messagesBundle = webContext.getMessagesBundle();
         String alreadyExistError = messagesBundle.getString("creating-product.error.alreadyExist");
         String successMessage = messagesBundle.getString("creating-product.message.success");
-
         ActionResult previousPage = new ActionResult(webContext.getPreviousURI(), true);
         getParametersFromRequest(webContext);
         String validationErrorMessage = validateInputData(webContext);
@@ -41,11 +40,6 @@ public class CreateProductAction extends AbstractCreatingProductAction {
             super.setAttributesToFlashScope(webContext); //for displaying on page if error
             webContext.setAttribute("errorMessage", validationErrorMessage, Scope.FLASH);
             return previousPage;
-        }
-        try {
-            productImage = getImageFromRequest(webContext);
-        } catch (IOException | ServletException e) {
-            throw new ActionException("exception while getting image from the request", e);
         }
         ProductService productService = webContext.getService(ProductService.class);
         //Check if there already exist product with that name
@@ -127,6 +121,11 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         productName = webContext.getParameter("productName");
         price = webContext.getParameter("price");
         description = webContext.getParameter("description");
+        try {
+            productImage = getImageFromRequest(webContext);
+        } catch (IOException | ServletException e) {
+            throw new ActionException("exception while getting image from the request", e);
+        }
         String[] attributeNamesParameter = webContext.getParameterValues("attributeNames");
         String[] attributeValuesParameter = webContext.getParameterValues("attributeValues");
         attributeNames = new ArrayList<>();
@@ -145,6 +144,7 @@ public class CreateProductAction extends AbstractCreatingProductAction {
      */
     private String validateInputData(WebContext webContext) {
         if (isFieldsEmpty()) return messagesBundle.getString("creating-product.error.notFilled");
+        if (productImage == null) return messagesBundle.getString("creating-product.error.image");
         if (hasAttributesDuplicateNames()) return messagesBundle.getString("creating-product.error.duplicate");
         //if price is not a number
         if (!RegexValidator.isIntegerNumber(price) && !RegexValidator.isDecimalNumber(price)) {
@@ -158,6 +158,7 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         String imageName = part.getSubmittedFileName();
         String contentType = part.getContentType();
         InputStream content = part.getInputStream();
+        if (content.available() == 0) return null; //if nothing to read it means image bytes is empty
         byte[] buffer = new byte[8192];
         int bytesRead;
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -165,7 +166,8 @@ public class CreateProductAction extends AbstractCreatingProductAction {
             output.write(buffer, 0, bytesRead);
         }
         byte[] imageBytes = output.toByteArray();
-        byte[] resizeImage = Images.resize(imageBytes, Image.STANDARD_WIDTH, Image.STANDARD_HEIGHT);
+        byte[] resizeImage;
+        resizeImage = Images.resize(imageBytes, Image.STANDARD_WIDTH, Image.STANDARD_HEIGHT);
         return new Image(imageName, contentType, resizeImage);
     }
 }

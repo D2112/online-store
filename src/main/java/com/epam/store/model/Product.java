@@ -1,7 +1,5 @@
 package com.epam.store.model;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +29,7 @@ public class Product extends BaseEntity {
     }
 
     public List<Attribute> getAttributes() {
-        return ImmutableList.copyOf(attributes);
+        return attributes;
     }
 
     public String getName() {

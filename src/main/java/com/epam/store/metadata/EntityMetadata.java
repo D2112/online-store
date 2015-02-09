@@ -2,7 +2,6 @@ package com.epam.store.metadata;
 
 
 import com.epam.store.model.BaseEntity;
-import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +13,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Contains field names of certain entity and their types
+ * Allows invoke entity setters and getters by name
+ *
+ * @param <T> type of entity
+ */
 public class EntityMetadata<T extends BaseEntity> {
     private static final Logger log = LoggerFactory.getLogger(EntityMetadata.class);
     private Map<String, Method> setterByFieldName;
@@ -30,21 +35,18 @@ public class EntityMetadata<T extends BaseEntity> {
         addFieldsNamesFromFields(type.getSuperclass().getDeclaredFields()); //getting names from superclass
         addFieldsNamesFromFields(type.getDeclaredFields());
 
-        addSetterAndGettersFromMethods(type.getSuperclass().getDeclaredMethods());//getting methods names from superclass
+        addSetterAndGettersFromMethods(type.getSuperclass().getDeclaredMethods()); //getting methods names from superclass
         addSetterAndGettersFromMethods(type.getDeclaredMethods());
     }
 
-    public Class<T> getFieldType(String fieldName) {
+    public Class<?> getFieldType(String fieldName) {
         try {
-            Class clazz = type.getDeclaredField(fieldName).getType();
-            if (BaseEntity.class.isAssignableFrom(clazz)) {
-                return clazz;
-            }
+            return type.getDeclaredField(fieldName).getType(); //getting type of the field by name
         } catch (NoSuchFieldException e) {
-            log.error("Exception while getting field type from entity: ", e);
-            throw new MetadataException(e);
+            String errorMessage = "Exception while getting field type from entity: ";
+            log.error(errorMessage, e);
+            throw new MetadataException(errorMessage, e);
         }
-        return null;
     }
 
     public Class<T> getEntityClass() {
@@ -56,9 +58,15 @@ public class EntityMetadata<T extends BaseEntity> {
     }
 
     public List<String> getFieldsNames() {
-        return ImmutableList.copyOf(fieldsNames);
+        return fieldsNames;
     }
 
+    /**
+     * Invoke setter by field name in specified object
+     * @param fieldName field name to find appropriate setter
+     * @param targetToInvoke object for invoke setter
+     * @param args parameters of the setter
+     */
     public void invokeSetterByFieldName(String fieldName, Object targetToInvoke, Object... args) {
         try {
             setterByFieldName.get(fieldName).invoke(targetToInvoke, args);
@@ -67,6 +75,11 @@ public class EntityMetadata<T extends BaseEntity> {
         }
     }
 
+    /**
+     * Invoke getter by field name in specified object
+     * @param fieldName field name to find appropriate getter
+     * @param targetToInvoke object for invoke getter
+     */
     public Object invokeGetter(String fieldName, Object targetToInvoke) {
         try {
             return getterByFieldName.get(fieldName).invoke(targetToInvoke);

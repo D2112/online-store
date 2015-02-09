@@ -29,11 +29,9 @@ public class SqlQueryGenerator {
     private static final String WILDCARD_PARAMETERS_QUERY_SEPARATOR = ", ";
     private Properties queries;
     private DBMetadataManager dbMetadataManager;
-    private NameFormatter nameFormatter;
 
     public SqlQueryGenerator(DBMetadataManager dbMetadataManager) {
         this.dbMetadataManager = dbMetadataManager;
-        nameFormatter = NameFormatter.getInstance();
         queries = new Properties();
         try (InputStream inputStream = SqlQueryGenerator.class.getClassLoader().getResourceAsStream(QUERY_FILE_NAME)) {
             queries.load(inputStream);
@@ -68,7 +66,7 @@ public class SqlQueryGenerator {
      */
     public String generateFindByParametersQuery(Class<? extends BaseEntity> entityClass,
                                                 Collection<String> parametersNames) {
-        String tableName = nameFormatter.getTableNameForClass(entityClass);
+        String tableName = NameFormatter.getTableNameForClass(entityClass);
         String templateQuery = queries.getProperty(FIND_BY_PARAMETERS_QUERY_NAME);
         String templateWithTableName =
                 String.format(templateQuery, tableName, "%s"); //substitute only table name for now

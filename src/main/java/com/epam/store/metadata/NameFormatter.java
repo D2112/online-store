@@ -4,14 +4,7 @@ public class NameFormatter {
     private static final NameFormatter instance = new NameFormatter();
     private static final char WORD_SEPARATOR = '_';
 
-    public static NameFormatter getInstance() {
-        return instance;
-    }
-
-    private NameFormatter() {
-    }
-
-    public String getTableNameForClass(Class clazz) {
+    public static String getTableNameForClass(Class clazz) {
         String className = clazz.getSimpleName();
         if (isCamelCase(className)) {
             return getTableNameForCamelCase(className);
@@ -19,7 +12,7 @@ public class NameFormatter {
         return className.toUpperCase();
     }
 
-    public String getFieldNameFromColumnName(String columnName) {
+    public static String getFieldNameFromColumnName(String columnName) {
         StringBuilder sb = new StringBuilder();
         if (columnName.endsWith(DatabaseColumn.ID_SUFFIX)) {
             columnName = columnName.substring(0, columnName.length() - DatabaseColumn.ID_SUFFIX.length());
@@ -38,11 +31,11 @@ public class NameFormatter {
         return sb.toString();
     }
 
-    public String getPrimaryKeyNameForTable(String tableName) {
+    public static String getPrimaryKeyNameForTable(String tableName) {
         return tableName + DatabaseColumn.ID_SUFFIX;
     }
 
-    public boolean isCamelCase(String str) {
+    public static boolean isCamelCase(String str) {
         for (char ch : str.substring(1).toCharArray()) {
             if (Character.isUpperCase(ch)) {
                 return true;
@@ -51,7 +44,7 @@ public class NameFormatter {
         return false;
     }
 
-    private String getTableNameForCamelCase(String str) {
+    private static String getTableNameForCamelCase(String str) {
         StringBuilder sb = new StringBuilder();
         char[] chars = str.toCharArray();
         int underscoreIndex = 0;

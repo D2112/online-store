@@ -94,7 +94,7 @@ public class ConfigParser {
     private void parsePageMappingNode(XMLStreamReader reader, Map<String, String> uriByPageNameMap) throws XMLStreamException {
         String page = null;
         String uri = null;
-        while (!elementEnds(reader, PAGE_MAPPING_ELEMENT)) {
+        while (!elementEnd(reader, PAGE_MAPPING_ELEMENT)) {
             reader.next();
             if (reader.getEventType() == XMLStreamReader.START_ELEMENT) {
                 String elementName = reader.getLocalName();
@@ -110,7 +110,7 @@ public class ConfigParser {
 
     private List<String> parsePagesWithUriParameters(XMLStreamReader reader) throws XMLStreamException {
         List<String> pagesWithUriParameters = new ArrayList<>();
-        while (!elementEnds(reader, PAGES_WITH_URI_PARAMETERS_ELEMENT)) {
+        while (!elementEnd(reader, PAGES_WITH_URI_PARAMETERS_ELEMENT)) {
             reader.next();
             if (reader.getEventType() == XMLStreamReader.START_ELEMENT) {
                 String elementName = reader.getLocalName();
@@ -122,7 +122,7 @@ public class ConfigParser {
         return pagesWithUriParameters;
     }
 
-    private boolean elementEnds(XMLStreamReader reader, String elementName) {
+    private boolean elementEnd(XMLStreamReader reader, String elementName) {
         return reader.getEventType() == XMLStreamReader.END_ELEMENT && reader.getLocalName().equals(elementName);
     }
 }

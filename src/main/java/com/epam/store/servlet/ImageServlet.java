@@ -16,10 +16,12 @@ import java.util.List;
 
 @WebServlet(urlPatterns = "/image/*")
 public class ImageServlet extends HttpServlet {
+    private static final String IMAGE_ID_COLUMN = "IMAGE_ID";
+    private static final String DAO_FACTORY_ATTRIBUTE_NAME = "daoFactory";
     private DaoFactory daoFactory;
 
     public void init(ServletConfig config) throws ServletException {
-        daoFactory = (DaoFactory) config.getServletContext().getAttribute("daoFactory");
+        daoFactory = (DaoFactory) config.getServletContext().getAttribute(DAO_FACTORY_ATTRIBUTE_NAME);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -34,16 +36,17 @@ public class ImageServlet extends HttpServlet {
             return;
         }
         Image image = null;
+        //try to get image from database
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Image> dao = daoSession.getDao(Image.class);
-            List<Image> images = dao.findByParameter("IMAGE_ID", imageId);
+            List<Image> images = dao.findByParameter(IMAGE_ID_COLUMN, imageId);
             if (images.size() == 1) image = images.iterator().next();
         }
         if (image == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
             return;
         }
-        response.reset();
+        response.reset(); //clear buffer to prevent it exceed
         response.setContentType(image.getContentType());
         response.setContentLength(image.getContent().length);
         // Write image content to response.

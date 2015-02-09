@@ -15,10 +15,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Class wrapper for work with {@link HttpServletRequest} and
+ * {@link HttpServletResponse} classes.
+ *
+ * @see javax.servlet.http.HttpServletRequest
+ * @see javax.servlet.http.HttpServletResponse
+ */
 public class WebContext {
     private static final Logger log = LoggerFactory.getLogger(WebContext.class);
     private static final String FLASH_ATTRIBUTE_PREFIX = "flash.";
     private static final String MESSAGES_BUNDLE_BASENAME = "i18n.MessagesBundle";
+    private static final String LANGUAGE_COOKIE_ATTRIBUTE_NAME = "lang";
+    private static final String LOCALE_ATTRIBUTE_NAME = "locale";
+    private static final String SPLIT_URL_PATH_REGEX = "[^/]+";
     private static final List<String> pagesWithURIParameters;
     private HttpServletRequest req;
     private HttpServletResponse resp;
@@ -38,6 +48,12 @@ public class WebContext {
         this((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse);
     }
 
+    /**
+     * Gets request method + URI path
+     * example: GET/category/stuff
+     *
+     * @return the key-name of requested action from request
+     */
     public String getRequestedAction() {
         return req.getMethod() + getPagePathFromURI();
     }
@@ -160,6 +176,11 @@ public class WebContext {
         return req.getHeader("Referer").substring(getURL().length());
     }
 
+    /**
+     * Constructs url from parts
+     * Scheme + server name + port
+     * @return string with url
+     */
     public String getURL() {
         StringBuilder sb = new StringBuilder();
         sb.append(req.getScheme());
@@ -175,6 +196,16 @@ public class WebContext {
         return req.getRequestURI();
     }
 
+    /**
+     * Gets path from uri, it's like {@link #getPathInfo} method
+     * but the difference is what this method looks pages config and search there
+     * pages with uri-parameters after which rest part of the path cut.
+     * For example if the path is: 'page/example/path'
+     * and if in config present page with name 'example'
+     * then methods return only 'page/example' string
+     * @return full uri path or cut uri path, depends on page config
+     * @see javax.servlet.http.HttpServletRequest#getPathInfo
+     */
     public String getPagePathFromURI() {
         List<String> pathSegments = splitIntoSegments(req.getPathInfo());
         StringBuilder sb = new StringBuilder();
@@ -189,16 +220,21 @@ public class WebContext {
         return sb.toString();
     }
 
-    public String getFirstParameterFromURI() {
-        List<String> parametersFromURI = getParametersFromURI();
-        if (parametersFromURI.size() == 0) return null;
-        return parametersFromURI.iterator().next();
-    }
-
+    /**
+     * Gets list of parameters from path if in the page config present
+     * the page after which path cut into parameters
+     * @return list of string parameters from path
+     */
     public List<String> getParametersFromURI() {
         String pathInfo = req.getPathInfo();
         String parameterString = pathInfo.substring(getPagePathFromURI().length());
         return splitIntoSegments(parameterString);
+    }
+
+    public String getFirstParameterFromURI() {
+        List<String> parametersFromURI = getParametersFromURI();
+        if (parametersFromURI.size() == 0) return null;
+        return parametersFromURI.iterator().next();
     }
 
     public String getPathInfo() {
@@ -222,8 +258,13 @@ public class WebContext {
         resp.addCookie(cookie);
     }
 
+    /**
+     * Adds cookie to response with specified locale
+     * The cookie adds on maximum possible age via integer max value
+     * @param locale the locale which be added in cookie
+     */
     public void addLangCookie(Locale locale) {
-        Cookie cookie = new Cookie("lang", locale.getLanguage());
+        Cookie cookie = new Cookie(LANGUAGE_COOKIE_ATTRIBUTE_NAME, locale.getLanguage());
         cookie.setMaxAge(Integer.MAX_VALUE);
         addCookie(cookie);
     }
@@ -245,7 +286,7 @@ public class WebContext {
     }
 
     public void setLocale(Locale locale) {
-        setAttribute("locale", locale, Scope.SESSION);
+        setAttribute(LOCALE_ATTRIBUTE_NAME, locale, Scope.SESSION);
         setJstlFormatterLocale(locale);
     }
 
@@ -260,7 +301,7 @@ public class WebContext {
 
     private List<String> splitIntoSegments(String uri) {
         List<String> names = new ArrayList<>();
-        String regex = "[^/]+";
+        String regex = SPLIT_URL_PATH_REGEX;
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(uri);
         while (matcher.find()) {

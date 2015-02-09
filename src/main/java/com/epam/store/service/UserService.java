@@ -59,15 +59,11 @@ public class UserService {
      * @return User object from database, or null, if such user didn't found
      */
     public User authenticateUser(String email, String password) {
-        User authenticatedUser = null;
-        try (DaoSession daoSession = daoFactory.getDaoSession()) {
-            Dao<User> userDao = daoSession.getDao(User.class);
-            User foundUser = findUser(email);
-            if (foundUser != null && PasswordEncryptor.comparePassword(password, foundUser.getPassword())) {
-                authenticatedUser = foundUser;
-            }
+        User foundUser = findUser(email);
+        if (foundUser != null && PasswordEncryptor.comparePassword(password, foundUser.getPassword())) {
+            return foundUser;
         }
-        return authenticatedUser;
+        return null;
     }
 
 

@@ -32,7 +32,8 @@ public interface Dao<T extends BaseEntity> {
     public boolean update(T object);
 
     /**
-     * Deletes record in database with specified id
+     * Deletes record in database with specified id,
+     * not deletes any related records
      *
      * @param id of the record to be deleted
      * @return true if record was successfully deleted or false if not

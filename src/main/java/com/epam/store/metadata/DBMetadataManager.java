@@ -21,10 +21,8 @@ import java.util.Map;
 public class DBMetadataManager {
     private static final String DELETED_COLUMN_NAME = "DELETED";
     private Map<String, DatabaseTable> tables;
-    private NameFormatter nameFormatter;
 
     public DBMetadataManager(DatabaseMetaData databaseMetaData) {
-        nameFormatter = NameFormatter.getInstance();
         tables = createTables(databaseMetaData);
     }
 
@@ -34,7 +32,7 @@ public class DBMetadataManager {
      * @throws MetadataException if table with such name don't exist
      */
     public DatabaseTable getTableForClass(Class<? extends BaseEntity> clazz) {
-        String tableName = nameFormatter.getTableNameForClass(clazz);
+        String tableName = NameFormatter.getTableNameForClass(clazz);
         DatabaseTable databaseTable = tables.get(tableName);
         if (databaseTable == null) throw new MetadataException("Can't find table " + tableName);
         return databaseTable;
@@ -47,7 +45,7 @@ public class DBMetadataManager {
             String tableName = entry.getKey();
             List<String> columnNames = entry.getValue();
             List<DatabaseColumn> columns = createColumns(tableName, columnNames, databaseMetaData);
-            String tablePrimaryKeyName = nameFormatter.getPrimaryKeyNameForTable(tableName);
+            String tablePrimaryKeyName = NameFormatter.getPrimaryKeyNameForTable(tableName);
             DatabaseTable databaseTable = new DatabaseTable(tableName, tablePrimaryKeyName, columns);
             tables.put(tableName, databaseTable);
         }
@@ -58,7 +56,7 @@ public class DBMetadataManager {
         List<DatabaseColumn> columnsList = new ArrayList<>();
         List<String> uniqueConstraintColumns = getUniqueConstraintColumns(tableName, databaseMetaData);
         for (String columnName : columnNames) {
-            String fieldName = nameFormatter.getFieldNameFromColumnName(columnName);
+            String fieldName = NameFormatter.getFieldNameFromColumnName(columnName);
             boolean foreignKey = isColumnForeignID(tableName, columnName);
             boolean unique = uniqueConstraintColumns.contains(columnName);
             DatabaseColumn column = new DatabaseColumn(columnName, fieldName, foreignKey, unique);
@@ -107,10 +105,9 @@ public class DBMetadataManager {
         return columnName.endsWith(DatabaseColumn.ID_SUFFIX) && !columnName.startsWith(tableName);
     }
 
-
     private boolean isColumnUnnecessary(String tableName, String columnName) {
         //Unnecessary for query is primary key and DELETED columns
-        return columnName.equals(nameFormatter.getPrimaryKeyNameForTable(tableName))
+        return columnName.equals(NameFormatter.getPrimaryKeyNameForTable(tableName))
                 || columnName.equalsIgnoreCase(DELETED_COLUMN_NAME);
     }
 }

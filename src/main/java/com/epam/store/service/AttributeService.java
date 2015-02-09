@@ -3,6 +3,7 @@ package com.epam.store.service;
 import com.epam.store.dao.*;
 import com.epam.store.dbpool.SqlPooledConnection;
 import com.epam.store.metadata.EntityMetadata;
+import com.epam.store.metadata.NameFormatter;
 import com.epam.store.model.Attribute;
 import com.epam.store.model.DecimalAttribute;
 import com.epam.store.model.IntegerAttribute;
@@ -96,8 +97,11 @@ class AttributeService {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 Attribute attribute = clazz.newInstance();
-                Long attributeID = rs.getLong(ATTRIBUTE_ID_COLUMN);
-                String attributeName = readAttributeName(attributeID, connection);
+                String attributePrimaryKey = getPrimaryKeyNameForAttributeClass(clazz);
+                Long abstractAttributeID = rs.getLong(ATTRIBUTE_ID_COLUMN); //abstract attribute need for getting name
+                Long certainAttributeID = rs.getLong(attributePrimaryKey);
+                attribute.setId(certainAttributeID);
+                String attributeName = readAttributeName(abstractAttributeID, connection); //get attribute name by id
                 Object value = rs.getObject(ATTRIBUTE_VALUE_COLUMN);
                 attributeEntityMetadata.invokeSetterByFieldName(ATTRIBUTE_NAME_COLUMN, attribute, attributeName);
                 attributeEntityMetadata.invokeSetterByFieldName(ATTRIBUTE_VALUE_COLUMN, attribute, value);
@@ -136,5 +140,10 @@ class AttributeService {
             throw new ServiceException(e);
         }
         return null; //not found
+    }
+
+    private String getPrimaryKeyNameForAttributeClass(Class<? extends Attribute> clazz) {
+        String tableNameForClass = NameFormatter.getTableNameForClass(clazz);
+        return NameFormatter.getPrimaryKeyNameForTable(tableNameForClass);
     }
 }

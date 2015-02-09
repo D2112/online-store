@@ -123,8 +123,8 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
         String deleteQuery = sqlQueryGenerator.generateQueryForClass(SqlQueryType.DELETE_BY_ID, clazz);
         try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
             statement.setLong(1, id);
-            T entityToDelete = find(id);
-            deleteDependencies(entityToDelete);
+            //T entityToDelete = find(id);
+            //deleteDependencies(entityToDelete);
             int deleted = statement.executeUpdate();
             if (deleted > 1) {
                 throw new DaoException("Deleted more than 1 record");
@@ -307,8 +307,11 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
             if (!entityMetadata.hasField(fieldName)) continue;
             if (column.isForeignKey()) {
                 BaseEntity entityToDelete = (BaseEntity) entityMetadata.invokeGetter(fieldName, entity); //get entity
-                Class<T> type = entityMetadata.getFieldType(fieldName); //get entity type
-                Dao dao = daoSession.getDao(type); //get dao with parametrized such type
+                Class type = entityMetadata.getFieldType(fieldName); //get entity type
+                if (!BaseEntity.class.isAssignableFrom(type)) {
+                    throw new DaoException("Trying to get dao with type which not extends BaseEntity");
+                }
+                Dao dao = daoSession.getDao(type); //get dao parametrized such type
                 dao.delete(entityToDelete.getId());
             }
         }
@@ -324,7 +327,10 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
      * @return Found object as {@link com.epam.store.model.BaseEntity}
      */
     private BaseEntity readDependency(String fieldName, Long dependencyEntityID) {
-        Class<T> type = entityMetadata.getFieldType(fieldName);
+        Class type = entityMetadata.getFieldType(fieldName);
+        if (!BaseEntity.class.isAssignableFrom(type)) {
+            throw new DaoException("Trying to get dao with type which not extends BaseEntity");
+        }
         Dao dao = daoSession.getDao(type);
         return dao.find(dependencyEntityID);
     }
@@ -338,8 +344,11 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
      */
     @SuppressWarnings("unchecked")
     private BaseEntity insertDependency(String fieldName, Object entityToInsert) {
-        Class<T> type = entityMetadata.getFieldType(fieldName);
+        Class type = entityMetadata.getFieldType(fieldName);
         Dao dao = daoSession.getDao(type);
+        if (!BaseEntity.class.isAssignableFrom(type)) {
+            throw new DaoException("Trying to get DAO with type which not extends BaseEntity");
+        }
         BaseEntity baseEntityToInsert = (BaseEntity) entityToInsert;
         return dao.insert(baseEntityToInsert);
     }

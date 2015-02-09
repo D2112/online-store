@@ -100,7 +100,7 @@ public class SqlConnectionPool implements ConnectionPool {
             if (availableConnection.isAlive()) {
                 return availableConnection;
             } else {
-                availableConnections.remove(availableConnection);//remove dead connection
+                availableConnections.iterator().remove();//remove dead connection
             }
         }
         return createConnection();
