@@ -135,6 +135,6 @@ class AttributeService {
         } catch (SQLException e) {
             throw new ServiceException(e);
         }
-        return null;
+        return null; //not found
     }
 }

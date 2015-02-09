@@ -1,4 +1,4 @@
-<%@tag description="displays creating product form" pageEncoding="UTF-8" %>
+<%@tag description="displays category management form" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="page" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>

@@ -1,3 +1,4 @@
+<%@ tag description="Trying to find and display one of three types of message" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="page" tagdir="/WEB-INF/tags" %>
 

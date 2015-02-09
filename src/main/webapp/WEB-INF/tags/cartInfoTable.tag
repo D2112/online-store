@@ -1,4 +1,4 @@
-<%@ tag description="Writes HTML code to display cart's info box" %>
+<%@ tag description="Writes HTML code to display cart info box" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="page" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>

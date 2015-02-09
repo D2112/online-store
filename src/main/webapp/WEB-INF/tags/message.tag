@@ -1,4 +1,3 @@
-<%@ tag description="Writes the HTML code for inserting a tab menu." %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ attribute name="text" required="true" %>
 <%@ attribute name="error" required="false" type="java.lang.Boolean" %>
