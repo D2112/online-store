@@ -33,7 +33,7 @@ public class RegistrationAction implements Action {
             log.debug("Registration error: " + errorMessage);
             return errorResult;
         }
-        if (userService.findUser(email) != null) {
+        if (userService.isUserExist(email)) {
             errorMessage = email + messagesBundle.getString("registration.error.registered");
             webContext.setAttribute("error", errorMessage, Scope.FLASH);
             log.debug("Registration error: " + errorMessage);

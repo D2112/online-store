@@ -22,11 +22,11 @@ public class LoginAction implements Action {
         User authenticatedUser = userService.authenticateUser(email, password);
         if (authenticatedUser == null) {
             webContext.setAttribute("email", email, Scope.FLASH);
-            webContext.setAttribute("loginResult", messagesBundle.getString("login.error.notFound"), Scope.FLASH);
+            webContext.setAttribute("errorMessage", messagesBundle.getString("login.error.notFound"), Scope.FLASH);
             return errorResult;
         }
         if (authenticatedUser.getBanned()) {
-            webContext.setAttribute("loginResult", messagesBundle.getString("login.error.ban"), Scope.FLASH);
+            webContext.setAttribute("errorMessage", messagesBundle.getString("login.error.ban"), Scope.FLASH);
             return errorResult;
         }
         webContext.setAttribute("user", authenticatedUser, Scope.SESSION);

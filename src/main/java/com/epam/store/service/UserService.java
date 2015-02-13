@@ -35,6 +35,10 @@ public class UserService {
         }
     }
 
+    public boolean isUserExist(String email) {
+        return findUser(email) != null;
+    }
+
     public User registerUser(String name, String email, String password) {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<User> userDao = daoSession.getDao(User.class);

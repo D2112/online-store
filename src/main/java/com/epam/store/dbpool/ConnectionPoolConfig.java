@@ -10,8 +10,8 @@ class ConnectionPoolConfig {
     private int connectionValidTimeout;
     private int maxConnections;
     private int minConnections;
-    private int maxIdleConnections;
-    private int minIdleConnections;
+    private int maxAvailableConnections;
+    private int minAvailableConnections;
     private String username;
     private String password;
     private String driver;
@@ -23,8 +23,8 @@ class ConnectionPoolConfig {
         connectionValidTimeout = config.connectionValidTimeout();
         maxConnections = config.maxConnections();
         minConnections = config.minConnections();
-        maxIdleConnections = config.maxIdleConnections();
-        minIdleConnections = config.minIdleConnections();
+        maxAvailableConnections = config.maxAvailableConnections();
+        minAvailableConnections = config.minAvailableConnections();
         username = config.username();
         password = config.password();
         driver = config.driver();
@@ -47,12 +47,12 @@ class ConnectionPoolConfig {
         return minConnections;
     }
 
-    public int maxIdleConnections() {
-        return maxIdleConnections;
+    public int maxAvailableConnections() {
+        return maxAvailableConnections;
     }
 
-    public int minIdleConnections() {
-        return minIdleConnections;
+    public int minAvailableConnections() {
+        return minAvailableConnections;
     }
 
     public String username() {
@@ -83,7 +83,7 @@ class ConnectionPoolConfig {
 
         public String url();
 
-        @DefaultValue("5")//minutes
+        @DefaultValue("2")//minutes
         public long connectionIdleTimeout();
 
         @DefaultValue("5")//sec
@@ -96,9 +96,9 @@ class ConnectionPoolConfig {
         public int minConnections();
 
         @DefaultValue("5")
-        public int minIdleConnections();
+        public int minAvailableConnections();
 
         @DefaultValue("50")
-        public int maxIdleConnections();
+        public int maxAvailableConnections();
     }
 }

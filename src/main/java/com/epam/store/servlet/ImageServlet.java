@@ -26,7 +26,7 @@ public class ImageServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         WebContext webContext = new WebContext(request, response);
-        List<String> parametersFromURI = webContext.getParametersFromURI();
+        List<String> parametersFromURI = webContext.getParametersFromPath();
         String imageId = null;
         if (parametersFromURI.size() == 1) {
             imageId = parametersFromURI.iterator().next();

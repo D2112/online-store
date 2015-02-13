@@ -55,7 +55,7 @@ public class WebContext {
      * @return the key-name of requested action from request
      */
     public String getRequestedAction() {
-        return req.getMethod() + getPagePathFromURI();
+        return req.getMethod() + getPagePathFromURN();
     }
 
     public String getParameter(String parameterName) {
@@ -206,7 +206,7 @@ public class WebContext {
      * @return full uri path or cut uri path, depends on page config
      * @see javax.servlet.http.HttpServletRequest#getPathInfo
      */
-    public String getPagePathFromURI() {
+    public String getPagePathFromURN() {
         List<String> pathSegments = splitIntoSegments(req.getPathInfo());
         StringBuilder sb = new StringBuilder();
         for (String segment : pathSegments) {
@@ -225,14 +225,14 @@ public class WebContext {
      * the page after which path cut into parameters
      * @return list of string parameters from path
      */
-    public List<String> getParametersFromURI() {
+    public List<String> getParametersFromPath() {
         String pathInfo = req.getPathInfo();
-        String parameterString = pathInfo.substring(getPagePathFromURI().length());
+        String parameterString = pathInfo.substring(getPagePathFromURN().length());
         return splitIntoSegments(parameterString);
     }
 
     public String getFirstParameterFromURI() {
-        List<String> parametersFromURI = getParametersFromURI();
+        List<String> parametersFromURI = getParametersFromPath();
         if (parametersFromURI.size() == 0) return null;
         return parametersFromURI.iterator().next();
     }
@@ -279,10 +279,6 @@ public class WebContext {
             }
         }
         return null;
-    }
-
-    public Cookie[] getCookies() {
-        return req.getCookies();
     }
 
     public void setLocale(Locale locale) {

@@ -33,6 +33,10 @@ public class DBMetadataManager {
      */
     public DatabaseTable getTableForClass(Class<? extends BaseEntity> clazz) {
         String tableName = NameFormatter.getTableNameForClass(clazz);
+        return getTableByName(tableName);
+    }
+
+    public DatabaseTable getTableByName(String tableName) {
         DatabaseTable databaseTable = tables.get(tableName);
         if (databaseTable == null) throw new MetadataException("Can't find table " + tableName);
         return databaseTable;

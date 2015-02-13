@@ -28,6 +28,13 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * The initializer of the application, on initialization of the context
+ * creates all classes in one exemplar that need to be available through
+ * whole application. Also on initializing class looks is database empty,
+ * if it is, then database will be deployed from sql script.
+ * On destroying of the context it'll shutdown the connection pool.
+ */
 @WebListener
 public class ContextListener implements ServletContextListener {
     private static final Logger log = LoggerFactory.getLogger(ContextListener.class);
@@ -49,6 +56,7 @@ public class ContextListener implements ServletContextListener {
                 //Construct database metadata again with recently added information from deploying script
                 dbMetadataManager = new DBMetadataManager(connection.getMetaData());
                 sqlQueryGenerator = new SqlQueryGenerator(dbMetadataManager);
+                log.info("Script deployed successfully");
             }
         } catch (SQLException | IOException e) {
             throw new ApplicationInitializationException(e);
@@ -62,6 +70,7 @@ public class ContextListener implements ServletContextListener {
         CategoryService categoryService = new CategoryService(daoFactory);
         servletContext.setAttribute(getNameForService(CategoryService.class), categoryService);
 
+        //set categories list to application context to have access to it from everywhere
         List<Category> categories = new CopyOnWriteArrayList<>(categoryService.getCategories());
         servletContext.setAttribute("categories", categories);
 

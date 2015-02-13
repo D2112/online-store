@@ -1,40 +1,26 @@
 package com.epam.store;
 
+import com.epam.store.dbpool.ConnectionPool;
 import com.epam.store.dbpool.SqlConnectionPool;
 import com.epam.store.dbpool.SqlPooledConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
 
 public class ThreadTest {
-    static SqlConnectionPool cp = new SqlConnectionPool();
-    static List<SqlPooledConnection> list = new CopyOnWriteArrayList<>();
+    private static final Logger log = LoggerFactory.getLogger(ThreadTest.class);
+    private static final ConnectionPool cp = new SqlConnectionPool();
 
-    public static void main(String[] args) throws InterruptedException {
-        Timer timer = new Timer(true);
-        timer.schedule(new Releaser(), 5000, 5000);
-
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        ExecutorService executor = Executors.newCachedThreadPool();
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1000);
         for (int i = 0; i < 1000; i++) {
-            new Thread(() -> {
-                SqlPooledConnection pooledConnection = cp.getConnection();
-                if (pooledConnection != null) {
-                    list.add(cp.getConnection());
-                    System.out.println("added connection");
-                }
-            }).start();
+            Future<SqlPooledConnection> future = executor.submit(cp::getConnection);
+            SqlPooledConnection connection = future.get();
+            scheduledExecutorService.schedule(connection::close, 5, TimeUnit.SECONDS);
         }
-    }
-
-    static class Releaser extends TimerTask {
-
-        @Override
-        public void run() {
-            System.out.println("Collect");
-            for (SqlPooledConnection pc : list) {
-                pc.close();
-            }
-        }
+        Thread.sleep(200000);
+        cp.shutdown();
     }
 }

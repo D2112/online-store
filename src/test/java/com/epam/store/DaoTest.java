@@ -10,7 +10,7 @@ public class DaoTest extends Assert {
 /*        DaoFactory daoFactory = new JdbcDaoFactory();
         DaoSession daoSession = daoFactory.getDaoSession();
         Dao<User> userDao = daoSession.getDao(User.class);
-        User user = new User("Test", "Test@gmail.com", new Password("hashHere", "SaltHere"));
+        User user = new User("com.epam.store.Test", "com.epam.store.Test@gmail.com", new Password("hashHere", "SaltHere"));
         User insertedUser = userDao.insert(user);
         user.setId(insertedUser.getId());
         assertEquals(user, insertedUser);

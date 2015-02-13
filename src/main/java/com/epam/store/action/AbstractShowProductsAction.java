@@ -18,7 +18,7 @@ public abstract class AbstractShowProductsAction implements Action {
     }
 
     protected String getCategoryNameFromPath(WebContext webContext) {
-        List<String> parametersFromPath = webContext.getParametersFromURI(); //category's parameter passes as a path part
+        List<String> parametersFromPath = webContext.getParametersFromPath(); //category's parameter passes as a path part
         String category = null;
         if (parametersFromPath.size() > 0) {
             category = parametersFromPath.iterator().next();

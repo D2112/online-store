@@ -18,6 +18,7 @@
     </form>
     <a href="<c:url value="/registration"/>"><fmt:message key="login.label.register"/></a>
 
-    <h4><span style="color: red; ">${loginResult}</span></h4>
-
+    <c:if test="${errorMessage != null}">
+        <h4><span style="color: red; ">${errorMessage}</span></h4>
+    </c:if>
 </div>

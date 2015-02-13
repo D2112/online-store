@@ -31,7 +31,7 @@ public class ActionFactory {
         Action action = actions.get(webContext.getRequestedAction());
         if (action == null) {
             log.debug("Action not found");
-            action = new ShowPageAction(webContext.getPagePathFromURI()); //Try to show requested page
+            action = new ShowPageAction(webContext.getPagePathFromURN()); //Try to show requested page
         }
         return action;
     }
