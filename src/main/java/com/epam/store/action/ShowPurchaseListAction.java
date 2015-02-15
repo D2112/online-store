@@ -13,7 +13,7 @@ public class ShowPurchaseListAction implements Action {
 
     @Override
     public ActionResult execute(WebContext webContext) {
-        String userID = webContext.getFirstParameterFromURI();
+        String userID = webContext.getFirstParameterFromPath();
         UserService userService = webContext.getService(UserService.class);
         if (userID != null && RegexValidator.isIntegerNumber(userID)) {
             List<Order> userOrderList = userService.getUserOrderList(Long.valueOf(userID));

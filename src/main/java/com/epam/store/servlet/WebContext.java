@@ -231,7 +231,7 @@ public class WebContext {
         return splitIntoSegments(parameterString);
     }
 
-    public String getFirstParameterFromURI() {
+    public String getFirstParameterFromPath() {
         List<String> parametersFromURI = getParametersFromPath();
         if (parametersFromURI.size() == 0) return null;
         return parametersFromURI.iterator().next();
