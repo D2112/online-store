@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Class wrapper for work with {@link HttpServletRequest} and
+ * Facade for work with {@link HttpServletRequest} and
  * {@link HttpServletResponse} classes.
  *
  * @see javax.servlet.http.HttpServletRequest

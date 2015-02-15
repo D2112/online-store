@@ -10,18 +10,20 @@ import java.util.ResourceBundle;
 
 @WebAction(path = "POST/login")
 public class LoginAction implements Action {
+    private static final String USER_EMAIL = "email";
+    private static final String USER_PASSWORD = "password";
     private ActionResult errorResult = new ActionResult("login", true);
     private ActionResult successfulResult = new ActionResult("catalog", true);
 
     @Override
     public ActionResult execute(WebContext webContext) {
         ResourceBundle messagesBundle = webContext.getMessagesBundle();
-        String email = webContext.getParameter("email");
-        String password = webContext.getParameter("password");
+        String email = webContext.getParameter(USER_EMAIL);
+        String password = webContext.getParameter(USER_PASSWORD);
         UserService userService = webContext.getService(UserService.class);
         User authenticatedUser = userService.authenticateUser(email, password);
         if (authenticatedUser == null) {
-            webContext.setAttribute("email", email, Scope.FLASH);
+            webContext.setAttribute(USER_EMAIL, email, Scope.FLASH);
             webContext.setAttribute("errorMessage", messagesBundle.getString("login.error.notFound"), Scope.FLASH);
             return errorResult;
         }

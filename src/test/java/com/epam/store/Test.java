@@ -1,26 +1,25 @@
 package com.epam.store;
 
+import java.sql.ResultSet;
+
 public class Test {
     public static void main(String[] args) throws ClassNotFoundException {
-        //Class.forName("com.epam.store.Singleton");
+        Class.forName("com.epam.store.Singleton");
+        ResultSet resultSet;
+
+
     }
 }
 
 class Singleton {
+    private static Singleton instance = new Singleton();
 
     static {
-        System.out.println("Outer class");
-    }
-
-    public static class SingletonHolder {
-        public static final Singleton HOLDER_INSTANCE = new Singleton();
-
-        static {
-            System.out.println("Holder");
-        }
+        System.out.println("static");
     }
 
     public static Singleton getInstance() {
-        return SingletonHolder.HOLDER_INSTANCE;
+        return instance;
     }
 }
+

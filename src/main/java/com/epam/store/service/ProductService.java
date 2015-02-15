@@ -64,6 +64,10 @@ public class ProductService {
         return product;
     }
 
+    public boolean isProductExist(String productName) {
+        return getProductByName(productName) != null;
+    }
+
     public Product getProductByName(String productName) {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Product> productDao = daoSession.getDao(Product.class);

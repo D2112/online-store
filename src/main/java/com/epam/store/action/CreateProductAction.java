@@ -31,28 +31,44 @@ public class CreateProductAction extends AbstractCreatingProductAction {
     @Override
     public ActionResult execute(WebContext webContext) {
         messagesBundle = webContext.getMessagesBundle();
-        String alreadyExistError = messagesBundle.getString("creating-product.error.alreadyExist");
-        String successMessage = messagesBundle.getString("creating-product.message.success");
         ActionResult previousPage = new ActionResult(webContext.getPreviousURI(), true);
         getParametersFromRequest(webContext);
-        String validationErrorMessage = validateInputData(webContext);
+        String validationErrorMessage = validateInputData();
         if (validationErrorMessage != null) {
             super.setAttributesToFlashScope(webContext); //for displaying on page if error
             webContext.setAttribute("errorMessage", validationErrorMessage, Scope.FLASH);
             return previousPage;
         }
         ProductService productService = webContext.getService(ProductService.class);
-        //Check if there already exist product with that name
-        Product productByName = productService.getProductByName(productName);
-        if (productByName != null) {
+        if (productService.isProductExist(productName)) {
             super.setAttributesToFlashScope(webContext); //for displaying on page if error
-            webContext.setAttribute("errorMessage", alreadyExistError, Scope.FLASH);
+            webContext.setAttribute
+                    ("errorMessage", messagesBundle.getString("creating-product.error.alreadyExist"), Scope.FLASH);
             return previousPage;
         }
         productService.addProduct(createProduct(webContext));
-        webContext.setAttribute("successMessage", successMessage, Scope.FLASH);
+        webContext.setAttribute
+                ("successMessage", messagesBundle.getString("creating-product.message.success"), Scope.FLASH);
         return previousPage; //redirect to previous page with message;
     }
+
+    /**
+     * Validates input data for empty fields,
+     * duplicate attribute names, checks is price a number
+     *
+     * @return message with validation error or null if there is no validation errors
+     */
+    private String validateInputData() {
+        if (isFieldsEmpty()) return messagesBundle.getString("creating-product.error.notFilled");
+        if (productImage == null) return messagesBundle.getString("creating-product.error.image");
+        if (hasAttributesDuplicateNames()) return messagesBundle.getString("creating-product.error.duplicate");
+        if (RegexValidator.notNumber(price)) return messagesBundle.getString("creating-product.error.price");
+        if (RegexValidator.isNumberTooLarge(price))
+            return messagesBundle.getString("creating-product.error.largeNumber");
+        return null;
+    }
+
+
 
     private List<Attribute> parseAttributes() {
         List<Attribute> attributeList = new ArrayList<>();
@@ -74,14 +90,9 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         return attributeList;
     }
 
-    private void validateInputLength() {
-        //todo validate input length
-    }
-
-    //fixme do this check another way
     private boolean isFieldsEmpty() {
-        return Arrays.asList(categoryName, productName, price, description).contains(EMPTY_STRING)
-                || hasAttributesEmptyFields(attributeNames, attributeValues);
+        if (Arrays.asList(categoryName, productName, price, description).contains(EMPTY_STRING)) return true;
+        return (attributeNames.contains(EMPTY_STRING) || attributeValues.contains(EMPTY_STRING));
     }
 
     private boolean hasAttributesDuplicateNames() {
@@ -89,31 +100,8 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         return set.size() < attributeNames.size();
     }
 
-    private boolean hasAttributesEmptyFields(List<String> attributeNames, List<String> attributeValues) {
-        return attributeNames.contains(EMPTY_STRING) || attributeValues.contains(EMPTY_STRING);
-    }
-
     private BigDecimal parseStringToBigDecimal(String s) {
         return BigDecimal.valueOf(Double.valueOf(s));
-    }
-
-    @SuppressWarnings("unchecked")
-    private Product createProduct(WebContext webContext) {
-        List<Category> categories = (List<Category>) webContext.getAttribute(CATEGORIES_LIST_NAME, Scope.APPLICATION);
-        Category productCategory = null;
-        //Find product category in categories from application context
-        //because need category with id from database
-        for (Category category : categories) {
-            if (category.getName().equals(categoryName)) {
-                productCategory = category;
-                break;
-            }
-        }
-        if (productCategory == null) productCategory = new Category(categoryName);
-        Price productPrice = new Price(parseStringToBigDecimal(price));
-        Product product = new Product(productName, productCategory, description, productPrice, productImage);
-        product.setAttributes(parseAttributes());
-        return product;
     }
 
     private void getParametersFromRequest(WebContext webContext) {
@@ -136,23 +124,6 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         }
     }
 
-    /**
-     * Validates input data for empty fields,
-     * duplicate attribute names, checks is price a number
-     *
-     * @return message with validation error or null if there is no validation errors
-     */
-    private String validateInputData(WebContext webContext) {
-        if (isFieldsEmpty()) return messagesBundle.getString("creating-product.error.notFilled");
-        if (productImage == null) return messagesBundle.getString("creating-product.error.image");
-        if (hasAttributesDuplicateNames()) return messagesBundle.getString("creating-product.error.duplicate");
-        //if price is not a number
-        if (!RegexValidator.isIntegerNumber(price) && !RegexValidator.isDecimalNumber(price)) {
-            return messagesBundle.getString("creating-product.error.price");
-        }
-        return null;
-    }
-
     private Image getImageFromRequest(WebContext webContext) throws IOException, ServletException {
         Part part = webContext.getPart("image");
         String imageName = part.getSubmittedFileName();
@@ -169,5 +140,24 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         byte[] resizeImage;
         resizeImage = Images.resize(imageBytes, Image.STANDARD_WIDTH, Image.STANDARD_HEIGHT);
         return new Image(imageName, contentType, resizeImage);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Product createProduct(WebContext webContext) {
+        List<Category> categories = (List<Category>) webContext.getAttribute(CATEGORIES_LIST_NAME, Scope.APPLICATION);
+        Category productCategory = null;
+        //Find product category in categories from application context
+        //because need category with id from database
+        for (Category category : categories) {
+            if (category.getName().equals(categoryName)) {
+                productCategory = category;
+                break;
+            }
+        }
+        if (productCategory == null) throw new ActionException("Such category is not exist " + categoryName);
+        Price productPrice = new Price(parseStringToBigDecimal(price));
+        Product product = new Product(productName, productCategory, description, productPrice, productImage);
+        product.setAttributes(parseAttributes());
+        return product;
     }
 }

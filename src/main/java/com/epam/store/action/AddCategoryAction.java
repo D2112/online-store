@@ -15,15 +15,12 @@ public class AddCategoryAction implements Action {
     @SuppressWarnings("unchecked")
     public ActionResult execute(WebContext webContext) {
         ResourceBundle messagesBundle = webContext.getMessagesBundle();
-        String emptyCategoryMessage = messagesBundle.getString("adding-category.message.emptyCategory");
-        String successMessage = messagesBundle.getString("adding-category.message.success");
-        String categoryExistMessage = messagesBundle.getString("adding-category.message.exist");
-
         ActionResult backToPreviousPage = new ActionResult(webContext.getPreviousURI(), true);
         String categoryName = webContext.getParameter("categoryName");
         CategoryService service = webContext.getService(CategoryService.class);
         if (categoryName == null || categoryName.isEmpty()) {
-            webContext.setAttribute("errorMessage", emptyCategoryMessage, Scope.FLASH);
+            webContext.setAttribute
+                    ("errorMessage", messagesBundle.getString("adding-category.message.emptyCategory"), Scope.FLASH);
             return backToPreviousPage;
         }
         Category addedCategory = service.addCategory(categoryName);
@@ -31,9 +28,11 @@ public class AddCategoryAction implements Action {
         if (addedCategory != null) {
             List<Category> categories = (List<Category>) webContext.getAttribute("categories", Scope.APPLICATION);
             categories.add(addedCategory);
-            webContext.setAttribute("successMessage", successMessage, Scope.FLASH);
+            webContext.setAttribute
+                    ("successMessage", messagesBundle.getString("adding-category.message.success"), Scope.FLASH);
         } else {
-            webContext.setAttribute("errorMessage", categoryExistMessage, Scope.FLASH);
+            webContext.setAttribute
+                    ("errorMessage", messagesBundle.getString("adding-category.message.exist"), Scope.FLASH);
         }
         return backToPreviousPage;
     }
