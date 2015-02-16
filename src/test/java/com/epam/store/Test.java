@@ -1,12 +1,8 @@
 package com.epam.store;
 
-import java.sql.ResultSet;
-
 public class Test {
     public static void main(String[] args) throws ClassNotFoundException {
-        Class.forName("com.epam.store.Singleton");
-        ResultSet resultSet;
-
+        Test.class.getClassLoader().loadClass("com.epam.store.Singleton");
 
     }
 }

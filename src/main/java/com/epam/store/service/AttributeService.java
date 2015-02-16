@@ -2,7 +2,7 @@ package com.epam.store.service;
 
 import com.epam.store.dao.*;
 import com.epam.store.dbpool.SqlPooledConnection;
-import com.epam.store.metadata.EntityMetadata;
+import com.epam.store.metadata.EntityManager;
 import com.epam.store.metadata.NameFormatter;
 import com.epam.store.model.Attribute;
 import com.epam.store.model.DecimalAttribute;
@@ -74,7 +74,7 @@ class AttributeService {
                 String insertAttributeQuery = sqlQueryGenerator.generateQueryForClass(SqlQueryType.INSERT, attribute.getClass());
                 //metadata needs for getting value from one of several attribute class
                 //because every class has different types of value
-                EntityMetadata attributeMetadata = new EntityMetadata(attribute.getClass());
+                EntityManager attributeMetadata = new EntityManager(attribute.getClass());
                 try (PreparedStatement statement = connection.prepareStatement(insertAttributeQuery)) {
                     statement.setLong(1, attributeID);
                     statement.setLong(2, productID);
@@ -91,7 +91,7 @@ class AttributeService {
             long productID, String query, Class<T> clazz, SqlPooledConnection connection) {
 
         List<Attribute> attributeList = new ArrayList<>();
-        EntityMetadata<T> attributeEntityMetadata = new EntityMetadata<>(clazz);
+        EntityManager<T> attributeEntityManager = new EntityManager<>(clazz);
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, productID);
             ResultSet rs = statement.executeQuery();
@@ -103,8 +103,8 @@ class AttributeService {
                 attribute.setId(certainAttributeID);
                 String attributeName = readAttributeName(abstractAttributeID, connection); //get attribute name by id
                 Object value = rs.getObject(ATTRIBUTE_VALUE_COLUMN);
-                attributeEntityMetadata.invokeSetterByFieldName(ATTRIBUTE_NAME_COLUMN, attribute, attributeName);
-                attributeEntityMetadata.invokeSetterByFieldName(ATTRIBUTE_VALUE_COLUMN, attribute, value);
+                attributeEntityManager.invokeSetterByFieldName(ATTRIBUTE_NAME_COLUMN, attribute, attributeName);
+                attributeEntityManager.invokeSetterByFieldName(ATTRIBUTE_VALUE_COLUMN, attribute, value);
                 attributeList.add(attribute);
             }
         } catch (SQLException | InstantiationException | IllegalAccessException e) {

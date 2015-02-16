@@ -3,7 +3,7 @@ package com.epam.store.dao;
 import com.epam.store.dbpool.SqlPooledConnection;
 import com.epam.store.metadata.DatabaseColumn;
 import com.epam.store.metadata.DatabaseTable;
-import com.epam.store.metadata.EntityMetadata;
+import com.epam.store.metadata.EntityManager;
 import com.epam.store.model.BaseEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     private DaoSession daoSession;
     private SqlPooledConnection connection;
     private SqlQueryGenerator sqlQueryGenerator;
-    private EntityMetadata<T> entityMetadata;
+    private EntityManager<T> entityManager;
     private DatabaseTable table;
 
     public JdbcDao(DaoSession daoSession, Class<T> clazz, SqlQueryGenerator sqlQueryGenerator, DatabaseTable table) {
@@ -31,7 +31,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
         this.table = table;
         this.sqlQueryGenerator = sqlQueryGenerator;
         this.clazz = clazz;
-        this.entityMetadata = new EntityMetadata<>(clazz);
+        this.entityManager = new EntityManager<>(clazz);
     }
 
     /**
@@ -217,14 +217,14 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
         List<T> resultList = new ArrayList<>();
         while (rs.next()) {
             try {
-                T entity = entityMetadata.getEntityClass().newInstance(); //creating new object
+                T entity = entityManager.getEntityClass().newInstance(); //creating new object
                 Long id = rs.getLong(table.getPrimaryKeyColumnName()); //getting object's id from result set
                 entity.setId(id);
                 //for each column in table get value from rs and set it to entity if entity has such field
                 for (DatabaseColumn column : table.getColumns()) {
                     String columnName = column.getName();
                     String fieldName = column.getFieldName();
-                    if (!entityMetadata.hasField(fieldName)) continue;
+                    if (!entityManager.hasField(fieldName)) continue;
                     Object valueToSet;
                     if (column.isForeignKey()) {
                         Long dependencyEntityID = rs.getLong(columnName); //getting dependency id
@@ -232,7 +232,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
                     } else {
                         valueToSet = rs.getObject(columnName);
                     }
-                    entityMetadata.invokeSetterByFieldName(fieldName, entity, valueToSet); //set value to entity
+                    entityManager.invokeSetterByFieldName(fieldName, entity, valueToSet); //set value to entity
                 }
                 resultList.add(entity);
             } catch (InstantiationException | IllegalAccessException e) {
@@ -256,11 +256,11 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
         int statementParameterIndex = 1;
         for (DatabaseColumn column : table.getColumns()) {
             String fieldName = column.getFieldName();
-            if (!entityMetadata.hasField(fieldName)) continue;
+            if (!entityManager.hasField(fieldName)) continue;
             log.debug("Setting to insert statement " + fieldName);
             if (column.isForeignKey()) {
                 //get dependency object from entity and try to get id from it
-                BaseEntity dependencyEntity = (BaseEntity) entityMetadata.invokeGetter(fieldName, entity);
+                BaseEntity dependencyEntity = (BaseEntity) entityManager.invokeGetter(fieldName, entity);
                 Long dependencyID = dependencyEntity.getId();
                 //if dependency object hasn't id, then insert it and get it's id to set to statement
                 if (dependencyID == null) {
@@ -269,7 +269,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
                 statement.setLong(statementParameterIndex, dependencyID);
             } else {
                 //if field is just a primitive value, then set it to statement like an object
-                Object valueToSet = entityMetadata.invokeGetter(fieldName, entity);
+                Object valueToSet = entityManager.invokeGetter(fieldName, entity);
                 statement.setObject(statementParameterIndex, valueToSet);
             }
             statementParameterIndex++;
@@ -304,10 +304,10 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     private void deleteDependencies(T entity) throws SQLException {
         for (DatabaseColumn column : table.getColumns()) {
             String fieldName = column.getFieldName();
-            if (!entityMetadata.hasField(fieldName)) continue;
+            if (!entityManager.hasField(fieldName)) continue;
             if (column.isForeignKey()) {
-                BaseEntity entityToDelete = (BaseEntity) entityMetadata.invokeGetter(fieldName, entity); //get entity
-                Class type = entityMetadata.getFieldType(fieldName); //get entity type
+                BaseEntity entityToDelete = (BaseEntity) entityManager.invokeGetter(fieldName, entity); //get entity
+                Class type = entityManager.getFieldType(fieldName); //get entity type
                 if (!BaseEntity.class.isAssignableFrom(type)) {
                     throw new DaoException("Trying to get dao with type which not extends BaseEntity");
                 }
@@ -327,7 +327,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
      * @return Found object as {@link com.epam.store.model.BaseEntity}
      */
     private BaseEntity readDependency(String fieldName, Long dependencyEntityID) {
-        Class type = entityMetadata.getFieldType(fieldName);
+        Class type = entityManager.getFieldType(fieldName);
         if (!BaseEntity.class.isAssignableFrom(type)) {
             throw new DaoException("Trying to get dao with type which not extends BaseEntity");
         }
@@ -344,7 +344,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
      */
     @SuppressWarnings("unchecked")
     private BaseEntity insertDependency(String fieldName, Object entityToInsert) {
-        Class type = entityMetadata.getFieldType(fieldName);
+        Class type = entityManager.getFieldType(fieldName);
         Dao dao = daoSession.getDao(type);
         if (!BaseEntity.class.isAssignableFrom(type)) {
             throw new DaoException("Trying to get DAO with type which not extends BaseEntity");

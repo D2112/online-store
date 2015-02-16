@@ -1,7 +1,6 @@
 package com.epam.store.metadata;
 
 
-import com.epam.store.model.BaseEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,14 +18,14 @@ import java.util.Map;
  *
  * @param <T> type of entity
  */
-public class EntityMetadata<T extends BaseEntity> {
-    private static final Logger log = LoggerFactory.getLogger(EntityMetadata.class);
+public class EntityManager<T> {
+    private static final Logger log = LoggerFactory.getLogger(EntityManager.class);
     private Map<String, Method> setterByFieldName;
     private Map<String, Method> getterByFieldName;
     private List<String> fieldsNames;
     private Class<T> type;
 
-    public EntityMetadata(Class<T> type) {
+    public EntityManager(Class<T> type) {
         fieldsNames = new ArrayList<>();
         setterByFieldName = new LinkedHashMap<>();
         getterByFieldName = new LinkedHashMap<>();
