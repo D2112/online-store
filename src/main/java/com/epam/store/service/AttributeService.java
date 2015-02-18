@@ -21,11 +21,11 @@ class AttributeService {
     private static final String ATTRIBUTE_NAME_COLUMN = "name";
     private static final String ATTRIBUTE_VALUE_COLUMN = "value";
     private DaoFactory daoFactory;
-    private SqlQueryGenerator sqlQueryGenerator;
+    private SqlQueryFactory SqlQueryFactory;
     private List<Class> attributeClasses;
 
-    public AttributeService(DaoFactory daoFactory, SqlQueryGenerator sqlQueryGenerator) {
-        this.sqlQueryGenerator = sqlQueryGenerator;
+    public AttributeService(DaoFactory daoFactory, SqlQueryFactory sqlQueryFactory) {
+        this.SqlQueryFactory = sqlQueryFactory;
         this.daoFactory = daoFactory;
 
         attributeClasses = new ArrayList<>();
@@ -40,7 +40,7 @@ class AttributeService {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             //get attributes of every classes
             for (Class attributeClass : attributeClasses) {
-                String sqlQuery = sqlQueryGenerator.generateFindByParameterQuery(attributeClass, PRODUCT_ID_COLUMN);
+                String sqlQuery = SqlQueryFactory.generateFindByParameterQuery(attributeClass, PRODUCT_ID_COLUMN);
                 List<Attribute> attributesOfCertainClass =
                         getAttributesOfCertainClass(productID, sqlQuery, attributeClass, daoSession.getConnection());
                 attributeList.addAll(attributesOfCertainClass);
@@ -71,11 +71,11 @@ class AttributeService {
                     attributeID = attributeDao.insert(attribute).getId();
                 }
                 //inserting attribute
-                String insertAttributeQuery = sqlQueryGenerator.generateQueryForClass(SqlQueryType.INSERT, attribute.getClass());
+                SqlQuery insertAttributeQuery = SqlQueryFactory.getQueryForClass(SqlQueryType.INSERT, attribute.getClass());
                 //metadata needs for getting value from one of several attribute class
                 //because every class has different types of value
                 EntityManager attributeMetadata = new EntityManager(attribute.getClass());
-                try (PreparedStatement statement = connection.prepareStatement(insertAttributeQuery)) {
+                try (PreparedStatement statement = connection.prepareStatement(insertAttributeQuery.getQuery())) {
                     statement.setLong(1, attributeID);
                     statement.setLong(2, productID);
                     statement.setObject(3, attributeMetadata.invokeGetter(ATTRIBUTE_VALUE_COLUMN, attribute)); //attribute value
@@ -114,9 +114,9 @@ class AttributeService {
     }
 
     private String readAttributeName(long attributeID, SqlPooledConnection connection) {
-        String sqlQuery = sqlQueryGenerator.generateQueryForClass(SqlQueryType.FIND_BY_ID, Attribute.class);
+        SqlQuery sqlQuery = SqlQueryFactory.getQueryForClass(SqlQueryType.FIND_BY_ID, Attribute.class);
         String attributeName = null;
-        try (PreparedStatement statement = connection.prepareStatement(sqlQuery)) {
+        try (PreparedStatement statement = connection.prepareStatement(sqlQuery.getQuery())) {
             statement.setLong(1, attributeID);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
@@ -129,7 +129,7 @@ class AttributeService {
     }
 
     private Long readAttributeID(String attributeName, SqlPooledConnection connection) {
-        String findAttributeByNameQuery = sqlQueryGenerator.generateFindByParameterQuery(Attribute.class, ATTRIBUTE_NAME_COLUMN);
+        String findAttributeByNameQuery = SqlQueryFactory.generateFindByParameterQuery(Attribute.class, ATTRIBUTE_NAME_COLUMN);
         try (PreparedStatement statement = connection.prepareStatement(findAttributeByNameQuery)) {
             statement.setString(1, attributeName);
             ResultSet rs = statement.executeQuery();

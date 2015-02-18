@@ -3,7 +3,7 @@ package com.epam.store.service;
 import com.epam.store.dao.Dao;
 import com.epam.store.dao.DaoFactory;
 import com.epam.store.dao.DaoSession;
-import com.epam.store.dao.SqlQueryGenerator;
+import com.epam.store.dao.SqlQueryFactory;
 import com.epam.store.model.*;
 
 import java.sql.SQLException;
@@ -17,9 +17,9 @@ public class ProductService {
     private DaoFactory daoFactory;
     private AttributeService attributeService;
 
-    public ProductService(DaoFactory daoFactory, SqlQueryGenerator sqlQueryGenerator) {
+    public ProductService(DaoFactory daoFactory, SqlQueryFactory sqlQueryFactory) {
         this.daoFactory = daoFactory;
-        attributeService = new AttributeService(daoFactory, sqlQueryGenerator);
+        attributeService = new AttributeService(daoFactory, sqlQueryFactory);
     }
 
     public List<Product> getProductsForCategory(String categoryName) {

@@ -2,11 +2,10 @@ package com.epam.store.listener;
 
 import com.epam.store.dao.DaoFactory;
 import com.epam.store.dao.JdbcDaoFactory;
-import com.epam.store.dao.SqlQueryGenerator;
+import com.epam.store.dao.SqlQueryFactory;
 import com.epam.store.dbpool.ConnectionPool;
 import com.epam.store.dbpool.SqlConnectionPool;
 import com.epam.store.dbpool.SqlPooledConnection;
-import com.epam.store.metadata.DBMetadataManager;
 import com.epam.store.model.Category;
 import com.epam.store.service.CategoryService;
 import com.epam.store.service.ImageService;
@@ -46,28 +45,25 @@ public class ContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent arg) {
         ServletContext servletContext = arg.getServletContext();
         connectionPool = new SqlConnectionPool();
-        DBMetadataManager dbMetadataManager;
-        SqlQueryGenerator sqlQueryGenerator;
+        SqlQueryFactory sqlQueryFactory;
         try (SqlPooledConnection connection = connectionPool.getConnection()) {
-            dbMetadataManager = new DBMetadataManager(connection.getMetaData());
-            sqlQueryGenerator = new SqlQueryGenerator(dbMetadataManager);
-            if (isDatabaseEmpty(connection, sqlQueryGenerator)) {
+            sqlQueryFactory = new SqlQueryFactory(connection.getMetaData());
+            if (isDatabaseEmpty(connection, sqlQueryFactory)) {
                 log.info("Database is empty. Trying to deploy with script");
                 deployDatabaseFromScript(connection);
-                //Construct database metadata again with recently added information from deploying script
-                dbMetadataManager = new DBMetadataManager(connection.getMetaData());
-                sqlQueryGenerator = new SqlQueryGenerator(dbMetadataManager);
+                //Construct query factory again with new database metadata with new information from deploying script
+                sqlQueryFactory = new SqlQueryFactory(connection.getMetaData());
                 log.info("Script deployed successfully");
             }
         } catch (SQLException | IOException e) {
             throw new ApplicationInitializationException(e);
         }
-        DaoFactory daoFactory = new JdbcDaoFactory(connectionPool, sqlQueryGenerator);
+        DaoFactory daoFactory = new JdbcDaoFactory(connectionPool, sqlQueryFactory);
         servletContext.setAttribute("daoFactory", daoFactory);
 
         //set services to servlet context, the class name is used as an attribute name
-        servletContext.setAttribute(getNameForService(ProductService.class), new ProductService(daoFactory, sqlQueryGenerator));
-        servletContext.setAttribute(getNameForService(UserService.class), new UserService(daoFactory, sqlQueryGenerator));
+        servletContext.setAttribute(getNameForService(ProductService.class), new ProductService(daoFactory, sqlQueryFactory));
+        servletContext.setAttribute(getNameForService(UserService.class), new UserService(daoFactory, sqlQueryFactory));
         servletContext.setAttribute(getNameForService(ImageService.class), new ImageService(daoFactory));
         CategoryService categoryService = new CategoryService(daoFactory);
         servletContext.setAttribute(getNameForService(CategoryService.class), categoryService);
@@ -86,8 +82,8 @@ public class ContextListener implements ServletContextListener {
         return clazz.getSimpleName();
     }
 
-    private boolean isDatabaseEmpty(SqlPooledConnection connection, SqlQueryGenerator sqlQueryGenerator) throws SQLException {
-        String publicTablesCountQuery = sqlQueryGenerator.getPublicTablesCountQuery();
+    private boolean isDatabaseEmpty(SqlPooledConnection connection, SqlQueryFactory sqlQueryFactory) throws SQLException {
+        String publicTablesCountQuery = sqlQueryFactory.getPublicTablesCountQuery();
         Statement statement = connection.createStatement();
         ResultSet rs = statement.executeQuery(publicTablesCountQuery);
         rs.next();

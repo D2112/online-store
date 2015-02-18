@@ -19,7 +19,6 @@ import java.util.Map;
  * and the Deleted column
  */
 public class DBMetadataManager {
-    private static final String DELETED_COLUMN_NAME = "DELETED";
     private Map<String, DatabaseTable> tables;
 
     public DBMetadataManager(DatabaseMetaData databaseMetaData) {
@@ -49,11 +48,20 @@ public class DBMetadataManager {
             String tableName = entry.getKey();
             List<String> columnNames = entry.getValue();
             List<DatabaseColumn> columns = createColumns(tableName, columnNames, databaseMetaData);
-            String tablePrimaryKeyName = NameFormatter.getPrimaryKeyNameForTable(tableName);
-            DatabaseTable databaseTable = new DatabaseTable(tableName, tablePrimaryKeyName, columns);
+            DatabaseColumn primaryKeyColumn = findPrimaryKeyColumn(tableName, columns);
+            DatabaseTable databaseTable = new DatabaseTable(tableName, primaryKeyColumn, columns);
             tables.put(tableName, databaseTable);
         }
         return tables;
+    }
+
+    private DatabaseColumn findPrimaryKeyColumn(String tableName, List<DatabaseColumn> columns) {
+        for (DatabaseColumn column : columns) {
+            if (isColumnPrimaryKey(tableName, column.getName())) {
+                return column;
+            }
+        }
+        return null;
     }
 
     private List<DatabaseColumn> createColumns(String tableName, List<String> columnNames, DatabaseMetaData databaseMetaData) {
@@ -63,7 +71,8 @@ public class DBMetadataManager {
             String fieldName = NameFormatter.getFieldNameFromColumnName(columnName);
             boolean foreignKey = isColumnForeignID(tableName, columnName);
             boolean unique = uniqueConstraintColumns.contains(columnName);
-            DatabaseColumn column = new DatabaseColumn(columnName, fieldName, foreignKey, unique);
+            boolean primaryKey = isColumnPrimaryKey(tableName, columnName);
+            DatabaseColumn column = new DatabaseColumn(primaryKey, columnName, foreignKey, fieldName, unique);
             columnsList.add(column);
         }
         return columnsList;
@@ -79,7 +88,6 @@ public class DBMetadataManager {
                 List<String> columnsList = new ArrayList<>();
                 while (columnsResultSet.next()) {
                     String columnName = columnsResultSet.getString("COLUMN_NAME");
-                    if (isColumnUnnecessary(tableName, columnName)) continue;
                     columnsList.add(columnName);
                 }
                 columnsByTableName.put(tableName, columnsList);
@@ -109,9 +117,7 @@ public class DBMetadataManager {
         return columnName.endsWith(DatabaseColumn.ID_SUFFIX) && !columnName.startsWith(tableName);
     }
 
-    private boolean isColumnUnnecessary(String tableName, String columnName) {
-        //Unnecessary for query is primary key and DELETED columns
-        return columnName.equals(NameFormatter.getPrimaryKeyNameForTable(tableName))
-                || columnName.equalsIgnoreCase(DELETED_COLUMN_NAME);
+    private boolean isColumnPrimaryKey(String tableName, String columnName) {
+        return columnName.startsWith(tableName) && columnName.endsWith(DatabaseColumn.ID_SUFFIX);
     }
 }

@@ -21,15 +21,15 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     private final Class<T> clazz;
     private DaoSession daoSession;
     private SqlPooledConnection connection;
-    private SqlQueryGenerator sqlQueryGenerator;
+    private SqlQueryFactory sqlQueryFactory;
     private EntityManager<T> entityManager;
     private DatabaseTable table;
 
-    public JdbcDao(DaoSession daoSession, Class<T> clazz, SqlQueryGenerator sqlQueryGenerator, DatabaseTable table) {
+    public JdbcDao(DaoSession daoSession, Class<T> clazz, SqlQueryFactory sqlQueryFactory, DatabaseTable table) {
         this.daoSession = daoSession;
         this.connection = daoSession.getConnection();
         this.table = table;
-        this.sqlQueryGenerator = sqlQueryGenerator;
+        this.sqlQueryFactory = sqlQueryFactory;
         this.clazz = clazz;
         this.entityManager = new EntityManager<>(clazz);
     }
@@ -42,9 +42,9 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
      */
     @Override
     public T insert(T object) {
-        String insertQuery = sqlQueryGenerator.generateQueryForClass(SqlQueryType.INSERT, clazz);
-        try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
-            prepareStatementForInsert(statement, object);
+        SqlQuery insertQuery = sqlQueryFactory.getQueryForClass(SqlQueryType.INSERT, clazz);
+        try (PreparedStatement statement = connection.prepareStatement(insertQuery.getQuery())) {
+            prepareStatementForInsert(statement, object, insertQuery);
             int inserted = statement.executeUpdate();
             if (inserted > 1) throw new DaoException("Inserted more than one record: " + inserted);
             if (inserted < 1) throw new DaoException("Record was not inserted");
@@ -52,11 +52,11 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
             throw new DaoException(exc);
         }
         //getting id of the inserted object
-        String readLastQuery = sqlQueryGenerator.generateQueryForClass(SqlQueryType.READ_LAST, clazz);
-        try (PreparedStatement statement = connection.prepareStatement(readLastQuery);
+        SqlQuery readLastQuery = sqlQueryFactory.getQueryForClass(SqlQueryType.READ_LAST, clazz);
+        try (PreparedStatement statement = connection.prepareStatement(readLastQuery.getQuery());
              ResultSet rs = statement.executeQuery()) {
             if (!rs.next()) throw new DaoException("Last inserted ID was not found");
-            Long lastInsertedID = rs.getLong(table.getPrimaryKeyColumnName());
+            Long lastInsertedID = rs.getLong(table.getPrimaryKeyName());
             object.setId(lastInsertedID);
         } catch (SQLException exc) {
             throw new DaoException(exc);
@@ -72,8 +72,8 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     @Override
     public T find(long id) {
         List<T> list;
-        String readQuery = sqlQueryGenerator.generateQueryForClass(SqlQueryType.FIND_BY_ID, clazz);
-        try (PreparedStatement statement = connection.prepareStatement(readQuery)) {
+        SqlQuery readQuery = sqlQueryFactory.getQueryForClass(SqlQueryType.FIND_BY_ID, clazz);
+        try (PreparedStatement statement = connection.prepareStatement(readQuery.getQuery())) {
             statement.setLong(1, id);
             ResultSet rs = statement.executeQuery();
             list = parseResultSet(rs);
@@ -98,9 +98,9 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
      */
     @Override
     public boolean update(T object) {
-        String updateQuery = sqlQueryGenerator.generateQueryForClass(SqlQueryType.UPDATE_BY_ID, clazz);
-        try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
-            prepareStatementForUpdate(statement, object);
+        SqlQuery updateQuery = sqlQueryFactory.getQueryForClass(SqlQueryType.UPDATE_BY_ID, clazz);
+        try (PreparedStatement statement = connection.prepareStatement(updateQuery.getQuery())) {
+            prepareStatementForUpdate(statement, object, updateQuery);
             int updated = statement.executeUpdate();
             if (updated > 1) {
                 throw new DaoException("Updated more than one record: " + updated);
@@ -120,11 +120,9 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
      */
     @Override
     public boolean delete(long id) {
-        String deleteQuery = sqlQueryGenerator.generateQueryForClass(SqlQueryType.DELETE_BY_ID, clazz);
-        try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+        SqlQuery deleteQuery = sqlQueryFactory.getQueryForClass(SqlQueryType.DELETE_BY_ID, clazz);
+        try (PreparedStatement statement = connection.prepareStatement(deleteQuery.getQuery())) {
             statement.setLong(1, id);
-            //T entityToDelete = find(id);
-            //deleteDependencies(entityToDelete);
             int deleted = statement.executeUpdate();
             if (deleted > 1) {
                 throw new DaoException("Deleted more than 1 record");
@@ -146,8 +144,8 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     @Override
     public List<T> getAll() {
         List<T> list;
-        String readAllQuery = sqlQueryGenerator.generateQueryForClass(SqlQueryType.READ_ALL, clazz);
-        try (PreparedStatement statement = connection.prepareStatement(readAllQuery);
+        SqlQuery readAllQuery = sqlQueryFactory.getQueryForClass(SqlQueryType.READ_ALL, clazz);
+        try (PreparedStatement statement = connection.prepareStatement(readAllQuery.getQuery());
              ResultSet rs = statement.executeQuery()) {
 
             list = parseResultSet(rs);
@@ -166,7 +164,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     @Override
     public List<T> findByParameters(Map<String, Object> parameters) {
         List<T> list;
-        String searchQuery = sqlQueryGenerator.generateFindByParametersQuery(clazz, parameters.keySet());
+        String searchQuery = sqlQueryFactory.generateFindByParametersQuery(clazz, parameters.keySet());
         try (PreparedStatement statement = connection.prepareStatement(searchQuery)) {
             int statementParameterIndex = 1;
             for (Object obj : parameters.values()) {
@@ -218,7 +216,7 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
         while (rs.next()) {
             try {
                 T entity = entityManager.getEntityClass().newInstance(); //creating new object
-                Long id = rs.getLong(table.getPrimaryKeyColumnName()); //getting object's id from result set
+                Long id = rs.getLong(table.getPrimaryKeyName()); //getting object's id from result set
                 entity.setId(id);
                 //for each column in table get value from rs and set it to entity if entity has such field
                 for (DatabaseColumn column : table.getColumns()) {
@@ -252,12 +250,12 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
      * @param entity    to take from it values
      * @throws SQLException
      */
-    private void prepareStatementForInsert(PreparedStatement statement, T entity) throws SQLException {
+    private void prepareStatementForInsert(PreparedStatement statement, T entity, SqlQuery query) throws SQLException {
         int statementParameterIndex = 1;
-        for (DatabaseColumn column : table.getColumns()) {
+        for (DatabaseColumn column : query.getParameters()) {
             String fieldName = column.getFieldName();
             if (!entityManager.hasField(fieldName)) continue;
-            log.debug("Setting to insert statement " + fieldName);
+            log.debug("Set to statement " + column.getName() + " from table " + table.getName());
             if (column.isForeignKey()) {
                 //get dependency object from entity and try to get id from it
                 BaseEntity dependencyEntity = (BaseEntity) entityManager.invokeGetter(fieldName, entity);
@@ -279,17 +277,18 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
 
     /**
      * Sets to statement all field from the entity-parameter,
-     * the main difference from {@link #prepareStatementForInsert(java.sql.PreparedStatement, T)
+     * the main difference from
+     * {@link #prepareStatementForInsert(java.sql.PreparedStatement, T, com.epam.store.dao.SqlQuery)
      * it's setting to last parameter in statement id of entity which need to be updated.
      *
      * @param statement to prepare.
      * @param entity    to take from it values.
      * @throws SQLException
      */
-    private void prepareStatementForUpdate(PreparedStatement statement, T entity) throws SQLException {
-        prepareStatementForInsert(statement, entity);
+    private void prepareStatementForUpdate(PreparedStatement statement, T entity, SqlQuery query) throws SQLException {
+        prepareStatementForInsert(statement, entity, query);
         //the last parameter it's id of entity which need to be updated,
-        //because end of sql query looks like this - ...WHERE ID = ?
+        //because the sql query ends like this - ...WHERE ID = ?
         int idParameterIndex = statement.getParameterMetaData().getParameterCount();
         statement.setLong(idParameterIndex, entity.getId());
     }

@@ -21,11 +21,11 @@ public class UserService {
     private static final String DATE_TIME_COLUMN = "TIME";
     private static final String STATUS_NAME_COLUMN = "NAME";
     private DaoFactory daoFactory;
-    private SqlQueryGenerator sqlQueryGenerator;
+    private SqlQueryFactory sqlQueryFactory;
 
-    public UserService(DaoFactory daoFactory, SqlQueryGenerator sqlQueryGenerator) {
+    public UserService(DaoFactory daoFactory, SqlQueryFactory sqlQueryFactory) {
         this.daoFactory = daoFactory;
-        this.sqlQueryGenerator = sqlQueryGenerator;
+        this.sqlQueryFactory = sqlQueryFactory;
     }
 
     public User findUser(String email) {
@@ -102,11 +102,11 @@ public class UserService {
     }
 
     public void addPurchaseListToUser(Long userID, List<Purchase> purchaseList) {
-        String insertQuery = sqlQueryGenerator.generateQueryForClass(SqlQueryType.INSERT, Purchase.class);
+        SqlQuery insertQuery = sqlQueryFactory.getQueryForClass(SqlQueryType.INSERT, Purchase.class);
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             SqlPooledConnection connection = daoSession.getConnection();
             for (Purchase purchase : purchaseList) {
-                try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                try (PreparedStatement statement = connection.prepareStatement(insertQuery.getQuery())) {
                     //inserting dependency entities
                     Dao<Price> priceDao = daoSession.getDao(Price.class);
                     Price insertedPrice = priceDao.insert(purchase.getPrice());

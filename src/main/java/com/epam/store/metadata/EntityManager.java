@@ -26,6 +26,7 @@ public class EntityManager<T> {
     private Class<T> type;
 
     public EntityManager(Class<T> type) {
+        log.debug("initializing entity metadata");
         fieldsNames = new ArrayList<>();
         setterByFieldName = new LinkedHashMap<>();
         getterByFieldName = new LinkedHashMap<>();

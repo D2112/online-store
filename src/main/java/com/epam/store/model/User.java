@@ -10,10 +10,12 @@ public class User extends BaseEntity {
     public User() {
     }
 
-    public User(String name, String email, Password password) {
+    public User(String name, String email, Role role, Password password, boolean banned) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.role = role;
+        this.banned = banned;
     }
 
     public String getName() {

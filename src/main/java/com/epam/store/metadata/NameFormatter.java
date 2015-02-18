@@ -15,11 +15,12 @@ public class NameFormatter {
     public static String getFieldNameFromColumnName(String columnName) {
         StringBuilder sb = new StringBuilder();
         if (columnName.endsWith(DatabaseColumn.ID_SUFFIX)) {
-            columnName = columnName.substring(0, columnName.length() - DatabaseColumn.ID_SUFFIX.length());
+            columnName = removeIdSuffix(columnName);
         }
         columnName = columnName.toLowerCase();
         char[] chars = columnName.toCharArray();
         int index = 0;
+        //remove low-dash separators and substitute uppercase char instead to get standard java camelcase field name
         for (int i = 0; i < chars.length; i++) {
             if (chars[i] == WORD_SEPARATOR) {
                 sb.append(columnName.substring(index, i));
@@ -57,5 +58,9 @@ public class NameFormatter {
         }
         sb.append(str.substring(underscoreIndex, chars.length));
         return sb.toString().toUpperCase();
+    }
+
+    private static String removeIdSuffix(String str) {
+        return str.substring(0, str.length() - DatabaseColumn.ID_SUFFIX.length());
     }
 }

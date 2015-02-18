@@ -12,7 +12,7 @@ public class Role extends BaseEntity {
     }
 
     public Role(String name) {
-
+        this.name = name;
     }
 
     public String getName() {
