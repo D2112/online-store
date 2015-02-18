@@ -32,7 +32,7 @@ public class SqlQueryFactory {
     private static final String COMMA = ", ";
     private static final String WILDCARD = " ? ";
     private static final String DELETED_COLUMN_NAME = "DELETED";
-    private static final ConcurrentTable<DatabaseTable, SqlQueryType, SqlQuery> queryCache = new ConcurrentTable<>();
+    private ConcurrentTable<DatabaseTable, SqlQueryType, SqlQuery> queryCache = new ConcurrentTable<>();
     private Properties queries;
     private DBMetadataManager dbMetadataManager;
 

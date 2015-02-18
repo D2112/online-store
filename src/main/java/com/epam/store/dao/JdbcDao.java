@@ -25,13 +25,14 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
     private EntityManager<T> entityManager;
     private DatabaseTable table;
 
-    public JdbcDao(DaoSession daoSession, Class<T> clazz, SqlQueryFactory sqlQueryFactory, DatabaseTable table) {
+    public JdbcDao(DaoSession daoSession, Class<T> clazz, EntityManager<T> entityManager,
+                   SqlQueryFactory sqlQueryFactory, DatabaseTable table) {
         this.daoSession = daoSession;
         this.connection = daoSession.getConnection();
         this.table = table;
         this.sqlQueryFactory = sqlQueryFactory;
         this.clazz = clazz;
-        this.entityManager = new EntityManager<>(clazz);
+        this.entityManager = entityManager;
     }
 
     /**
@@ -350,5 +351,9 @@ class JdbcDao<T extends BaseEntity> implements Dao<T> {
         }
         BaseEntity baseEntityToInsert = (BaseEntity) entityToInsert;
         return dao.insert(baseEntityToInsert);
+    }
+
+    void putConnection(SqlPooledConnection connection) {
+        this.connection = connection;
     }
 }
