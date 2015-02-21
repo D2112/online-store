@@ -16,6 +16,22 @@ public interface Dao<T extends BaseEntity> {
     public T insert(T object);
 
     /**
+     * Inserts object into database
+     *
+     * @param object to insert
+     * @return The same object, but with id from database
+     */
+    public T insertWithAdditionalParameters(T object, Map<String, Object> parameters);
+
+    /**
+     * Inserts object into database
+     *
+     * @param object to insert
+     * @return The same object, but with id from database
+     */
+    public T insertWithAdditionalParameter(T object, String paramName, Object value);
+
+    /**
      * Tries to find record with specified id
      *
      * @param id of the record
@@ -30,6 +46,22 @@ public interface Dao<T extends BaseEntity> {
      * @return true if record was successfully updated or false if not
      */
     public boolean update(T object);
+
+    /**
+     * Updates record in database with data from object
+     *
+     * @param object to be updated
+     * @return true if record was successfully updated or false if not
+     */
+    public boolean updateWithAdditionalParameters(T object, Map<String, Object> parameters);
+
+    /**
+     * Updates record in database with data from object
+     *
+     * @param object to be updated
+     * @return true if record was successfully updated or false if not
+     */
+    public boolean updateWithAdditionalParameter(T object, String paramName, Object value);
 
     /**
      * Deletes record in database with specified id,

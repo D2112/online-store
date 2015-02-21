@@ -3,35 +3,35 @@ package com.epam.store.service;
 import com.epam.store.dao.Dao;
 import com.epam.store.dao.DaoFactory;
 import com.epam.store.dao.DaoSession;
-import com.epam.store.dao.SqlQueryFactory;
 import com.epam.store.model.*;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class ProductService {
     private static final String PRODUCT_NAME_COLUMN = "NAME";
+    private static final String PRODUCT_ID_COLUMN = "PRODUCT_ID";
     private static final String CATEGORY_ID_COLUMN = "CATEGORY_ID";
     private DaoFactory daoFactory;
-    private AttributeService attributeService;
 
-    public ProductService(DaoFactory daoFactory, SqlQueryFactory sqlQueryFactory) {
+    public ProductService(DaoFactory daoFactory) {
         this.daoFactory = daoFactory;
-        attributeService = new AttributeService(daoFactory, sqlQueryFactory);
     }
 
     public List<Product> getProductsForCategory(String categoryName) {
         List<Product> productsList = new ArrayList<>();
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Category> categoryDao = daoSession.getDao(Category.class);
-            List<Category> categories = categoryDao.findByParameter(PRODUCT_NAME_COLUMN, categoryName);
-            if (categories.size() == 1) {
-                long categoryID = categories.get(0).getId();
+            Category category = categoryDao.findFirstByParameter(PRODUCT_NAME_COLUMN, categoryName);
+            if (category != null) {
                 Dao<Product> productDao = daoSession.getDao(Product.class);
-                productsList = productDao.findByParameter(CATEGORY_ID_COLUMN, categoryID);
-                productsList.forEach(this::setAttributesToProduct);
+                Dao<Attribute> attributeDao = daoSession.getDao(Attribute.class);
+                productsList = productDao.findByParameter(CATEGORY_ID_COLUMN, category.getId());
+                for (Product product : productsList) {
+                    List<Attribute> attributeList = attributeDao.findByParameter(PRODUCT_ID_COLUMN, product.getId());
+                    product.setAttributes(attributeList);
+                }
             }
         }
         return productsList;
@@ -40,28 +40,25 @@ public class ProductService {
     public Product getProductByID(long id) {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Product> productDao = daoSession.getDao(Product.class);
+            Dao<Attribute> attributeDao = daoSession.getDao(Attribute.class);
             Product product = productDao.find(id);
-            setAttributesToProduct(product);
+            if (product != null) {
+                List<Attribute> attributeList = attributeDao.findByParameter(PRODUCT_ID_COLUMN, product.getId());
+                product.setAttributes(attributeList);
+            }
             return product;
         }
     }
 
+
     public void addProduct(Product product) {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Product> productDao = daoSession.getDao(Product.class);
+            daoSession.beginTransaction();
             productDao.insert(product);
-            attributeService.insertAttributes(product.getId(), product.getAttributes());
+            insertAttributes(daoSession, product.getAttributes(), product.getId());
+            daoSession.endTransaction();
         }
-    }
-
-    private Product setAttributesToProduct(Product product) {
-        try {
-            List<Attribute> attributesForProduct = attributeService.getAttributesForProduct(product.getId());
-            product.setAttributes(attributesForProduct);
-        } catch (SQLException e) {
-            throw new ServiceException(e);
-        }
-        return product;
     }
 
     public boolean isProductExist(String productName) {
@@ -79,8 +76,8 @@ public class ProductService {
 
     public void deleteProduct(long id) {
         Product product = getProductByID(id);
-        attributeService.deleteAttributes(product.getAttributes());
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
+            deleteAttributes(daoSession, product.getAttributes());
             Dao<Product> productDao = daoSession.getDao(Product.class);
             daoSession.beginTransaction();
             //deleting price
@@ -92,6 +89,21 @@ public class ProductService {
             //deleting product
             productDao.delete(product.getId());
             daoSession.endTransaction();
+        }
+    }
+
+
+    private void insertAttributes(DaoSession daoSession, List<Attribute> attributes, long productID) {
+        Dao<Attribute> attributeDao = daoSession.getDao(Attribute.class);
+        for (Attribute attribute : attributes) {
+            attributeDao.insertWithAdditionalParameter(attribute, PRODUCT_ID_COLUMN, productID);
+        }
+    }
+
+    private void deleteAttributes(DaoSession daoSession, List<Attribute> attributes) {
+        Dao<Attribute> attributeDao = daoSession.getDao(Attribute.class);
+        for (Attribute attribute : attributes) {
+            attributeDao.delete(attribute.getId());
         }
     }
 }

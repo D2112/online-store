@@ -74,17 +74,17 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         List<Attribute> attributeList = new ArrayList<>();
         for (int i = 0; i < attributeNames.size(); i++) {
             Attribute attribute = null;
+            String name = attributeNames.get(i);
             String value = attributeValues.get(i);
             if (RegexValidator.isIntegerNumber(value)) {
-                attribute = new IntegerAttribute(Integer.valueOf(value));
+                attribute = new IntegerAttribute(name, Integer.valueOf(value));
             }
             if (RegexValidator.isDecimalNumber(value)) {
-                attribute = new DecimalAttribute(parseStringToBigDecimal(value));
+                attribute = new DecimalAttribute(name, parseStringToBigDecimal(value));
             }
             if (attribute == null) {
-                attribute = new StringAttribute(value);
+                attribute = new StringAttribute(name, value);
             }
-            attribute.setName(attributeNames.get(i));
             attributeList.add(attribute);
         }
         return attributeList;

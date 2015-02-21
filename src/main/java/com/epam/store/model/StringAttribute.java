@@ -6,7 +6,8 @@ public class StringAttribute extends Attribute {
     public StringAttribute() {
     }
 
-    public StringAttribute(String value) {
+    public StringAttribute(String name, String value) {
+        super(name);
         this.value = value;
     }
 

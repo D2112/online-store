@@ -3,6 +3,14 @@ package com.epam.store.model;
 public abstract class Attribute extends BaseEntity implements Comparable<Attribute> {
     private String name;
 
+    public Attribute() {
+
+    }
+
+    public Attribute(String name) {
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }

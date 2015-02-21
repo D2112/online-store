@@ -1,5 +1,6 @@
 package com.epam.store.action;
 
+import com.epam.store.listener.ContextListener;
 import com.epam.store.model.Category;
 import com.epam.store.service.CategoryService;
 import com.epam.store.servlet.Scope;
@@ -26,7 +27,8 @@ public class AddCategoryAction implements Action {
         Category addedCategory = service.addCategory(categoryName);
         //adding new category to category list in application context
         if (addedCategory != null) {
-            List<Category> categories = (List<Category>) webContext.getAttribute("categories", Scope.APPLICATION);
+            List<Category> categories = (List<Category>)
+                    webContext.getAttribute(ContextListener.CATEGORY_LIST_ATTRIBUTE_NAME, Scope.APPLICATION);
             categories.add(addedCategory);
             webContext.setAttribute
                     ("successMessage", messagesBundle.getString("adding-category.message.success"), Scope.FLASH);

@@ -8,7 +8,8 @@ public class DecimalAttribute extends Attribute {
     public DecimalAttribute() {
     }
 
-    public DecimalAttribute(BigDecimal value) {
+    public DecimalAttribute(String name, BigDecimal value) {
+        super(name);
         this.value = value;
     }
 

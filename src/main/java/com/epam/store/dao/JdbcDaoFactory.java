@@ -3,31 +3,28 @@ package com.epam.store.dao;
 import com.epam.store.dbpool.ConnectionPool;
 import com.epam.store.dbpool.SqlPooledConnection;
 import com.epam.store.metadata.DBMetadataManager;
-import com.epam.store.metadata.EntityManager;
 import com.epam.store.model.BaseEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class JdbcDaoFactory implements DaoFactory {
     private static final Logger log = LoggerFactory.getLogger(JdbcDao.class);
-    private ConnectionPool connectionPool;
+    private ConnectionPool cp;
     private DBMetadataManager dbMetadataManager;
     private SqlQueryFactory sqlQueryFactory;
-    private Map<Class, EntityManager> entityManagerCache = new HashMap<>();
+    private DaoRegistry daoRegistry;
 
-    public JdbcDaoFactory(ConnectionPool connectionPool, SqlQueryFactory sqlQueryFactory) {
-        this.connectionPool = connectionPool;
-        this.sqlQueryFactory = sqlQueryFactory;
-        try (SqlPooledConnection connection = connectionPool.getConnection()) {
+    public JdbcDaoFactory(ConnectionPool cp) {
+        this.cp = cp;
+        try (SqlPooledConnection connection = cp.getConnection()) {
             dbMetadataManager = new DBMetadataManager(connection.getMetaData());
+            sqlQueryFactory = new SqlQueryFactory(dbMetadataManager);
         }
+        daoRegistry = new DaoRegistry();
     }
 
     public DaoSession getDaoSession() {
-        return new JdbcDaoSession(connectionPool.getConnection());
+        return new JdbcDaoSession(cp.getConnection());
     }
 
     private class JdbcDaoSession implements DaoSession {
@@ -40,8 +37,8 @@ public class JdbcDaoFactory implements DaoFactory {
         @Override
         @SuppressWarnings("unchecked")
         public <T extends BaseEntity> Dao<T> getDao(Class<T> clazz) {
-            EntityManager<T> entityManager = getEntityManagerForClass(clazz);
-            return new JdbcDao<>(this, clazz, entityManager, sqlQueryFactory, dbMetadataManager.getTableForClass(clazz));
+            DaoCreator daoCreator = daoRegistry.get(clazz);
+            return daoCreator.create(this, clazz, sqlQueryFactory, dbMetadataManager.getTableForClass(clazz));
         }
 
         @Override
@@ -64,22 +61,5 @@ public class JdbcDaoFactory implements DaoFactory {
         public SqlPooledConnection getConnection() {
             return connection;
         }
-    }
-
-    private synchronized void addToCache(Class clazz, EntityManager entityManager) {
-        entityManagerCache.put(clazz, entityManager);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> EntityManager getEntityManagerForClass(Class<T> clazz) {
-        EntityManager<T> entityManager;
-        if (entityManagerCache.containsKey(clazz)) {
-            log.debug("Getting entity manager from cache for class: " + clazz.getSimpleName());
-            entityManager = entityManagerCache.get(clazz);
-        } else {
-            entityManager = new EntityManager<>(clazz);
-            addToCache(clazz, entityManager);
-        }
-        return entityManager;
     }
 }

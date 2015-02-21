@@ -1,6 +1,6 @@
 package com.epam.store.servlet;
 
-import com.epam.store.config.ConfigParser;
+import com.epam.store.config.ApplicationSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class WebContext {
     private HttpServletResponse resp;
 
     static {
-        pagesWithURIParameters = ConfigParser.getInstance().getPageConfig().getPagesWithUriParameters();
+        pagesWithURIParameters = ApplicationSettings.getPageConfig().getPagesWithUriParameters();
     }
 
     public WebContext(HttpServletRequest req, HttpServletResponse resp) {

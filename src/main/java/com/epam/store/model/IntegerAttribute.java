@@ -6,7 +6,8 @@ public class IntegerAttribute extends Attribute {
     public IntegerAttribute() {
     }
 
-    public IntegerAttribute(Integer value) {
+    public IntegerAttribute(String name, Integer value) {
+        super(name);
         this.value = value;
     }
 

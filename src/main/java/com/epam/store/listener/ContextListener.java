@@ -2,11 +2,9 @@ package com.epam.store.listener;
 
 import com.epam.store.dao.DaoFactory;
 import com.epam.store.dao.JdbcDaoFactory;
-import com.epam.store.dao.SqlQueryFactory;
 import com.epam.store.dbpool.ConnectionPool;
 import com.epam.store.dbpool.SqlConnectionPool;
 import com.epam.store.dbpool.SqlPooledConnection;
-import com.epam.store.model.Category;
 import com.epam.store.service.CategoryService;
 import com.epam.store.service.ImageService;
 import com.epam.store.service.ProductService;
@@ -25,7 +23,6 @@ import java.io.InputStreamReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -38,39 +35,36 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @WebListener
 public class ContextListener implements ServletContextListener {
     private static final Logger log = LoggerFactory.getLogger(ContextListener.class);
+    public static final String CATEGORY_LIST_ATTRIBUTE_NAME = "categories";
     private static final String SCRIPT_FILE_NAME = "online-store.sql";
+    private static final String TABLE_COUNT_QUERY = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'PUBLIC';";
     private ConnectionPool connectionPool;
 
     @Override
     public void contextInitialized(ServletContextEvent arg) {
         ServletContext servletContext = arg.getServletContext();
         connectionPool = new SqlConnectionPool();
-        SqlQueryFactory sqlQueryFactory;
         try (SqlPooledConnection connection = connectionPool.getConnection()) {
-            sqlQueryFactory = new SqlQueryFactory(connection.getMetaData());
-            if (isDatabaseEmpty(connection, sqlQueryFactory)) {
+            if (isDatabaseEmpty(connection)) {
                 log.info("Database is empty. Trying to deploy with script");
                 deployDatabaseFromScript(connection);
-                //Construct query factory again with new database metadata with new information from deploying script
-                sqlQueryFactory = new SqlQueryFactory(connection.getMetaData());
                 log.info("Script deployed successfully");
             }
         } catch (SQLException | IOException e) {
             throw new ApplicationInitializationException(e);
         }
-        DaoFactory daoFactory = new JdbcDaoFactory(connectionPool, sqlQueryFactory);
+        DaoFactory daoFactory = new JdbcDaoFactory(connectionPool);
         servletContext.setAttribute("daoFactory", daoFactory);
 
         //set services to servlet context, the class name is used as an attribute name
-        servletContext.setAttribute(getNameForService(ProductService.class), new ProductService(daoFactory, sqlQueryFactory));
-        servletContext.setAttribute(getNameForService(UserService.class), new UserService(daoFactory, sqlQueryFactory));
+        servletContext.setAttribute(getNameForService(ProductService.class), new ProductService(daoFactory));
+        servletContext.setAttribute(getNameForService(UserService.class), new UserService(daoFactory));
         servletContext.setAttribute(getNameForService(ImageService.class), new ImageService(daoFactory));
         CategoryService categoryService = new CategoryService(daoFactory);
         servletContext.setAttribute(getNameForService(CategoryService.class), categoryService);
 
         //set categories list to application context to have access to it from everywhere
-        List<Category> categories = new CopyOnWriteArrayList<>(categoryService.getCategories());
-        servletContext.setAttribute("categories", categories);
+        servletContext.setAttribute(CATEGORY_LIST_ATTRIBUTE_NAME, new CopyOnWriteArrayList<>(categoryService.getCategories()));
     }
 
     @Override
@@ -82,10 +76,9 @@ public class ContextListener implements ServletContextListener {
         return clazz.getSimpleName();
     }
 
-    private boolean isDatabaseEmpty(SqlPooledConnection connection, SqlQueryFactory sqlQueryFactory) throws SQLException {
-        String publicTablesCountQuery = sqlQueryFactory.getPublicTablesCountQuery();
+    private boolean isDatabaseEmpty(SqlPooledConnection connection) throws SQLException {
         Statement statement = connection.createStatement();
-        ResultSet rs = statement.executeQuery(publicTablesCountQuery);
+        ResultSet rs = statement.executeQuery(TABLE_COUNT_QUERY);
         rs.next();
         long count = rs.getLong(1);
         return count == 0;

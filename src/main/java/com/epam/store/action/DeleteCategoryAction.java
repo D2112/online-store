@@ -1,5 +1,6 @@
 package com.epam.store.action;
 
+import com.epam.store.listener.ContextListener;
 import com.epam.store.model.Category;
 import com.epam.store.service.CategoryService;
 import com.epam.store.servlet.Scope;
@@ -20,7 +21,8 @@ public class DeleteCategoryAction implements Action {
             if (category != null) {
                 service.deleteCategory(category);
                 //removing category from the application context
-                List<Category> categories = (List<Category>) webContext.getAttribute("categories", Scope.APPLICATION);
+                List<Category> categories = (List<Category>)
+                        webContext.getAttribute(ContextListener.CATEGORY_LIST_ATTRIBUTE_NAME, Scope.APPLICATION);
                 categories.remove(category);
             }
         }

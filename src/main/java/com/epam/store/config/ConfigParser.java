@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class ConfigParser {
+class ConfigParser {
     private static final ConfigParser instance = new ConfigParser();
     private static final String CONFIG_FILE_NAME = "page-config.xml";
     private static final String CONFIG_SCHEMA_NAME = "page-config.xsd";
@@ -30,25 +30,14 @@ public class ConfigParser {
     private static final String PAGES_WITH_URI_PARAMETERS_PAGE_NAME_ELEMENT = "page-name";
     private static final String START_PAGE_ELEMENT = "start-page";
     private static final String EMPTY_STRING = "";
-    private static PageConfig pageConfig = null;
 
-    private ConfigParser() {
-    }
-
-    public static ConfigParser getInstance() {
-        return instance;
-    }
-
-    public PageConfig getPageConfig() {
-        if (pageConfig != null) return pageConfig;
-        //otherwise parse
+    public PageConfig readPageConfig() {
         try {
             validate(getReader());
             //reopen reader because validator closed the stream
-            pageConfig = parsePageConfig(getReader());
-            return pageConfig;
+            return parsePageConfig(getReader());
         } catch (XMLStreamException | SAXException | IOException e) {
-            throw new XmlConfigException(e);
+            throw new ConfigInitializationException(e);
         }
     }
 

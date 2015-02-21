@@ -1,6 +1,6 @@
 package com.epam.store.action;
 
-import com.epam.store.config.ConfigParser;
+import com.epam.store.config.ApplicationSettings;
 import com.epam.store.config.PageConfig;
 import com.epam.store.metadata.AnnotationManager;
 import com.epam.store.servlet.WebContext;
@@ -22,7 +22,7 @@ public class ActionFactory {
     }
 
     private ActionFactory() {
-        PageConfig pageConfig = ConfigParser.getInstance().getPageConfig();
+        PageConfig pageConfig = ApplicationSettings.getPageConfig();
         actions = initializeWebActions(pageConfig);
         mapStartPage(pageConfig.getStartPage());
     }

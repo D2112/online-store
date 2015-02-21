@@ -1,32 +1,36 @@
 package com.epam.store;
 
-import com.epam.store.dao.SqlQuery;
+import com.epam.store.dao.DaoFactory;
+import com.epam.store.dao.JdbcDaoFactory;
 import com.epam.store.dao.SqlQueryFactory;
-import com.epam.store.dao.SqlQueryType;
 import com.epam.store.dbpool.ConnectionPool;
 import com.epam.store.dbpool.SqlConnectionPool;
 import com.epam.store.dbpool.SqlPooledConnection;
 import com.epam.store.metadata.DBMetadataManager;
-import com.epam.store.metadata.DatabaseColumn;
-import com.epam.store.model.Product;
+import com.epam.store.service.UserService;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class Test {
-    public static void main(String[] args) throws ClassNotFoundException {
+    private static final String USER_EMAIL_COLUMN = "EMAIL";
+    private static final String ROLE_NAME_COLUMN = "NAME";
+    private static final String ROLE_ID_COLUMN = "ROLE_ID";
+    private static final String USER_ID_COLUMN = "USER_ID";
+    private static final String DATE_TIME_COLUMN = "TIME";
+    private static final String STATUS_NAME_COLUMN = "NAME";
+
+    public static void main(String[] args) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+
         ConnectionPool cp = new SqlConnectionPool();
-        DBMetadataManager dbMetadataManager;
         SqlQueryFactory queryFactory;
+        DBMetadataManager dbMetadataManager;
         try (SqlPooledConnection connection = cp.getConnection()) {
-            queryFactory = new SqlQueryFactory(connection.getMetaData());
+            dbMetadataManager = new DBMetadataManager(connection.getMetaData());
+            queryFactory = new SqlQueryFactory(dbMetadataManager);
         }
-        for (SqlQueryType type : SqlQueryType.values()) {
-            SqlQuery query = queryFactory.getQueryForClass(type, Product.class);
-            for (DatabaseColumn column : query.getParameters()) {
-                System.out.print(column.getName());
-                System.out.print(", ");
-            }
-            System.out.println();
-        }
+        DaoFactory daoFactory = new JdbcDaoFactory(cp);
+        UserService userService = new UserService(daoFactory);
+
         cp.shutdown();
     }
 }
-

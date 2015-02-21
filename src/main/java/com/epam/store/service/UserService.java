@@ -1,12 +1,11 @@
 package com.epam.store.service;
 
 import com.epam.store.PasswordEncryptor;
-import com.epam.store.dao.*;
-import com.epam.store.dbpool.SqlPooledConnection;
+import com.epam.store.dao.Dao;
+import com.epam.store.dao.DaoFactory;
+import com.epam.store.dao.DaoSession;
 import com.epam.store.model.*;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,11 +20,9 @@ public class UserService {
     private static final String DATE_TIME_COLUMN = "TIME";
     private static final String STATUS_NAME_COLUMN = "NAME";
     private DaoFactory daoFactory;
-    private SqlQueryFactory sqlQueryFactory;
 
-    public UserService(DaoFactory daoFactory, SqlQueryFactory sqlQueryFactory) {
+    public UserService(DaoFactory daoFactory) {
         this.daoFactory = daoFactory;
-        this.sqlQueryFactory = sqlQueryFactory;
     }
 
     public User findUser(String email) {
@@ -102,40 +99,20 @@ public class UserService {
     }
 
     public void addPurchaseListToUser(Long userID, List<Purchase> purchaseList) {
-        SqlQuery insertQuery = sqlQueryFactory.getQueryForClass(SqlQueryType.INSERT, Purchase.class);
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
-            SqlPooledConnection connection = daoSession.getConnection();
             for (Purchase purchase : purchaseList) {
-                try (PreparedStatement statement = connection.prepareStatement(insertQuery.getQuery())) {
-                    //inserting dependency entities
-                    Dao<Price> priceDao = daoSession.getDao(Price.class);
-                    Price insertedPrice = priceDao.insert(purchase.getPrice());
-                    //try to find exist date and status with the same value and use them instead inserting
-                    Dao<Date> dateDao = daoSession.getDao(Date.class);
-                    Dao<Status> statusDao = daoSession.getDao(Status.class);
-                    Date insertedDate = dateDao.findFirstByParameter(DATE_TIME_COLUMN, purchase.getDate().getTime());
-                    Status insertedStatus = statusDao.findFirstByParameter(STATUS_NAME_COLUMN, purchase.getStatus().getName());
-                    if (insertedDate == null) insertedDate = dateDao.insert(purchase.getDate());
-                    if (insertedStatus == null) insertedStatus = statusDao.insert(purchase.getStatus());
-                    statement.setLong(1, userID); //user id
-                    statement.setLong(2, purchase.getProduct().getId()); // purchase id
-                    statement.setLong(3, insertedPrice.getId()); // price id
-                    statement.setLong(4, insertedDate.getId()); // date id
-                    statement.setLong(5, insertedStatus.getId()); //status id
-                    statement.executeUpdate();
-                } catch (SQLException e) {
-                    throw new ServiceException(e);
-                }
+                Dao<Purchase> purchaseDao = daoSession.getDao(Purchase.class);
+                Dao<Date> dateDao = daoSession.getDao(Date.class);
+                Dao<Status> statusDao = daoSession.getDao(Status.class);
+                //try to find exist date and status with the same value and use them instead inserting
+                Date existDate = dateDao.findFirstByParameter(DATE_TIME_COLUMN, purchase.getDate().getTime());
+                Status existStatus = statusDao.findFirstByParameter(STATUS_NAME_COLUMN, purchase.getStatus().getName());
+                //setting to purchase id of already exist date and time records
+                if (existDate != null) purchase.getDate().setId(existDate.getId());
+                if (existStatus != null) purchase.getStatus().setId(existStatus.getId());
+                purchaseDao.insertWithAdditionalParameter(purchase, USER_ID_COLUMN, userID);
             }
         }
-    }
-
-    private Set<Date> getUniqueDatesFromPurchaseList(List<Purchase> purchaseList) {
-        Set<Date> dates = new HashSet<>();
-        for (Purchase purchase : purchaseList) {
-            dates.add(purchase.getDate());
-        }
-        return dates;
     }
 
     private List<Order> getOrderList(List<Purchase> purchaseList) {
@@ -148,5 +125,13 @@ public class UserService {
             orderList.add(new Order(orderPurchaseList, date)); //form with them order
         }
         return orderList;
+    }
+
+    private Set<Date> getUniqueDatesFromPurchaseList(List<Purchase> purchaseList) {
+        Set<Date> dates = new HashSet<>();
+        for (Purchase purchase : purchaseList) {
+            dates.add(purchase.getDate());
+        }
+        return dates;
     }
 }

@@ -7,10 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Contains field names of certain entity and their types
@@ -20,12 +17,21 @@ import java.util.Map;
  */
 public class EntityManager<T> {
     private static final Logger log = LoggerFactory.getLogger(EntityManager.class);
+    private static final Map<Class, EntityManager> cache = new HashMap<>();
     private Map<String, Method> setterByFieldName;
     private Map<String, Method> getterByFieldName;
     private List<String> fieldsNames;
     private Class<T> type;
 
-    public EntityManager(Class<T> type) {
+    @SuppressWarnings("unchecked")
+    public static synchronized <T> EntityManager<T> getManager(Class<T> type) {
+        EntityManager<T> entityManager = cache.get(type);
+        if (entityManager == null) entityManager = new EntityManager<>(type);
+        cache.put(type, entityManager);
+        return entityManager;
+    }
+
+    private EntityManager(Class<T> type) {
         log.debug("initializing entity metadata");
         fieldsNames = new ArrayList<>();
         setterByFieldName = new LinkedHashMap<>();

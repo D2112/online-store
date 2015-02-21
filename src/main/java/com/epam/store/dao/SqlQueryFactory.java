@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,18 +26,17 @@ public class SqlQueryFactory {
     private static final Logger log = LoggerFactory.getLogger(SqlQueryFactory.class);
     private static final String QUERY_FILE_NAME = "query.properties";
     private static final String FIND_BY_PARAMETERS_QUERY_NAME = "FIND_BY_PARAMETERS";
-    private static final String PUBLIC_TABLES_COUNT_QUERY_NAME = "PUBLIC_TABLES_COUNT";
+    private static final String DELETED_COLUMN_NAME = "DELETED";
     private static final String SEARCH_QUERY_PARAMETERS_SEPARATOR = " AND ";
     private static final String COMMA = ", ";
     private static final String WILDCARD = " ? ";
-    private static final String DELETED_COLUMN_NAME = "DELETED";
     private ConcurrentTable<DatabaseTable, SqlQueryType, SqlQuery> queryCache = new ConcurrentTable<>();
     private Properties queries;
     private DBMetadataManager dbMetadataManager;
 
 
-    public SqlQueryFactory(DatabaseMetaData metaData) {
-        dbMetadataManager = new DBMetadataManager(metaData);
+    public SqlQueryFactory(DBMetadataManager dbMetadataManager) {
+        this.dbMetadataManager = dbMetadataManager;
         queries = new Properties();
         try (InputStream inputStream = SqlQueryFactory.class.getClassLoader().getResourceAsStream(QUERY_FILE_NAME)) {
             queries.load(inputStream);
@@ -101,13 +99,6 @@ public class SqlQueryFactory {
         List<String> parameters = new ArrayList<>();
         parameters.add(parameterName);
         return generateFindByParametersQuery(entityClass, parameters);
-    }
-
-    /**
-     * @return query for counting public tables in database
-     */
-    public String getPublicTablesCountQuery() {
-        return queries.getProperty(PUBLIC_TABLES_COUNT_QUERY_NAME);
     }
 
     /**

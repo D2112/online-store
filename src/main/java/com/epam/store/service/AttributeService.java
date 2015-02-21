@@ -42,7 +42,7 @@ class AttributeService {
             for (Class attributeClass : attributeClasses) {
                 String sqlQuery = SqlQueryFactory.generateFindByParameterQuery(attributeClass, PRODUCT_ID_COLUMN);
                 List<Attribute> attributesOfCertainClass =
-                        getAttributesOfCertainClass(productID, sqlQuery, attributeClass, daoSession.getConnection());
+                        getAttributesOfConcreteClass(productID, sqlQuery, attributeClass, daoSession.getConnection());
                 attributeList.addAll(attributesOfCertainClass);
             }
         }
@@ -74,7 +74,7 @@ class AttributeService {
                 SqlQuery insertAttributeQuery = SqlQueryFactory.getQueryForClass(SqlQueryType.INSERT, attribute.getClass());
                 //metadata needs for getting value from one of several attribute class
                 //because every class has different types of value
-                EntityManager attributeMetadata = new EntityManager(attribute.getClass());
+                EntityManager attributeMetadata = EntityManager.getManager(attribute.getClass());
                 try (PreparedStatement statement = connection.prepareStatement(insertAttributeQuery.getQuery())) {
                     statement.setLong(1, attributeID);
                     statement.setLong(2, productID);
@@ -87,11 +87,11 @@ class AttributeService {
         }
     }
 
-    private <T extends Attribute> List<Attribute> getAttributesOfCertainClass(
+    private <T extends Attribute> List<Attribute> getAttributesOfConcreteClass(
             long productID, String query, Class<T> clazz, SqlPooledConnection connection) {
 
         List<Attribute> attributeList = new ArrayList<>();
-        EntityManager<T> attributeEntityManager = new EntityManager<>(clazz);
+        EntityManager<T> attributeEntityManager = EntityManager.getManager(clazz);
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, productID);
             ResultSet rs = statement.executeQuery();
