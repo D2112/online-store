@@ -14,6 +14,7 @@ import java.io.IOException;
 public class ErrorHandler extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(ErrorHandler.class);
     private static final String ERROR_PAGE = "WEB-INF/jsp/error.jsp";
+    private static final String NO_ACCESS_ERROR_PAGE = "WEB-INF/jsp/no-access-error.jsp";
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -24,13 +25,19 @@ public class ErrorHandler extends HttpServlet {
         if (requestUri != null) {
             log.warn("Error when accessing: " + requestUri);
         }
-        if (statusCode != null) {
-            log.warn("Error status code:" + statusCode);
-            webContext.setAttribute("statusCode", statusCode, Scope.REQUEST);
-        }
         if (throwable != null) {
             log.warn("Handled exception:", throwable);
         }
+
+        if (statusCode != null) {
+            log.warn("Error status code:" + statusCode);
+            webContext.setAttribute("statusCode", statusCode, Scope.REQUEST);
+            if (statusCode == 403) {
+                webContext.forward(NO_ACCESS_ERROR_PAGE);
+                return;
+            }
+        }
+
         webContext.forward(ERROR_PAGE);
     }
 }

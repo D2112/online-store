@@ -6,10 +6,10 @@
     <title><fmt:message key="title.error"/> ${statusCode}</title>
 </head>
 <body>
-<center>
+<div style="text-align: center;">
     <h1>
         ERROR: ${statusCode}
     </h1>
-</center>
+</div>
 </body>
 </html>
