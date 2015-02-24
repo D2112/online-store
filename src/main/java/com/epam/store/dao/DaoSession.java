@@ -13,4 +13,5 @@ public interface DaoSession extends AutoCloseable {
     public void close();
 
     public SqlPooledConnection getConnection();
+
 }

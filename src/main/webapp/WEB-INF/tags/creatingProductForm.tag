@@ -19,6 +19,7 @@
             <page:inputTextField label="${nameLabel}:" inputName="productName" value="${productName}"
                                  formName="creatingProduct"/>
             <page:inputTextField label="${priceLabel}:" inputName="price" value="${price}" formName="creatingProduct"/>
+            ₸
             <page:inputTextArea label="${descriptionLabel}:" inputName="description" value="${description}"
                                 formName="creatingProduct"/>
             <br/>

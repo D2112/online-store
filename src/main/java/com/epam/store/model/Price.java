@@ -2,7 +2,7 @@ package com.epam.store.model;
 
 import java.math.BigDecimal;
 
-public class Price extends BaseEntity {
+public class Price extends BaseEntity implements Comparable<Price> {
     private BigDecimal value;
 
     public Price() {
@@ -34,5 +34,10 @@ public class Price extends BaseEntity {
     @Override
     public int hashCode() {
         return value != null ? value.hashCode() : 0;
+    }
+
+    @Override
+    public int compareTo(Price o) {
+        return this.value.compareTo(o.getValue());
     }
 }

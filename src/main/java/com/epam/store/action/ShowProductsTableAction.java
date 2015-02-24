@@ -12,11 +12,11 @@ public class ShowProductsTableAction extends AbstractShowProductsAction {
 
     @Override
     public ActionResult execute(WebContext webContext) {
-        String categoryName = webContext.getParameter("category");
+        String categoryName = super.getCategoryNameFromPath(webContext);
         if (categoryName != null) {
             List<Product> products = super.getProducts(webContext, categoryName);
             webContext.setAttribute("products", products, Scope.REQUEST);
-            webContext.setAttribute("category", categoryName, Scope.FLASH);
+            webContext.setAttribute("categoryName", categoryName, Scope.REQUEST);
         }
         return adminPage;
     }

@@ -7,6 +7,8 @@ import com.epam.store.model.BaseEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
+
 public class JdbcDaoFactory implements DaoFactory {
     private static final Logger log = LoggerFactory.getLogger(JdbcDao.class);
     private ConnectionPool cp;
@@ -43,13 +45,26 @@ public class JdbcDaoFactory implements DaoFactory {
 
         @Override
         public void beginTransaction() {
-            connection.setAutoCommit(false);
+            try {
+                connection.setAutoCommit(false);
+            } catch (SQLException e) {
+                log.error("Error on start transaction");
+            }
         }
 
         @Override
         public void endTransaction() {
-            connection.commit();
-            connection.setAutoCommit(true);
+            try {
+                connection.commit();
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                log.error("End of the transaction has been failed", e);
+                try {
+                    connection.rollBack();
+                } catch (SQLException exc) {
+                    log.error("Error while rollback", e);
+                }
+            }
         }
 
         @Override

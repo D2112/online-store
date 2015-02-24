@@ -128,18 +128,20 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         Part part = webContext.getPart("image");
         String imageName = part.getSubmittedFileName();
         String contentType = part.getContentType();
-        InputStream content = part.getInputStream();
-        if (content.available() == 0) return null; //if nothing to read it means image bytes is empty
-        byte[] buffer = new byte[8192];
-        int bytesRead;
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        while ((bytesRead = content.read(buffer)) != -1) {
-            output.write(buffer, 0, bytesRead);
+        byte[] imageBytes;
+
+        try (InputStream content = part.getInputStream();
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            if (content.available() == 0) return null; //if nothing to read it means image bytes is empty
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = content.read(buffer)) != -1) {
+                output.write(buffer, 0, bytesRead);
+            }
+            imageBytes = output.toByteArray();
         }
-        byte[] imageBytes = output.toByteArray();
-        byte[] resizeImage;
-        resizeImage = Images.resize(imageBytes, Image.STANDARD_WIDTH, Image.STANDARD_HEIGHT);
-        return new Image(imageName, contentType, resizeImage);
+        byte[] reducedImage = Images.resize(imageBytes, Image.STANDARD_WIDTH, Image.STANDARD_HEIGHT);
+        return new Image(imageName, contentType, reducedImage);
     }
 
     @SuppressWarnings("unchecked")

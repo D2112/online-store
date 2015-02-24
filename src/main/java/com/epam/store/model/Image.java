@@ -1,5 +1,6 @@
 package com.epam.store.model;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 
 public class Image extends BaseEntity {
@@ -8,11 +9,14 @@ public class Image extends BaseEntity {
     private String name;
     private String contentType;
     private byte[] content;
+    private Timestamp lastModified;
 
     public Image() {
+        lastModified = new Timestamp(System.currentTimeMillis());
     }
 
     public Image(String name, String contentType, byte[] content) {
+        this();
         this.name = name;
         this.contentType = contentType;
         this.content = content;
@@ -40,6 +44,14 @@ public class Image extends BaseEntity {
 
     public void setContent(byte[] content) {
         this.content = content;
+    }
+
+    public Timestamp getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Timestamp lastModified) {
+        this.lastModified = lastModified;
     }
 
     @Override

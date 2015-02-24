@@ -3,7 +3,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="page" tagdir="/WEB-INF/tags" %>
 
-<page:genericPage>
+<fmt:message key="title.cart" var="titleMsg"/>
+<page:genericPage title="${titleMsg}">
     <jsp:attribute name="leftSideBar">
         <page:userSideBar/>
     </jsp:attribute>

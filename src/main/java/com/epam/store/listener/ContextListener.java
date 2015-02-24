@@ -5,10 +5,7 @@ import com.epam.store.dao.JdbcDaoFactory;
 import com.epam.store.dbpool.ConnectionPool;
 import com.epam.store.dbpool.SqlConnectionPool;
 import com.epam.store.dbpool.SqlPooledConnection;
-import com.epam.store.service.CategoryService;
-import com.epam.store.service.ImageService;
-import com.epam.store.service.ProductService;
-import com.epam.store.service.UserService;
+import com.epam.store.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,14 +31,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @WebListener
 public class ContextListener implements ServletContextListener {
-    private static final Logger log = LoggerFactory.getLogger(ContextListener.class);
     public static final String CATEGORY_LIST_ATTRIBUTE_NAME = "categories";
+    private static final Logger log = LoggerFactory.getLogger(ContextListener.class);
+    private static final String SETTINGS_CLASS = "com.epam.store.config.ApplicationSettings";
     private static final String SCRIPT_FILE_NAME = "online-store.sql";
     private static final String TABLE_COUNT_QUERY = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'PUBLIC';";
     private ConnectionPool connectionPool;
 
     @Override
     public void contextInitialized(ServletContextEvent arg) {
+        initializeSettings();
         ServletContext servletContext = arg.getServletContext();
         connectionPool = new SqlConnectionPool();
         try (SqlPooledConnection connection = connectionPool.getConnection()) {
@@ -60,6 +59,7 @@ public class ContextListener implements ServletContextListener {
         servletContext.setAttribute(getNameForService(ProductService.class), new ProductService(daoFactory));
         servletContext.setAttribute(getNameForService(UserService.class), new UserService(daoFactory));
         servletContext.setAttribute(getNameForService(ImageService.class), new ImageService(daoFactory));
+        servletContext.setAttribute(getNameForService(PurchaseService.class), new PurchaseService(daoFactory));
         CategoryService categoryService = new CategoryService(daoFactory);
         servletContext.setAttribute(getNameForService(CategoryService.class), categoryService);
 
@@ -70,6 +70,14 @@ public class ContextListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent arg) {
         connectionPool.shutdown();
+    }
+
+    private void initializeSettings() {
+        try {
+            Class.forName(SETTINGS_CLASS);
+        } catch (ClassNotFoundException e) {
+            throw new ApplicationInitializationException(e);
+        }
     }
 
     private String getNameForService(Class clazz) {

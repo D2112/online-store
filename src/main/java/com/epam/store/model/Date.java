@@ -1,9 +1,10 @@
 package com.epam.store.model;
 
-public class Date extends BaseEntity {
+public class Date extends BaseEntity implements Comparable<Date> {
     private Long time;
 
     public Date() {
+        this(System.currentTimeMillis());
     }
 
     public Date(Long time) {
@@ -37,8 +38,11 @@ public class Date extends BaseEntity {
 
     @Override
     public String toString() {
-        return "Date{" +
-                "time=" + time +
-                '}';
+        return new java.util.Date(time).toString();
+    }
+
+    @Override
+    public int compareTo(Date o) {
+        return Long.compare(this.getTime(), o.getTime());
     }
 }

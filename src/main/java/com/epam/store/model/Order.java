@@ -3,7 +3,7 @@ package com.epam.store.model;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class Order {
+public class Order implements Comparable<Order> {
     private Date date;
     private List<Purchase> purchaseList;
 
@@ -35,16 +35,8 @@ public class Order {
         return totalPrice;
     }
 
-    private enum Status {
-        PAID("paid"), UNPAID("Unpaid"), NOT_FULLY_PAID("Not Fully Paid");
-        private String name;
-
-        private Status(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
+    @Override
+    public int compareTo(Order o) {
+        return this.date.compareTo(o.getDate());
     }
 }

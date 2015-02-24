@@ -6,6 +6,8 @@ import com.epam.store.servlet.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 
@@ -27,33 +29,32 @@ public class RegistrationAction implements Action {
         //set attributes to flash scope for displaying after redirect if error
         webContext.setAttribute("name", name, Scope.FLASH);
         webContext.setAttribute("email", email, Scope.FLASH);
-        String errorMessage = checkValidationErrors(name, email, password, passwordConfirm);
-        if (errorMessage != null) {
-            webContext.setAttribute("error", errorMessage, Scope.FLASH);
-            log.debug("Registration error: " + errorMessage);
-            return errorResult;
-        }
-        if (userService.isUserExist(email)) {
-            errorMessage = email + messagesBundle.getString("registration.error.registered");
-            webContext.setAttribute("error", errorMessage, Scope.FLASH);
-            log.debug("Registration error: " + errorMessage);
+        List<String> validationErrors = checkValidationErrors(name, email, password, passwordConfirm, userService);
+        if (validationErrors.size() > 0) {
+            webContext.setAttribute("errors", validationErrors, Scope.FLASH);
+            log.debug("Registration errors: " + validationErrors);
             return errorResult;
         }
         userService.registerUser(name, email, password);
         return successResult;
     }
 
-    private String checkValidationErrors(String name, String email, String password, String passwordConfirm) {
+    private List<String> checkValidationErrors(String name, String email, String password, String passwordConfirm,
+                                               UserService userService) {
+        List<String> errors = new ArrayList<>();
         if (!RegexValidator.isEmailValid(email)) {
-            return messagesBundle.getString("registration.error.email");
+            errors.add(messagesBundle.getString("registration.error.email"));
         }
         if (!RegexValidator.isNameValid(name)) {
-            return messagesBundle.getString("registration.error.name");
+            errors.add(messagesBundle.getString("registration.error.name"));
         }
         if (!password.equals(passwordConfirm)) {
-            return messagesBundle.getString("registration.error.password");
+            errors.add(messagesBundle.getString("registration.error.password"));
         }
-        return null;
+        if (userService.isUserExist(email)) {
+            errors.add(email + " " + messagesBundle.getString("registration.error.registered"));
+        }
+        return errors;
     }
 }
 

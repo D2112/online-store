@@ -21,6 +21,7 @@ public class SecurityFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        log.debug("SECURITY FILTER");
         WebContext webContext = new WebContext(servletRequest, servletResponse);
         String path = webContext.getPathInfo();
         User user = (User) webContext.getAttribute("user", Scope.SESSION);

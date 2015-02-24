@@ -24,7 +24,7 @@ class ConfigParser {
     private static final String CONFIG_FILE_NAME = "page-config.xml";
     private static final String CONFIG_SCHEMA_NAME = "page-config.xsd";
     private static final String PAGE_MAPPING_ELEMENT = "page-mapping";
-    private static final String PAGE_MAPPING_PAGE_NAME_ELEMENT = "page-name";
+    private static final String PAGE_MAPPING_PAGE_NAME_ELEMENT = "jsp-page-name";
     private static final String PAGE_MAPPING_URI_ELEMENT = "uri";
     private static final String PAGES_WITH_URI_PARAMETERS_ELEMENT = "pages-with-uri-parameters";
     private static final String PAGES_WITH_URI_PARAMETERS_PAGE_NAME_ELEMENT = "page-name";
@@ -33,21 +33,30 @@ class ConfigParser {
 
     public PageConfig readPageConfig() {
         try {
-            validate(getReader());
+            XMLStreamReader reader = getReader();
+            validate(reader);
+            reader.close();
             //reopen reader because validator closed the stream
-            return parsePageConfig(getReader());
-        } catch (XMLStreamException | SAXException | IOException e) {
+            reader = getReader();
+            PageConfig pageConfig = parsePageConfig(reader);
+            reader.close();
+            return pageConfig;
+        } catch (XMLStreamException e) {
             throw new ConfigInitializationException(e);
         }
     }
 
-    private void validate(XMLStreamReader reader) throws SAXException, IOException {
+    private void validate(XMLStreamReader reader) {
         URL xsdUrl = PageConfig.class.getClassLoader().getResource(CONFIG_SCHEMA_NAME);
         if (xsdUrl != null) {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = factory.newSchema(xsdUrl);
-            Validator validator = schema.newValidator();
-            validator.validate(new StAXSource(reader));
+            try {
+                Schema schema = factory.newSchema(xsdUrl);
+                Validator validator = schema.newValidator();
+                validator.validate(new StAXSource(reader));
+            } catch (SAXException | IOException e) {
+                throw new ConfigInitializationException("Error while validating " + CONFIG_FILE_NAME, e);
+            }
         }
     }
 

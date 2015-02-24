@@ -112,6 +112,12 @@ a.nav:hover {
     right: 0;
 }
 
+.categories_list {
+    font-size: medium;
+    font-family: Arial, serif;
+
+}
+
 /*---------------- Creating product menu----------------------*/
 .creating_form {
     font-size: medium;

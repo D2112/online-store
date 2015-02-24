@@ -3,8 +3,12 @@
     <start-page>catalog</start-page>
 
     <com:page-mapping>
-        <page-name>category-management</page-name>
+        <jsp-page-name>category-management</jsp-page-name>
         <uri>admin/categories</uri>
+    </com:page-mapping>
+    <com:page-mapping>
+        <jsp-page-name>change-password</jsp-page-name>
+        <uri>user/change-password</uri>
     </com:page-mapping>
 
     <com:pages-with-uri-parameters>

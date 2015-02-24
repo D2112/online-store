@@ -6,7 +6,7 @@
 <div class="creating_form">
     <page:findAndDisplayMessage/>
     <fieldset>
-        <legend>Categories</legend>
+        <legend><fmt:message key="adding-category.label.categories"/></legend>
         <form id="addCategory" action="<c:url value="categories/add"/>" method="POST">
             <fmt:message key="adding-category.label.categoryName" var="categoryNameLabel"/>
             <page:inputTextField label="${categoryNameLabel}:" inputName="categoryName" value="${categoryName}"

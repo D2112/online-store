@@ -5,4 +5,3 @@
 <h2><fmt:message key="profile.label.yourName"/>: ${user.name}</h2>
 
 <h2><fmt:message key="profile.label.yourEmail"/>: ${user.email}</h2>
-<br/>

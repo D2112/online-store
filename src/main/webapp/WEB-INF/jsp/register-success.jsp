@@ -4,7 +4,7 @@
 
 <html>
 <head>
-    <title></title>
+    <title><fmt:message key="title.register-success"/></title>
 </head>
 <body>
     <div style="text-align: center;">

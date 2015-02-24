@@ -8,13 +8,14 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import java.io.IOException;
 
-@WebFilter(filterName = "ResourceFilter", urlPatterns = "/*", dispatcherTypes = DispatcherType.REQUEST)
+@WebFilter(filterName = "ResourceFilter", dispatcherTypes = DispatcherType.REQUEST)
 public class ResourceFilter implements Filter {
     private static final Logger log = LoggerFactory.getLogger(ResourceFilter.class);
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
+        log.debug("resource filter");
         WebContext webContext = new WebContext(servletRequest, servletResponse);
         String path = webContext.getURI();
         if (path.startsWith("/static/")) {

@@ -1,13 +1,12 @@
 package com.epam.store;
 
-import com.epam.store.dao.DaoFactory;
-import com.epam.store.dao.JdbcDaoFactory;
-import com.epam.store.dao.SqlQueryFactory;
+import com.epam.store.dao.*;
 import com.epam.store.dbpool.ConnectionPool;
 import com.epam.store.dbpool.SqlConnectionPool;
 import com.epam.store.dbpool.SqlPooledConnection;
 import com.epam.store.metadata.DBMetadataManager;
-import com.epam.store.service.UserService;
+import com.epam.store.model.Date;
+import com.epam.store.model.Image;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -29,8 +28,14 @@ public class Test {
             queryFactory = new SqlQueryFactory(dbMetadataManager);
         }
         DaoFactory daoFactory = new JdbcDaoFactory(cp);
-        UserService userService = new UserService(daoFactory);
-
+        DaoSession daoSession = daoFactory.getDaoSession();
+        Dao<Image> dao = daoSession.getDao(Image.class);
+        Image image = dao.find(40);
+        Date date = new Date(image.getLastModified().getTime());
+        dao.insert(image);
+        System.out.println(new Date());
+        System.out.println(date);
+        daoSession.close();
         cp.shutdown();
     }
 }

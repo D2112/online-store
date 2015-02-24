@@ -4,15 +4,41 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
+    <filter-mapping>
+        <filter-name>CacheControlFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>ResourceFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <context-param>
         <param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
         <param-value>i18n.MessagesBundle</param-value>
     </context-param>
+
     <session-config>
         <session-timeout>120</session-timeout>
         <tracking-mode>COOKIE</tracking-mode>
     </session-config>
+
     <error-page>
         <location>/ErrorHandler</location>
     </error-page>
+
+    <servlet>
+        <servlet-name>Controller</servlet-name>
+        <multipart-config>
+            <!--16MB max-->
+            <max-file-size>16428800</max-file-size>
+            <max-request-size>16428800</max-request-size>
+            <file-size-threshold>0</file-size-threshold>
+        </multipart-config>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Controller</servlet-name>
+        <url-pattern>/controller/*</url-pattern>
+    </servlet-mapping>
+
 </web-app>

@@ -2,8 +2,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-<link rel="stylesheet" type="text/css" href="<c:url value="/static/css/registration-style.css"/>"/>
-
+<html>
+<head>
+    <title><fmt:message key="title.login"/></title>
+    <link rel="stylesheet" type="text/css" href="<c:url value="/static/css/registration-style.css"/>"/>
+</head>
+<body>
 <div align="center" class="registration_box">
     <h1><fmt:message key="login.label.header"/></h1>
 
@@ -22,3 +26,5 @@
         <h4><span style="color: red; ">${errorMessage}</span></h4>
     </c:if>
 </div>
+</body>
+</html>

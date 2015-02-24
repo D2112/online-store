@@ -1,7 +1,7 @@
 package com.epam.store.action;
 
 import com.epam.store.model.*;
-import com.epam.store.service.UserService;
+import com.epam.store.service.PurchaseService;
 import com.epam.store.servlet.Scope;
 import com.epam.store.servlet.WebContext;
 
@@ -25,8 +25,8 @@ public class ConfirmOrderAction implements Action {
         for (Product product : products) {
             purchaseList.add(new Purchase(product, product.getPrice(), currentDate, new Status(DEFAULT_STATUS)));
         }
-        UserService userService = webContext.getService(UserService.class);
-        userService.addPurchaseListToUser(user.getId(), purchaseList);
+        PurchaseService purchaseService = webContext.getService(PurchaseService.class);
+        purchaseService.addPurchaseListToUser(user.getId(), purchaseList);
         cart.removeAllProducts();
         webContext.setAttribute("successMessage", messagesBundle.getString("cart.message.success"), Scope.FLASH);
         return toCartPage;

@@ -59,7 +59,7 @@ public class ActionFactory {
             String pageName = entry.getKey();
             String keyPath = "GET/" + entry.getValue();
             actionsMap.put(keyPath, new ShowPageAction(pageName));
-            log.debug("Path: " + keyPath + ", mapped with default show page action");
+            log.debug("Path: " + keyPath + ", mapped with show page action, page name: " + pageName);
         }
         return actionsMap;
     }

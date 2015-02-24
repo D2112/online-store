@@ -45,13 +45,18 @@ html {
     background-color: #ffffff;
 }
 
+.error_message {
+    text-align: center;
+    color: red;
+}
+
 .registration_box {
     margin-top: 20px;
     margin-right: auto;
     margin-left: auto;
     margin-bottom: 20px;
     width: 343px;
-    height: 400px;
+    height: 500px;
     -webkit-border-radius: 8px/7px;
     -moz-border-radius: 8px/7px;
     border-radius: 8px/7px;

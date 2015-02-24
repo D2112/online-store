@@ -2,9 +2,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="page" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ attribute name="categoryName" %>
 <%@ attribute name="products" type="java.util.Collection" %>
 
-<table>
+<table align="right">
+    <tr>
+        <th colspan="4">${categoryName}:</th>
+    </tr>
     <tr>
         <th><fmt:message key="cart.label.product"/></th>
         <th><fmt:message key="cart.label.price"/></th>
@@ -31,9 +35,7 @@
         </c:forEach>
     </form>
     <tr>
-        <th></th>
-        <th></th>
-        <th></th>
+        <th colspan="3"></th>
         <th width="60">
             <button type="submit" form="deletingProducts" class="base_button">
                 <fmt:message key="cart.button.delete"/>

@@ -88,16 +88,18 @@ public class SqlConnectionPool implements ConnectionPool {
      * @throws PoolException if all available connections is dead
      */
     private PooledConnection getAvailableConnection() {
-        if (availableConnections.size() == 0) {
+        if (availableConnections.size() == 0 && config.minAvailableConnections() > 0) {
             initializePoolWithMinimumConnections();
             return availableConnections.iterator().next();
         }
-        for (PooledConnection availableConnection : availableConnections) {
+        Iterator<PooledConnection> iterator = availableConnections.iterator();
+        while (iterator.hasNext()) {
+            PooledConnection availableConnection = iterator.next();
             //check for the case if database is down
             if (availableConnection.isAlive()) {
                 return availableConnection;
             } else {
-                availableConnections.iterator().remove();//remove dead connection
+                iterator.remove();//remove dead connection
             }
         }
         return createConnection(); //if can't then throws exception because database is down
@@ -208,23 +210,17 @@ public class SqlConnectionPool implements ConnectionPool {
         }
 
         @Override
-        public void setAutoCommit(boolean b) {
-            try {
-                connection.setAutoCommit(false);
-            } catch (SQLException e) {
-                log.error("Error while setting connection auto-commit");
-                throw new PoolException(e);
-            }
+        public void setAutoCommit(boolean b) throws SQLException {
+            connection.setAutoCommit(false);
         }
 
         @Override
-        public void commit() {
-            try {
-                connection.commit();
-            } catch (SQLException e) {
-                log.error("Error while committing");
-                throw new PoolException(e);
-            }
+        public void commit() throws SQLException {
+            connection.commit();
+        }
+
+        public void rollBack() throws SQLException {
+            connection.rollback();
         }
 
         private Connection getConnection() {
@@ -266,7 +262,6 @@ public class SqlConnectionPool implements ConnectionPool {
 
         public void stop() {
             timer.cancel();
-            ;
         }
 
         @Override
@@ -316,7 +311,7 @@ public class SqlConnectionPool implements ConnectionPool {
             int remains = availableConnections.size() - connectionsToClose.size();
             int minimum = config.minAvailableConnections();
             if ((remains < minimum) && (connectionsToClose.size() > minimum)) {
-                //removing the minimum connections from list
+                //removing the minimum amount from the list
                 connectionsToClose = new ArrayList<>(connectionsToClose.subList(minimum, connectionsToClose.size()));
             }
             return closeConnections(connectionsToClose);

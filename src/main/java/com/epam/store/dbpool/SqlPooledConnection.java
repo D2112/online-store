@@ -2,6 +2,7 @@ package com.epam.store.dbpool;
 
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 public interface SqlPooledConnection extends AutoCloseable {
@@ -13,8 +14,9 @@ public interface SqlPooledConnection extends AutoCloseable {
 
     public void close();
 
-    public void setAutoCommit(boolean b);
+    public void setAutoCommit(boolean b) throws SQLException;
 
-    public void commit();
+    public void commit() throws SQLException;
 
+    public void rollBack() throws SQLException;
 }

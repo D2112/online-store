@@ -1,7 +1,8 @@
 <%@tag description="Overall Page template" pageEncoding="UTF-8" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="page" tagdir="/WEB-INF/tags" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@attribute name="title" fragment="false" required="false" %>
 <%@attribute name="leftSideBar" fragment="true" required="false" %>
 <%@attribute name="rightSideBar" fragment="true" required="false" %>
 
@@ -11,7 +12,7 @@
 <head>
     <link rel="stylesheet" type="text/css" href="<c:url value="/static/css/style.css"/>"/>
     <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-    <title></title>
+    <title>${title}</title>
 </head>
 <body>
 <div id="main_container">

@@ -18,10 +18,8 @@ public abstract class AbstractShowProductsAction implements Action {
     }
 
     protected String getCategoryNameFromPath(WebContext webContext) {
-        List<String> parametersFromPath = webContext.getParametersFromPath(); //category's parameter passes as a path part
-        String category = null;
-        if (parametersFromPath.size() > 0) {
-            category = parametersFromPath.iterator().next();
+        String category = webContext.getFirstParameterFromPath(); //category parameter passes as part of the path
+        if (category != null) {
             try {
                 category = URLDecoder.decode(category, "UTF-8"); //decode category name from URL decoding
             } catch (UnsupportedEncodingException e) {
