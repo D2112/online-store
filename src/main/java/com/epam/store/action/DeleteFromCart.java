@@ -1,5 +1,6 @@
 package com.epam.store.action;
 
+import com.epam.store.listener.SessionListener;
 import com.epam.store.model.Cart;
 import com.epam.store.servlet.Scope;
 import com.epam.store.servlet.WebContext;
@@ -12,7 +13,7 @@ public class DeleteFromCart implements Action {
 
     @Override
     public ActionResult execute(WebContext webContext) {
-        Cart cart = (Cart) webContext.getAttribute("cart", Scope.SESSION);
+        Cart cart = (Cart) webContext.getAttribute(SessionListener.CART_ATTRIBUTE_NAME, Scope.SESSION);
         String[] productToDelete = webContext.getParameterValues("productIdToDelete");
         if (productToDelete != null) {
             for (String productID : productToDelete) {

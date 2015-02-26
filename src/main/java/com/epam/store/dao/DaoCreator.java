@@ -6,7 +6,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 
-public class DaoCreator {
+/**
+ * Class which creates dao object with a reflection
+ * Need for lazy initialization of dao classes in {@link com.epam.store.dao.JdbcDaoFactory}
+ */
+class DaoCreator {
     private Class<?> daoClazz;
 
     public DaoCreator(Class<?> daoClazz) {

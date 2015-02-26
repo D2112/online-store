@@ -7,20 +7,16 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-import javax.servlet.jsp.jstl.core.Config;
-import java.util.Locale;
 
 @WebListener
 public class SessionListener implements HttpSessionListener {
     private static final Logger log = LoggerFactory.getLogger(SessionListener.class);
+    public static final String CART_ATTRIBUTE_NAME = "cart";
 
     @Override
     public void sessionCreated(HttpSessionEvent httpSessionEvent) {
         log.debug("creating session with id: " + httpSessionEvent.getSession().getId());
-        httpSessionEvent.getSession().setAttribute("cart", new Cart());
-        httpSessionEvent.getSession().setAttribute("locale", Locale.ENGLISH);
-        //setting locale for jstl formatter
-        Config.set(httpSessionEvent.getSession(), Config.FMT_LOCALE, Locale.ENGLISH);
+        httpSessionEvent.getSession().setAttribute(CART_ATTRIBUTE_NAME, new Cart());
     }
 
     @Override

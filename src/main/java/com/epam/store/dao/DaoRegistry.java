@@ -7,6 +7,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Class which registry all classes marked
+ * {@link com.epam.store.dao.DaoClass} annotation
+ * and distributes them, if requested entity class which not registered
+ * when default universal realization {@link com.epam.store.dao.JdbcDao}
+ * will be given
+ */
 class DaoRegistry {
     private static final Class DEFAULT_DAO_IMPLEMENTATION_CLASS = JdbcDao.class;
     private Map<Class, DaoCreator> daoRegistry = new HashMap<>();

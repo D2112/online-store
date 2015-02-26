@@ -1,5 +1,6 @@
 package com.epam.store.action;
 
+import com.epam.store.listener.SessionListener;
 import com.epam.store.model.Cart;
 import com.epam.store.model.Product;
 import com.epam.store.service.ProductService;
@@ -14,7 +15,7 @@ public class AddToCartAction implements Action {
 
     @Override
     public ActionResult execute(WebContext webContext) {
-        Cart cart = (Cart) webContext.getAttribute("cart", Scope.SESSION);
+        Cart cart = (Cart) webContext.getAttribute(SessionListener.CART_ATTRIBUTE_NAME, Scope.SESSION);
         Long id = Long.valueOf(webContext.getParameter("id"));
         if (id != null) {
             ProductService service = webContext.getService(ProductService.class);

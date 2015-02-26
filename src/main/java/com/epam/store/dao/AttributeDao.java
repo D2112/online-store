@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @DaoClass(entityClasses = {Attribute.class, IntegerAttribute.class, StringAttribute.class, DecimalAttribute.class,})
-public class AttributeDao extends JdbcDao<Attribute> {
+class AttributeDao extends JdbcDao<Attribute> {
     private static final String VALUE_FIELD_NAME = "value";
 
     public AttributeDao(DaoSession daoSession, Class<Attribute> clazz, SqlQueryFactory queryFactory, DatabaseTable table) {
