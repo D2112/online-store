@@ -16,6 +16,11 @@
             <c:when test="${blackList != null}">
                 <page:blackListTable blackList="${blackList}"/>
             </c:when>
+            <c:otherwise>
+                <div class="center_text">
+                    <h2><fmt:message key="admin.message.chooseManagement"/></h2>
+                </div>
+            </c:otherwise>
         </c:choose>
     </jsp:body>
 </page:genericPage>

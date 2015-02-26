@@ -3,25 +3,29 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="page" tagdir="/WEB-INF/tags" %>
 
+<fmt:message key="creating-product.label.selectCategory" var="selectCategoryLabel"/>
+<fmt:message key="creating-product.label.name" var="nameLabel"/>
+<fmt:message key="creating-product.label.price" var="priceLabel"/>
+<fmt:message key="creating-product.label.description" var="descriptionLabel"/>
+
 <div class="creating_form">
-    <page:findAndDisplayMessage/>
+    <div align="center">
+        <page:findAndDisplayMessage/>
+        <page:displayErrors errors="${errors}"/>
+    </div>
     <form id="creatingProduct" action="<c:url value="creating-product/create"/>" method="POST"
           enctype="multipart/form-data">
-
-        <fmt:message key="creating-product.label.selectCategory" var="selectCategoryLabel"/>
-        <fmt:message key="creating-product.label.name" var="nameLabel"/>
-        <fmt:message key="creating-product.label.price" var="priceLabel"/>
-        <fmt:message key="creating-product.label.description" var="descriptionLabel"/>
         <fieldset>
             <legend><fmt:message key="admin.label.header"/></legend>
             <page:selectCategoriesMenu formName="creatingProduct" paramName="categoryName"
                                        label="${selectCategoryLabel}:"/>
             <page:inputTextField label="${nameLabel}:" inputName="productName" value="${productName}"
                                  formName="creatingProduct"/>
-            <page:inputTextField label="${priceLabel}:" inputName="price" value="${price}" formName="creatingProduct"/>
-            ₸
+            <page:inputTextField label="${priceLabel}:" inputName="price" value="${price}"
+                                 formName="creatingProduct"/>₸
+
             <page:inputTextArea label="${descriptionLabel}:" inputName="description" value="${description}"
-                                formName="creatingProduct"/>
+                                formName="creatingProduct" maxLength="1024"/>
             <br/>
             <label class="input_field"> <fmt:message key="creating-product.label.image"/>:
                 <input type="file" name="image"/>

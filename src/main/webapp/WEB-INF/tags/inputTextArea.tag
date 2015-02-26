@@ -3,9 +3,10 @@
 <%@ attribute name="inputName" %>
 <%@ attribute name="formName" required="false" %>
 <%@ attribute name="value" required="false" %>
+<%@ attribute name="maxLength" required="false" %>
 
 <div class="input_field">
     <label>${label}<br/>
-        <textarea form="${formName}" name="${inputName}" rows="3" cols="87">${value}</textarea>
+        <textarea form="${formName}" name="${inputName}" rows="3" cols="87" maxlength="${maxLength}">${value}</textarea>
     </label>
 </div>

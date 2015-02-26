@@ -58,12 +58,11 @@ public class SqlConnectionPool implements ConnectionPool {
      *
      * @throws PoolException if can't close one of the connections
      */
-
     public void shutdown() {
-        int closedCount = availableConnections.size() + usedConnections.size();
+        int closedCount;
         try {
-            closeConnections(availableConnections);
-            closeConnections(usedConnections);
+            closedCount = closeConnections(availableConnections);
+            closedCount += closeConnections(usedConnections);
         } catch (SQLException e) {
             String errorMessage = "Can't close connection pool";
             log.error(errorMessage, e);
@@ -124,11 +123,11 @@ public class SqlConnectionPool implements ConnectionPool {
 
     private int closeConnections(List<PooledConnection> connections) throws SQLException {
         int closed = 0;
-        availableConnections.removeAll(connections);
         for (PooledConnection pooledConnection : connections) {
             pooledConnection.getConnection().close();
             closed++;
         }
+        availableConnections.removeAll(connections);
         return closed;
     }
 
@@ -146,7 +145,7 @@ public class SqlConnectionPool implements ConnectionPool {
     }
 
     private void initializePoolWithMinimumConnections() {
-        for (int i = 0; i < config.minConnections(); i++) {
+        for (int i = 0; i < config.minAvailableConnections(); i++) {
             availableConnections.add(createConnection());
         }
     }

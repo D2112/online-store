@@ -81,9 +81,9 @@ public class DBMetadataManager {
     private Map<String, List<String>> getColumnsByTableNameMap(DatabaseMetaData databaseMetaData) {
         Map<String, List<String>> columnsByTableName = new HashMap<>();
         try {
-            ResultSet tables = databaseMetaData.getTables(null, "PUBLIC", null, null);
-            while (tables.next()) {
-                String tableName = tables.getString(3);
+            ResultSet tablesResultSet = databaseMetaData.getTables(null, "PUBLIC", null, null);
+            while (tablesResultSet.next()) {
+                String tableName = tablesResultSet.getString(3);
                 ResultSet columnsResultSet = databaseMetaData.getColumns(null, null, tableName, null);
                 List<String> columnsList = new ArrayList<>();
                 while (columnsResultSet.next()) {
@@ -91,7 +91,9 @@ public class DBMetadataManager {
                     columnsList.add(columnName);
                 }
                 columnsByTableName.put(tableName, columnsList);
+                columnsResultSet.close();
             }
+            tablesResultSet.close();
         } catch (SQLException e) {
             throw new MetadataException(e);
         }
@@ -107,6 +109,7 @@ public class DBMetadataManager {
                 boolean unique = !indexInfo.getBoolean("NON_UNIQUE");
                 if (unique) uniqueColumns.add(columnName);
             }
+            indexInfo.close();
         } catch (SQLException e) {
             throw new MetadataException(e);
         }

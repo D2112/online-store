@@ -67,11 +67,6 @@ public class ContextListener implements ServletContextListener {
         servletContext.setAttribute(CATEGORY_LIST_ATTRIBUTE_NAME, new CopyOnWriteArrayList<>(categoryService.getCategories()));
     }
 
-    @Override
-    public void contextDestroyed(ServletContextEvent arg) {
-        connectionPool.shutdown();
-    }
-
     private void initializeSettings() {
         try {
             Class.forName(SETTINGS_CLASS);
@@ -108,5 +103,10 @@ public class ContextListener implements ServletContextListener {
             }
         }
         return sb.toString();
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent arg) {
+        connectionPool.shutdown();
     }
 }

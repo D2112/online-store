@@ -35,8 +35,8 @@ public class UserService {
     }
 
     public void changeUserPassword(User user, String newPassword) {
-        Password password = PasswordEncryptor.encrypt(newPassword);
-        user.setPassword(password);
+        Password encryptedPassword = PasswordEncryptor.encrypt(newPassword.getBytes());
+        user.setPassword(encryptedPassword);
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<User> userDao = daoSession.getDao(User.class);
             userDao.update(user);
@@ -57,7 +57,7 @@ public class UserService {
             Dao<Role> roleDao = daoSession.getDao(Role.class);
             Role userRole = roleDao.findFirstByParameter(ROLE_NAME_COLUMN, Role.USER_ROLE_NAME);
             user.setRole(userRole);
-            user.setPassword(PasswordEncryptor.encrypt(password));
+            user.setPassword(PasswordEncryptor.encrypt(password.getBytes()));
             return userDao.insert(user);
         }
     }
@@ -72,7 +72,7 @@ public class UserService {
      */
     public User authenticateUser(String email, String password) {
         User foundUser = findUser(email);
-        if (foundUser != null && PasswordEncryptor.comparePassword(password, foundUser.getPassword())) {
+        if (foundUser != null && PasswordEncryptor.comparePassword(password.getBytes(), foundUser.getPassword())) {
             return foundUser;
         }
         return null;

@@ -39,11 +39,15 @@ public class ChangePasswordAction implements Action {
 
     private List<String> checkValidationErrors(String oldPassword, User user, String newPassword, String confirmNewPassword) {
         List<String> errors = new ArrayList<>();
-        if (!PasswordEncryptor.comparePassword(oldPassword, user.getPassword())) {
+        if (!PasswordEncryptor.comparePassword(oldPassword.getBytes(), user.getPassword())) {
             errors.add(messagesBundle.getString("change-password.error.wrongPassword"));
         }
         if (!newPassword.equals(confirmNewPassword)) {
-            errors.add(messagesBundle.getString("change-password.error.wrongPassword"));
+            errors.add(messagesBundle.getString("change-password.error.passwordsNotEqual"));
+            return errors;
+        }
+        if (oldPassword.equals(newPassword)) {
+            errors.add(messagesBundle.getString("change-password.error.theSamePassword"));
         }
         return errors;
     }

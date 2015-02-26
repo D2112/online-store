@@ -18,7 +18,7 @@ public class ShowOrderListAction implements Action {
         String userStringID = webContext.getFirstParameterFromPath();
         UserService userService = webContext.getService(UserService.class);
         PurchaseService purchaseService = webContext.getService(PurchaseService.class);
-        if (userStringID != null && RegexValidator.isIntegerNumber(userStringID)) {
+        if (userStringID != null && Validator.isIntegerNumber(userStringID)) {
             Long userID = Long.valueOf(userStringID);
             User user = userService.findUser(userID);
             List<Order> userOrderList = purchaseService.getUserOrderList(userID);

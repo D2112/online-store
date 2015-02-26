@@ -33,10 +33,10 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         messagesBundle = webContext.getMessagesBundle();
         ActionResult previousPage = new ActionResult(webContext.getPreviousURI(), true);
         getParametersFromRequest(webContext);
-        String validationErrorMessage = validateInputData();
-        if (validationErrorMessage != null) {
+        List<String> validationErrors = validateInputData();
+        if (validationErrors.size() > 0) {
             super.setAttributesToFlashScope(webContext); //for displaying on page if error
-            webContext.setAttribute("errorMessage", validationErrorMessage, Scope.FLASH);
+            webContext.setAttribute("errors", validationErrors, Scope.FLASH);
             return previousPage;
         }
         ProductService productService = webContext.getService(ProductService.class);
@@ -58,14 +58,28 @@ public class CreateProductAction extends AbstractCreatingProductAction {
      *
      * @return message with validation error or null if there is no validation errors
      */
-    private String validateInputData() {
-        if (isFieldsEmpty()) return messagesBundle.getString("creating-product.error.notFilled");
-        if (productImage == null) return messagesBundle.getString("creating-product.error.image");
-        if (hasAttributesDuplicateNames()) return messagesBundle.getString("creating-product.error.duplicate");
-        if (RegexValidator.notNumber(price)) return messagesBundle.getString("creating-product.error.price");
-        if (RegexValidator.isNumberTooLarge(price))
-            return messagesBundle.getString("creating-product.error.largeNumber");
-        return null;
+    private List<String> validateInputData() {
+        List<String> errors = new ArrayList<>();
+        if (isFieldsEmpty()) {
+            errors.add(messagesBundle.getString("creating-product.error.notFilled"));
+            return errors; //return to prevent errors when trying validate empty fields
+        }
+        if (Validator.isDescriptionTooBig(description)) {
+            errors.add(messagesBundle.getString("creating-product.error.descriptionTooBig"));
+        }
+        if (productImage == null) {
+            errors.add(messagesBundle.getString("creating-product.error.image"));
+        }
+        if (hasAttributesDuplicateNames()) {
+            errors.add(messagesBundle.getString("creating-product.error.duplicate"));
+        }
+        if (Validator.notNumber(price)) {
+            errors.add(messagesBundle.getString("creating-product.error.price"));
+        }
+        if (Validator.isNumberTooLarge(price)) {
+            errors.add(messagesBundle.getString("creating-product.error.largeNumber"));
+        }
+        return errors;
     }
 
 
@@ -76,10 +90,10 @@ public class CreateProductAction extends AbstractCreatingProductAction {
             Attribute attribute = null;
             String name = attributeNames.get(i);
             String value = attributeValues.get(i);
-            if (RegexValidator.isIntegerNumber(value)) {
+            if (Validator.isIntegerNumber(value)) {
                 attribute = new IntegerAttribute(name, Integer.valueOf(value));
             }
-            if (RegexValidator.isDecimalNumber(value)) {
+            if (Validator.isDecimalNumber(value)) {
                 attribute = new DecimalAttribute(name, parseStringToBigDecimal(value));
             }
             if (attribute == null) {
@@ -129,7 +143,6 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         String imageName = part.getSubmittedFileName();
         String contentType = part.getContentType();
         byte[] imageBytes;
-
         try (InputStream content = part.getInputStream();
              ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             if (content.available() == 0) return null; //if nothing to read it means image bytes is empty

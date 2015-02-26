@@ -38,6 +38,7 @@ public class PurchaseService {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
             Dao<Purchase> purchaseDao = daoSession.getDao(Purchase.class);
             Dao<Status> statusDao = daoSession.getDao(Status.class);
+            daoSession.beginTransaction();
             for (Map.Entry<Long, String> longStringEntry : purchaseStatusByID.entrySet()) {
                 Long purchaseID = longStringEntry.getKey();
                 String purchaseNewStatus = longStringEntry.getValue();
@@ -58,6 +59,7 @@ public class PurchaseService {
                         purchaseDao.updateWithAdditionalParameter(purchase, USER_ID_COLUMN, userID);
                 }
             }
+            daoSession.endTransaction();
         }
     }
 
@@ -70,6 +72,7 @@ public class PurchaseService {
 
     public void addPurchaseListToUser(Long userID, List<Purchase> purchaseList) {
         try (DaoSession daoSession = daoFactory.getDaoSession()) {
+            daoSession.beginTransaction();
             for (Purchase purchase : purchaseList) {
                 Dao<Purchase> purchaseDao = daoSession.getDao(Purchase.class);
                 Dao<Date> dateDao = daoSession.getDao(Date.class);
@@ -82,6 +85,7 @@ public class PurchaseService {
                 if (existStatus != null) purchase.getStatus().setId(existStatus.getId());
                 purchaseDao.insertWithAdditionalParameter(purchase, USER_ID_COLUMN, userID);
             }
+            daoSession.endTransaction();
         }
     }
 

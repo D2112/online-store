@@ -42,10 +42,10 @@ public class RegistrationAction implements Action {
     private List<String> checkValidationErrors(String name, String email, String password, String passwordConfirm,
                                                UserService userService) {
         List<String> errors = new ArrayList<>();
-        if (!RegexValidator.isEmailValid(email)) {
+        if (!Validator.isEmailValid(email)) {
             errors.add(messagesBundle.getString("registration.error.email"));
         }
-        if (!RegexValidator.isNameValid(name)) {
+        if (!Validator.isNameValid(name)) {
             errors.add(messagesBundle.getString("registration.error.name"));
         }
         if (!password.equals(passwordConfirm)) {
