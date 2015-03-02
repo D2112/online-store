@@ -15,21 +15,22 @@ import java.util.Set;
  * will be given
  */
 class DaoRegistry {
-    private static final Class DEFAULT_DAO_IMPLEMENTATION_CLASS = JdbcDao.class;
+    private static final Class<JdbcDao> DEFAULT_DAO_IMPLEMENTATION_CLASS = JdbcDao.class;
     private Map<Class, DaoCreator> daoRegistry = new HashMap<>();
 
+    @SuppressWarnings("unchecked")
     public DaoRegistry() {
         Set<Class<?>> annotatedClasses = AnnotationManager.getAnnotatedClasses("com.epam.store.dao", DaoClass.class);
         for (Class<?> annotatedClass : annotatedClasses) {
-            if (!Dao.class.isAssignableFrom(annotatedClass)) {
-                throw new DaoException(
-                        DaoClass.class.getSimpleName()
-                                + " annotation used with class which is not implement interface " + Dao.class.getSimpleName());
+            if (!JdbcDao.class.isAssignableFrom(annotatedClass)) {
+                throw new DaoException(DaoClass.class.getName()
+                        + " annotation used with class which is not extends " + JdbcDao.class.getName());
             }
-            DaoClass annotation = annotatedClass.getAnnotation(DaoClass.class);
+            Class<? extends JdbcDao> annotatedDaoClass = (Class<? extends JdbcDao>) annotatedClass;
+            DaoClass annotation = annotatedDaoClass.getAnnotation(DaoClass.class);
             Class[] entityClasses = annotation.entityClasses();
             for (Class entityClass : entityClasses) {
-                daoRegistry.put(entityClass, new DaoCreator(annotatedClass));
+                daoRegistry.put(entityClass, new DaoCreator(annotatedDaoClass));
             }
         }
     }
