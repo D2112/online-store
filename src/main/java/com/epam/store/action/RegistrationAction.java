@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -14,6 +15,7 @@ import java.util.ResourceBundle;
 @WebAction(path = "POST/registration")
 public class RegistrationAction implements Action {
     private static final Logger log = LoggerFactory.getLogger(RegistrationAction.class);
+    private static final String EMPTY_STRING = "";
     private ActionResult errorResult = new ActionResult("registration", true);
     private ActionResult successResult = new ActionResult("register-success", true);
     private ResourceBundle messagesBundle;
@@ -42,6 +44,10 @@ public class RegistrationAction implements Action {
     private List<String> checkValidationErrors(String name, String email, String password, String passwordConfirm,
                                                UserService userService) {
         List<String> errors = new ArrayList<>();
+        if (Arrays.asList(name, email, password, passwordConfirm).contains(EMPTY_STRING)) {
+            errors.add(messagesBundle.getString("registration.error.empty"));
+            return errors; //return now to avoid validation error
+        }
         if (!Validator.isEmailValid(email)) {
             errors.add(messagesBundle.getString("registration.error.email"));
         }

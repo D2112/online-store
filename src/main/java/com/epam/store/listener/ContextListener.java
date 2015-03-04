@@ -91,6 +91,7 @@ public class ContextListener implements ServletContextListener {
         String scriptQuery = readScriptQuery();
         Statement statement = connection.createStatement();
         statement.execute(scriptQuery);
+        statement.close();
     }
 
     private String readScriptQuery() throws IOException {

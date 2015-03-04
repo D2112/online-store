@@ -5,7 +5,7 @@
 <div id="header">
     <div class="language">
         <fmt:message key="main.label.languages"/>:
-        <a href="<c:url value="/changeLang?lang=en"/>"><img src="/image/21"/></a>
-        <a href="<c:url value="/changeLang?lang=ru"/>"><img src="/image/22"/></a>
+        <a href="<c:url value="/changeLang?lang=en"/>"><img src="<c:url value="/static/img/en.gif"/>"/></a>
+        <a href="<c:url value="/changeLang?lang=ru"/>"><img src="<c:url value="/static/img/rus.jpg"/>"/></a>
     </div>
 </div>

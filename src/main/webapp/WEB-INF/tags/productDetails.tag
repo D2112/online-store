@@ -4,7 +4,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ attribute name="product" type="com.epam.store.model.Product" %>
 
-<link rel="stylesheet" type="text/css" href="<c:url value="/static/css/style.css"/>"/>
 <div class="center_content">
     <div class="center_title_bar">${product.name}</div>
     <div class="prod_box_big">

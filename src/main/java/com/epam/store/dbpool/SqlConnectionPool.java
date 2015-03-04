@@ -35,9 +35,9 @@ public class SqlConnectionPool implements ConnectionPool {
         PooledConnection availableConnection = null;
         try {
             lock.lockInterruptibly();
-            while (noAvailableConnections()) {
-                log.info("Limit of connections has been reached");
-                hasAvailableConnection.await();
+            while (noAvailableConnections() && isConnectionLimit()) {
+                //log.info("Limit of connections has been reached");
+                hasAvailableConnection.await(); //wait until other thread release the connection
             }
             try {
                 availableConnection = getAvailableConnection();
@@ -87,10 +87,12 @@ public class SqlConnectionPool implements ConnectionPool {
      * @throws PoolException if all available connections is dead
      */
     private PooledConnection getAvailableConnection() {
-        if (availableConnections.size() == 0 && config.minAvailableConnections() > 0) {
+        if (noAvailableConnections() && config.minAvailableConnections() > 0) {
             initializePoolWithMinimumConnections();
+            log.info("Connection pool initialized again with " + availableConnections.size() + " connections");
             return availableConnections.iterator().next();
         }
+        //iterate available connections and find alive one
         Iterator<PooledConnection> iterator = availableConnections.iterator();
         while (iterator.hasNext()) {
             PooledConnection availableConnection = iterator.next();
@@ -101,11 +103,15 @@ public class SqlConnectionPool implements ConnectionPool {
                 iterator.remove();//remove dead connection
             }
         }
-        return createConnection(); //if can't then throws exception because database is down
+        return createConnection(); //if can't create connection then throws exception because database is down
     }
 
     private boolean noAvailableConnections() {
-        return (availableConnections.size() == 0) && (config.maxConnections() == usedConnections.size());
+        return (availableConnections.size() == 0);
+    }
+
+    private boolean isConnectionLimit() {
+        return (usedConnections.size() == config.maxConnections());
     }
 
     private void releaseConnection(PooledConnection connection) {
@@ -205,6 +211,14 @@ public class SqlConnectionPool implements ConnectionPool {
 
         @Override
         public void close() {
+            try {
+                connection.rollback();
+                if (!connection.getAutoCommit()) {
+                    connection.setAutoCommit(true);
+                }
+            } catch (SQLException e) {
+                throw new PoolException(e);
+            }
             releaseConnection(this);
         }
 
@@ -265,15 +279,17 @@ public class SqlConnectionPool implements ConnectionPool {
 
         @Override
         public void run() {
-            if (availableConnections.size() == config.minAvailableConnections()) return;
+            if (availableConnections.size() <= config.minAvailableConnections()) return;
             lock.lock();
             log.debug("Starting collect connections");
             try {
-                int closedTimeoutConnections = closeAllButTheMinimum(getTimeoutConnections());
-                int closedRedundantConnections = closeConnections(getRedundantConnections());
-                log.debug(closedTimeoutConnections + " timeout connections has been closed");
-                log.debug(closedRedundantConnections + " redundant connections has been closed");
+                List<PooledConnection> connectionsToClose = getConnectionsToClose();
+                int closedConnections = closeConnections(connectionsToClose);
+                log.debug(closedConnections + " connections has been closed");
                 log.debug("current connections amount " + (availableConnections.size() + usedConnections.size()));
+                if (availableConnections.size() < config.minAvailableConnections()) {
+                    throw new PoolException("Amount of closed connections exceeds minimum");
+                }
             } catch (SQLException e) {
                 String errorMessage = "Error on close connection: " + e.getMessage();
                 log.error(errorMessage, e);
@@ -281,6 +297,25 @@ public class SqlConnectionPool implements ConnectionPool {
             } finally {
                 lock.unlock();
             }
+        }
+
+        private List<PooledConnection> getConnectionsToClose() {
+            List<PooledConnection> timeoutConnections = getTimeoutConnections();
+            int remains = availableConnections.size() - timeoutConnections.size();
+            //if after closing connection remains less than config minimum connection,
+            //than remove some connections from timeout connections list
+            while (remains < config.minAvailableConnections() && timeoutConnections.size() > 0) {
+                timeoutConnections.remove(timeoutConnections.size() - 1); //remove last connection
+                remains = availableConnections.size() - timeoutConnections.size();
+            }
+            log.debug("Preparing to close " + timeoutConnections.size() + " timeout connections");
+            if (remains == config.minAvailableConnections()) return timeoutConnections;
+            List<PooledConnection> connectionsToClose = new ArrayList<>();
+            List<PooledConnection> redundantConnections = getRedundantConnections();
+            connectionsToClose.addAll(timeoutConnections);
+            connectionsToClose.addAll(redundantConnections);
+            log.debug("Preparing to close " + redundantConnections.size() + " redundant connections");
+            return connectionsToClose;
         }
 
         private List<PooledConnection> getTimeoutConnections() {
@@ -299,21 +334,10 @@ public class SqlConnectionPool implements ConnectionPool {
         private List<PooledConnection> getRedundantConnections() {
             List<PooledConnection> redundantConnections = new ArrayList<>();
             int redundantAmount = availableConnections.size() - config.maxAvailableConnections();
-            if (redundantAmount > 0) {
-                //get first n connections from available list
-                redundantConnections.addAll(availableConnections.subList(0, redundantAmount));
+            for (int i = 0; i < redundantAmount; i++) {
+                redundantConnections.add(availableConnections.get(i));
             }
             return redundantConnections;
-        }
-
-        private int closeAllButTheMinimum(List<PooledConnection> connectionsToClose) throws SQLException {
-            int remains = availableConnections.size() - connectionsToClose.size();
-            int minimum = config.minAvailableConnections();
-            if ((remains < minimum) && (connectionsToClose.size() > minimum)) {
-                //removing the minimum amount from the list
-                connectionsToClose = new ArrayList<>(connectionsToClose.subList(minimum, connectionsToClose.size()));
-            }
-            return closeConnections(connectionsToClose);
         }
     }
 }

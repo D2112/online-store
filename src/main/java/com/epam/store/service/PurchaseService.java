@@ -93,11 +93,11 @@ public class PurchaseService {
         List<Order> orderList = new ArrayList<>();
         Set<Date> dates = getUniqueDatesFromPurchaseList(purchaseList);
         for (Date date : dates) {
-            List<Purchase> orderPurchaseList = purchaseList.stream()
+            List<Purchase> purchaseListWithTheSameDate = purchaseList.stream()
                     .filter(purchase -> purchase.getDate().equals(date)) //get all purchases with the same date
                     .collect(Collectors.toList());
-            sortPurchaseListByStatus(orderPurchaseList);
-            orderList.add(new Order(orderPurchaseList, date)); //form with them order
+            sortPurchaseListByStatus(purchaseListWithTheSameDate);
+            orderList.add(new Order(purchaseListWithTheSameDate, date)); //form with them order
         }
         orderList.sort(Order::compareTo);
         return orderList;

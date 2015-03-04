@@ -86,7 +86,7 @@ class ConnectionPoolConfig {
         @DefaultValue("100")
         public int maxConnections();
 
-        @DefaultValue("10")
+        @DefaultValue("5")
         public int minAvailableConnections();
 
         @DefaultValue("50")

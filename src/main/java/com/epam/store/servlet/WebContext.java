@@ -244,8 +244,11 @@ public class WebContext {
     }
 
     public ResourceBundle getMessagesBundle() {
-        Locale currentLocale = (Locale) req.getSession().getAttribute("locale");
-        return ResourceBundle.getBundle(MESSAGES_BUNDLE_BASENAME, currentLocale);
+        return ResourceBundle.getBundle(MESSAGES_BUNDLE_BASENAME, getCurrentLocale());
+    }
+
+    public Locale getCurrentLocale() {
+        return (Locale) req.getSession().getAttribute("locale");
     }
 
     public void setJstlFormatterLocale(Locale locale) {

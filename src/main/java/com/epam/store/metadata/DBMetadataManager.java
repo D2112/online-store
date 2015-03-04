@@ -78,6 +78,13 @@ public class DBMetadataManager {
         return columnsList;
     }
 
+    /**
+     * Gets all table and columns name from database,
+     * transforms table names to uppercase before add to map
+     *
+     * @param databaseMetaData The sql database metadata
+     * @return Map with key as a table name string and value as a list of columns of this table
+     */
     private Map<String, List<String>> getColumnsByTableNameMap(DatabaseMetaData databaseMetaData) {
         Map<String, List<String>> columnsByTableName = new HashMap<>();
         try {
@@ -90,7 +97,7 @@ public class DBMetadataManager {
                     String columnName = columnsResultSet.getString("COLUMN_NAME");
                     columnsList.add(columnName);
                 }
-                columnsByTableName.put(tableName, columnsList);
+                columnsByTableName.put(tableName.toUpperCase(), columnsList);
                 columnsResultSet.close();
             }
             tablesResultSet.close();

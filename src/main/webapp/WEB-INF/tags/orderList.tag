@@ -13,9 +13,9 @@
             </tr>
             <c:forEach items="${order.purchaseList}" var="purchase">
                 <tr>
-                    <td>${purchase.product.name}</td>
+                    <td width="550">${purchase.product.name}</td>
                     <td><page:price value="${purchase.price.value}"/></td>
-                    <td>${purchase.status.name}</td>
+                    <td><fmt:message key="status.${purchase.status.name}"/></td>
                 </tr>
             </c:forEach>
         </c:forEach>

@@ -26,19 +26,14 @@
                 </tr>
                 <c:forEach items="${order.purchaseList}" var="purchase">
                     <tr>
-                        <td>${purchase.product.name}</td>
+                        <td width="550">${purchase.product.name}</td>
                         <td><page:price value="${purchase.price.value}"/></td>
                         <td>
                             <input form="changingStatusForm${orderLoopStatus.count}" type="hidden"
                                    value="${purchase.id}"
                                    name="purchaseID"/>
-                            <select form="changingStatusForm${orderLoopStatus.count}" name="purchaseStatus">
-                                <option value="Delivery">Delivery</option>
-                                <option value="Canceled">Canceled</option>
-                                <option value="Paid">Paid</option>
-                                <option value="Unpaid">Unpaid</option>
-                                <option selected>${purchase.status.name}</option>
-                            </select>
+                            <page:selectStatusMenu formName="changingStatusForm${orderLoopStatus.count}"
+                                                   defaultValue="${purchase.status.name}"/>
                         </td>
                     </tr>
                 </c:forEach>

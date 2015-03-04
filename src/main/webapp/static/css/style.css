@@ -1,5 +1,5 @@
 body {
-    background: url(/image/2) repeat-x #e4e9ec top;
+    background: url(/static/img/background.jpg) repeat-x #e4e9ec top;
     padding: 0;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 11px;
@@ -22,7 +22,7 @@ p {
 #header {
     width: 1000px;
     height: 136px;
-    background: url(/image/3) no-repeat 0 0;
+    background: url(/static/img/header.jpg) no-repeat 0 0;
     position: relative;
     margin: auto;
 }
@@ -60,7 +60,6 @@ ul.menu {
     width: 982px;
     margin: 0;
     padding: 0;
-    background: url(/image/4) repeat-x;
 }
 
 ul.menu li {
@@ -75,7 +74,7 @@ ul.menu li.divider {
     width: 4px;
     height: 36px;
     float: left;
-    background: url(/image/5) no-repeat center;
+    background: url(/static/img/menu_divider.gif) no-repeat center;
 }
 
 a.nav:link, a.nav:visited {
@@ -201,7 +200,7 @@ a.nav:hover {
     width: 180px;
     height: 30px;
     margin: 5px 0 0 0;
-    background: url(/image/6) no-repeat center;
+    background: url(/static/img/menu_title_bg.gif) no-repeat center;
     text-align: center;
     font-size: 13px;
     font-weight: bold;
@@ -298,7 +297,7 @@ ul.list_menu li.even a:hover, ul.list_menu li.odd a:hover {
     font-size: 12px;
     color: #159DCC;
     font-weight: bold;
-    background: url(/image/7) no-repeat center;
+    background: url(/static/img/bar_bg.gif) no-repeat center;
 }
 
 /*----------------------right content--------------*/
@@ -343,8 +342,8 @@ span.border_cart {
 }
 
 .center_prod_box {
-    width: 173px;
-    height: auto;
+    width: 175px;
+    height: 170px;
     float: left;
     text-align: center;
     padding: 0px;
@@ -364,7 +363,7 @@ span.border_cart {
     height: 24px;
     display: block;
     float: right;
-    background: url(/image/8) no-repeat center;
+    background: url(/static/img/link_bg.gif) no-repeat center;
     margin: 2px 5px 0 0;
     text-align: center;
     line-height: 24px;
@@ -378,7 +377,7 @@ span.border_cart {
     height: 24px;
     display: block;
     float: left;
-    background: url(/image/8) no-repeat center;
+    background: url(/static/img/link_bg.gif) no-repeat center;
     margin: 2px 0 0 5px;
     text-align: center;
     line-height: 24px;
@@ -440,7 +439,7 @@ span.blue {
     width: 1000px;
     clear: both;
     height: 65px;
-    background: url(/image/9) repeat-x top;
+    background: url(/static/img/footer_bg.gif) repeat-x top;
 }
 
 /*--------------button------------------*/

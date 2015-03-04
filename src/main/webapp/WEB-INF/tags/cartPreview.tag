@@ -14,7 +14,7 @@
     </div>
     <div class="cart_icon">
         <a href="<c:url value="/cart"/>">
-            <img src="/image/10" alt="" width="35" height="35" border="0"/>
+            <img src="<c:url value="/static/img/shoppingcart.png"/>" alt="" width="35" height="35" border="0"/>
         </a>
     </div>
 </div>

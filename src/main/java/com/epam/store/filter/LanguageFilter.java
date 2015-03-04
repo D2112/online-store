@@ -15,6 +15,7 @@ import java.util.Locale;
 public class LanguageFilter implements Filter {
     private static final Logger log = LoggerFactory.getLogger(LanguageFilter.class);
     private static final String RU_LANGUAGE = "ru";
+    private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -33,7 +34,10 @@ public class LanguageFilter implements Filter {
                 }
                 webContext.setLocale(localeFromCookie);
             }
+        } else if (webContext.getCurrentLocale() == null) {
+            webContext.setLocale(DEFAULT_LOCALE);
         }
+
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
