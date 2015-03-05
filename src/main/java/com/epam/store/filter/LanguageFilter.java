@@ -19,7 +19,6 @@ public class LanguageFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        log.debug("LANGUAGE FILTER");
         WebContext webContext = new WebContext(servletRequest, servletResponse);
         HttpSession session = webContext.getSession();
         if (session.isNew()) {
@@ -32,12 +31,13 @@ public class LanguageFilter implements Filter {
                 } else {
                     localeFromCookie = new Locale(value);
                 }
+                log.debug("Setting locale: " + localeFromCookie);
                 webContext.setLocale(localeFromCookie);
             }
         } else if (webContext.getCurrentLocale() == null) {
+            log.debug("Setting default locale: " + DEFAULT_LOCALE);
             webContext.setLocale(DEFAULT_LOCALE);
         }
-
         filterChain.doFilter(servletRequest, servletResponse);
     }
 

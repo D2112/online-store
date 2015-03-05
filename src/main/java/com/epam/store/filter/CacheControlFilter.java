@@ -20,7 +20,6 @@ public class CacheControlFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletResponse resp = (HttpServletResponse) servletResponse;
         HttpServletRequest req = (HttpServletRequest) servletRequest;
-        log.debug("CACHE FILTER");
         WebContext webContext = new WebContext(servletRequest, servletResponse);
         String path = webContext.getURI();
 
@@ -29,6 +28,7 @@ public class CacheControlFilter implements Filter {
             resp.setHeader("Cache-Control", "max-age=" + MAX_AGE);
         } else {
             //otherwise disable caching
+            log.debug("disable caching for " + path);
             resp.setHeader("Cache-Control", "private, no-cache, no-store, must-revalidate"); // HTTP 1.1.
             resp.setHeader("Pragma", "no-cache"); // HTTP 1.0.
             resp.setDateHeader("Expires", 0); // Proxies.

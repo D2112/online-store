@@ -15,7 +15,6 @@ public class ResourceFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
-        log.debug("resource filter");
         WebContext webContext = new WebContext(servletRequest, servletResponse);
         String path = webContext.getURI();
         if (path.startsWith("/static/")) {
