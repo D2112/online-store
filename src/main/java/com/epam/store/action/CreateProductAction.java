@@ -19,7 +19,6 @@ import java.util.*;
 public class CreateProductAction extends AbstractCreatingProductAction {
     private static final String EMPTY_STRING = "";
     private static final String CATEGORIES_LIST_NAME = "categories";
-    private static final long MAX_IMAGE_SIZE = 2097152;
     private ResourceBundle messagesBundle;
     private String categoryName;
     private String productName;
@@ -79,9 +78,6 @@ public class CreateProductAction extends AbstractCreatingProductAction {
         }
         if (Validator.isNumberTooLarge(price)) {
             errors.add(messagesBundle.getString("creating-product.error.largeNumber"));
-        }
-        if (productImage.getContent().length > MAX_IMAGE_SIZE) {
-            errors.add(messagesBundle.getString("creating-product.error.largeImage"));
         }
         return errors;
     }
