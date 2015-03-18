@@ -11,7 +11,6 @@ import javax.servlet.http.*;
 import javax.servlet.jsp.jstl.core.Config;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -147,7 +146,7 @@ public class WebContext {
             case FLASH:
                 if (isSessionExist()) {
                     Enumeration<String> attributeEnumeration = req.getSession().getAttributeNames();
-                    attributeNames = getAttributeNamesForFlashScope(attributeEnumeration);
+                    attributeNames = getAttributeNamesWithFlashPrefix(attributeEnumeration);
                 }
                 break;
         }
@@ -326,18 +325,23 @@ public class WebContext {
     }
 
     /**
-     * Remove all names without flash prefix from the list,
-     * and then remove flash prefix of the remaining names
+     * Gets attribute names with flash-prefix from the enumeration
+     * and then clean them from the prefix and collect to list
      *
+     * @param enumeration the enumeration of the attribute names
      * @return List of flash attribute names without flash prefix
      */
-    private List<String> getAttributeNamesForFlashScope(Enumeration<String> enumeration) {
-        List<String> attributeNames = new CopyOnWriteArrayList<>(getListFromEnumeration(enumeration));
-        for (String attributeName : attributeNames) {
+    private List<String> getAttributeNamesWithFlashPrefix(Enumeration<String> enumeration) {
+        List<String> attributeNames = new ArrayList<>(getListFromEnumeration(enumeration));
+        //get names with flash-prefix
+        Iterator<String> iterator = attributeNames.iterator();
+        while (iterator.hasNext()) {
+            String attributeName = iterator.next();
             if (!attributeName.startsWith(FLASH_ATTRIBUTE_PREFIX)) {
-                attributeNames.remove(attributeName);
+                iterator.remove();
             }
         }
+        //remove flash-prefix from all names
         attributeNames.replaceAll(s -> s.substring(FLASH_ATTRIBUTE_PREFIX.length()));
         return attributeNames;
     }
