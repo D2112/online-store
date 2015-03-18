@@ -19,4 +19,6 @@ public interface SqlPooledConnection extends AutoCloseable {
     public void commit() throws SQLException;
 
     public void rollBack() throws SQLException;
+
+    public boolean isValid();
 }

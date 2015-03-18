@@ -10,6 +10,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Disables cache for all requests except those,
+ * which path begins with "image". Set header max-age
+ * to value current time + {@link com.epam.store.filter.CacheControlFilter#MAX_AGE}
+ */
 @WebFilter(filterName = "CacheControlFilter", dispatcherTypes = DispatcherType.REQUEST)
 public class CacheControlFilter implements Filter {
     private static final Logger log = LoggerFactory.getLogger(CacheControlFilter.class);

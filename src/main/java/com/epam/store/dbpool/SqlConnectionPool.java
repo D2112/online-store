@@ -34,7 +34,8 @@ public class SqlConnectionPool implements ConnectionPool {
     public SqlPooledConnection getConnection() {
         PooledConnection availableConnection = null;
         try {
-            lock.lockInterruptibly();
+            lock.lock();
+            log.debug("Current amount of connections: " + (availableConnections.size() + usedConnections.size()));
             while (noAvailableConnections() && isConnectionLimit()) {
                 //log.info("Limit of connections has been reached");
                 hasAvailableConnection.await(); //wait until other thread release the connection
@@ -69,7 +70,7 @@ public class SqlConnectionPool implements ConnectionPool {
             throw new PoolException(errorMessage, e);
         }
         connectionCollector.stop();
-        log.info("The connection pool closed successfully. {} connections have been closed", closedCount);
+        log.info("The connection pool closed successfully. {} connections has been closed", closedCount);
     }
 
     /**
@@ -87,7 +88,7 @@ public class SqlConnectionPool implements ConnectionPool {
      * @throws PoolException if all available connections is dead
      */
     private PooledConnection getAvailableConnection() {
-        if (noAvailableConnections() && config.minAvailableConnections() > 0) {
+        if (noAvailableConnections() && noUsedConnections() && config.minAvailableConnections() > 0) {
             initializePoolWithMinimumConnections();
             log.info("Connection pool initialized again with " + availableConnections.size() + " connections");
             return availableConnections.iterator().next();
@@ -97,7 +98,7 @@ public class SqlConnectionPool implements ConnectionPool {
         while (iterator.hasNext()) {
             PooledConnection availableConnection = iterator.next();
             //check for the case if database is down
-            if (availableConnection.isAlive()) {
+            if (availableConnection.isValid()) {
                 return availableConnection;
             } else {
                 iterator.remove();//remove dead connection
@@ -112,6 +113,10 @@ public class SqlConnectionPool implements ConnectionPool {
 
     private boolean isConnectionLimit() {
         return (usedConnections.size() == config.maxConnections());
+    }
+
+    private boolean noUsedConnections() {
+        return (usedConnections.size() == 0);
     }
 
     private void releaseConnection(PooledConnection connection) {
@@ -236,6 +241,15 @@ public class SqlConnectionPool implements ConnectionPool {
             connection.rollback();
         }
 
+        public boolean isValid() {
+            try {
+                return connection.isValid(config.getConnectionValidTimeout());
+            } catch (SQLException e) {
+                log.error("connection valid check has failed", e);
+                return false;
+            }
+        }
+
         private Connection getConnection() {
             return connection;
         }
@@ -246,15 +260,6 @@ public class SqlConnectionPool implements ConnectionPool {
 
         private long getLastAccessTimeStamp() {
             return lastAccessTimeStamp;
-        }
-
-        private boolean isAlive() {
-            try {
-                return connection.isValid(config.getConnectionValidTimeout());
-            } catch (SQLException e) {
-                log.error("connection alive check has failed", e);
-                return false;
-            }
         }
     }
 
